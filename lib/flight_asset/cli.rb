@@ -24,3 +24,18 @@
 # For more information on Flight Asset, please visit:
 # https://github.com/alces-flight/alces-flight/flight-asset-cli
 #==============================================================================
+
+require 'commander'
+
+require_relative 'version'
+
+module FlightAsset
+  module CLI
+    extend Commander::CLI
+
+    program :name, 'flight-asset'
+    program :version, "v#{FlightAsset::VERSION}"
+    program :description, 'Manage Alces Flight Center Assets'
+    program :help_paging, false
+  end
+end
