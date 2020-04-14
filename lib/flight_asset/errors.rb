@@ -25,38 +25,25 @@
 # https://github.com/alces-flight/alces-flight/flight-asset-cli
 #==============================================================================
 
-require 'commander'
-
-require_relative 'version'
-
 module FlightAsset
-  module CLI
-    extend Commander::CLI
-
-    program :name, 'flight-asset'
-    program :version, "v#{FlightAsset::VERSION}"
-    program :description, 'Manage Alces Flight Center Assets'
-    program :help_paging, false
-
-    def self.create_command(name, args_str = '')
-      command(name) do |c|
-        c.syntax = "#{program :name} #{name} #{args_str}"
-        c.hidden = true if args_str.split.length > 1
-        c.action do |args, opts|
-          require_relative '../flight_asset'
-          cmd = Commands.build(name, *args, **opts.__hash__)
-          cmd.run
-          if $stdout.tty?
-            cmd.print_pretty
-          else
-            cmd.print_machine
-          end
-        end
-        yield c if block_given?
+  class Error < RuntimeError
+    def self.define_class(code)
+      Class.new(self).tap do |klass|
+        klass.instance_variable_set(:@exit_code, code)
       end
     end
 
-    create_command 'list' do |c|
+    def self.exit_code
+      @exit_code || begin
+        parent.respond_to?(:exit_code) ? parent.exit_code : 2
+      end
+    end
+
+    def exit_code
+      self.class.exit_code
     end
   end
+
+  InternalError = Error.define_class(1)
+  GeneralError = Error.define_class(2)
 end
