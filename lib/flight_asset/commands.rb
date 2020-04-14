@@ -25,38 +25,17 @@
 # https://github.com/alces-flight/alces-flight/flight-asset-cli
 #==============================================================================
 
-require 'commander'
-
-require_relative 'version'
-
 module FlightAsset
-  module CLI
-    extend Commander::CLI
-
-    program :name, 'flight-asset'
-    program :version, "v#{FlightAsset::VERSION}"
-    program :description, 'Manage Alces Flight Center Assets'
-    program :help_paging, false
-
-    def self.create_command(name, args_str = '')
-      command(name) do |c|
-        c.syntax = "#{program :name} #{name} #{args_str}"
-        c.hidden = true if args_str.split.length > 1
-        c.action do |args, opts|
-          require_relative '../flight_asset'
-          cmd = Commands.build(name, *args, **opts.__hash__)
-          cmd.run
-          if $stdout.tty?
-            cmd.print_pretty
-          else
-            cmd.print_machine
-          end
-        end
-        yield c if block_given?
+  module Commands
+    class << self
+      def build(s, *args, **opts)
+        name = s.to_s.dup.split('-').map { |c| c[0] = c[0].upcase; c }.join
+        klass = self.const_get(name)
+        klass.new(*args, **opts)
+      rescue NameError
+        raise InternalError, 'Command Not Found!'
       end
-    end
-
-    create_command 'list' do |c|
     end
   end
 end
+
