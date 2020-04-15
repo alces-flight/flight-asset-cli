@@ -28,11 +28,14 @@
 require 'yaml'
 require 'hashie'
 require 'simple_jsonapi_client'
-
-require_relative 'flight_asset/records'
+require 'faraday'
+require 'faraday_middleware'
 
 require_relative 'flight_asset/errors'
 require_relative 'flight_asset/config'
+
+require_relative 'flight_asset/records'
+
 require_relative 'flight_asset/command'
 require_relative 'flight_asset/commands'
 
