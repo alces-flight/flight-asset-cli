@@ -28,11 +28,29 @@
 module FlightAsset
   module Commands
     class List < FlightAsset::Command
+      attr_reader :assets_records
+
       def run
+        @assets_records ||= AssetsRecord.fetch_all_in_component(
+          component_id: Config::CACHE.component_id, connection: connection
+        )
+      end
+
+      def table_procs
+        [
+          ['Name', ->(a) { a.name }],
+          ['Support Type', ->(a) { a.support_type }],
+          ['Decommissioned', ->(a) { a.decommissioned }]
+        ]
+      end
+
+      def print_pretty
+        puts parse_header_table(assets_records, table_procs).render(:ascii)
       end
 
       def print_machine
-        puts 'hello world'
+        procs = table_procs.map { |p| p[1] }
+        puts parse_table(assets_records, procs).render(:basic)
       end
     end
   end

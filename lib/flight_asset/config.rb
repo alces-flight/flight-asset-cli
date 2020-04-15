@@ -30,6 +30,7 @@ module FlightAsset
   class Config < Hashie::Dash
     property :base_url, default: 'https://example.com/api/v1'
     property :jwt, default: ''
+    property :component_id, required: true
 
     # Define Constants Last
     Config::PATH = File.join(File.join(__dir__, '../../etc/config.yaml'))
