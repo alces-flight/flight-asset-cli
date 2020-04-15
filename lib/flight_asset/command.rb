@@ -40,6 +40,22 @@ module FlightAsset
       @opts = Hashie::Mash.new(**opts.dup)
     end
 
+    def connection
+      @connection ||= begin
+        default_headers = {
+          'Accept' => 'application/vnd.api+json',
+          'Content-Type' => 'application/vnd.api+json',
+          'Authorization' => "token=#{Config::CACHE.jwt}"
+        }
+
+        Faraday.new(url: Config::CACHE.base_url, headers: default_headers) do |connection|
+          connection.request :json
+          connection.response :json, :content_type => /\bjson$/
+          connection.adapter :net_http
+        end
+      end
+    end
+
     ##
     # The main runner method that preforms the action
     # This method must not print to StandardOut as this gets in the way of output
