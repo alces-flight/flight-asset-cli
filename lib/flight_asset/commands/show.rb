@@ -28,29 +28,13 @@
 module FlightAsset
   module Commands
     class Show  < FlightAsset::Command
-      rotate_table
-      define_args :name
+      include Concerns::HasAssetsRecord
 
+      define_args :name
       attr_reader :assets_record
 
       def run
         @assets_record ||= request_assets_record_by_name(name)
-      end
-
-      def table_procs
-        [
-          ['Name', ->(a) { a.name }],
-          ['Support Type', ->(a) { a.support_type }],
-          ['Decommissioned', ->(a) { a.decommissioned }]
-        ]
-      end
-
-      def pretty_table
-        parse_header_table(assets_record, table_procs)
-      end
-
-      def machine_table
-        parse_table(assets_record, table_procs.map { |p| p[1] })
       end
     end
   end
