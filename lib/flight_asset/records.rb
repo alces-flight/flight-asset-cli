@@ -40,7 +40,9 @@ module FlightAsset
     #
     def self.fallback_attributes(*attrs)
       attrs.each do |snake|
-        camal = snake.to_s.split('_').map(&:capitalize).join.to_sym
+        camal = snake.to_s.split('_').each_with_index.map do |part, idx|
+          idx == 0 ? part : part.capitalize
+        end.join.to_sym
         snake = snake.to_sym
         define_method(snake) do
           camal_attr = attributes[camal]
@@ -48,7 +50,7 @@ module FlightAsset
           if camal_attr == snake_attr
             snake_attr
           elsif camal_attr.nil? || snake_attr.nil?
-            camal_attr || snake_attr
+            snake_attr.nil? ? camal_attr : snake_attr
           else
             raise InternalError, 'Invalid API response!'
           end
