@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 #==============================================================================
 # Copyright (C) 2019-present Alces Flight Ltd.
 #
@@ -25,22 +26,22 @@
 # https://github.com/alces-flight/alces-flight/flight-asset-cli
 #==============================================================================
 
-require 'yaml'
-require 'hashie'
-require 'simple_jsonapi_client'
+module FlightAsset
+  class Config < Hashie::Dash
+    property :base_url, default: 'https://example.com/api/v1'
+    property :jwt, default: ''
 
-require_relative 'flight_asset/records'
-
-require_relative 'flight_asset/errors'
-require_relative 'flight_asset/config'
-require_relative 'flight_asset/command'
-require_relative 'flight_asset/commands'
-
-Dir.glob(File.join(__dir__, 'flight_asset/commands', '*.rb')).each do |f|
-  require_relative f
+    # Define Constants Last
+    Config::PATH = File.join(File.join(__dir__, '../../etc/config.yaml'))
+    Config::CACHE = if File.file? Config::PATH
+                      begin
+                        new YAML.load(File.read(Config::PATH), symbolize_names: true)
+                      rescue
+                        raise InternalError, "Failed to load config: #{Config::PATH}"
+                      end
+                    else
+                      new
+                    end
+  end
 end
-
-# Ensures the CLI file is required last
-# NOTE: In most cases it has already been required
-require_relative 'flight_asset/cli'
 
