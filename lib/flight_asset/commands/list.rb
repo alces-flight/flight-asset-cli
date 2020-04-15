@@ -31,9 +31,7 @@ module FlightAsset
       attr_reader :assets_records
 
       def run
-        @assets_records ||= AssetsRecord.fetch_all_in_component(
-          component_id: Config::CACHE.component_id, connection: connection
-        )
+        @assets_records ||= request_assets_records
       end
 
       def table_procs
