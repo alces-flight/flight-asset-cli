@@ -40,22 +40,6 @@ module FlightAsset
       @opts = Hashie::Mash.new(**opts.dup)
     end
 
-    def connection
-      @connection ||= begin
-        default_headers = {
-          'Accept' => 'application/vnd.api+json',
-          'Content-Type' => 'application/vnd.api+json',
-          'Authorization' => "token=#{Config::CACHE.jwt}"
-        }
-
-        Faraday.new(url: Config::CACHE.base_url, headers: default_headers) do |connection|
-          connection.request :json
-          connection.response :json, :content_type => /\bjson$/
-          connection.adapter :net_http
-        end
-      end
-    end
-
     ##
     # The main runner method that preforms the action
     # This method must not print to StandardOut as this gets in the way of output
@@ -68,7 +52,7 @@ module FlightAsset
     # Outputs the prettified output intended for humans
     # This output MAY change but should be avoided
     def print_pretty
-      print_machine
+      raise NotImplementedError
     end
 
     ##
@@ -86,6 +70,40 @@ module FlightAsset
     # a --headers global flag should be added to print the headers
     def print_machine
       raise InternalError, 'No output available!'
+    end
+
+    ##
+    # Faraday Connection To the Remote service
+    def connection
+      @connection ||= begin
+        default_headers = {
+          'Accept' => 'application/vnd.api+json',
+          'Content-Type' => 'application/vnd.api+json',
+          'Authorization' => "Bearer #{Config::CACHE.jwt}"
+        }
+
+        Faraday.new(url: Config::CACHE.base_url, headers: default_headers) do |connection|
+          connection.request :json
+          connection.response :json, :content_type => /\bjson$/
+          connection.adapter :net_http
+        end
+      end
+    end
+
+    # The procs should be a 2N array of headers to procs OR a hash
+    def parse_header_table(elements, headers_and_procs_raw)
+      headers_and_procs = headers_and_procs_raw.to_a
+      headers = headers_and_procs.map { |h| h[0] }
+      procs = headers_and_procs.map { |h| h[1] }
+      parse_table(elements, procs, headers: headers)
+    end
+
+    def parse_table(elements, procs, headers: nil)
+      rows = elements.map do |element|
+        procs.map { |p| p.respond_to?(:call) ? p.call(element) : p }
+      end
+      opts = { rows: rows }.tap { |o| o[:headers] = headers if headers }
+      TTY::Table.new(**opts)
     end
   end
 end
