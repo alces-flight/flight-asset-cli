@@ -44,13 +44,12 @@ module FlightAsset
         ]
       end
 
-      def print_pretty
-        puts parse_header_table(assets_records, table_procs).render(:ascii)
+      def pretty_table
+        parse_header_table(assets_records, table_procs)
       end
 
-      def print_machine
-        procs = table_procs.map { |p| p[1] }
-        puts parse_table(assets_records, procs).render(:basic)
+      def machine_table
+        parse_table(assets_records, table_procs.map { |p| p[1] })
       end
     end
   end
