@@ -25,30 +25,31 @@
 # https://github.com/alces-flight/alces-flight/flight-asset-cli
 #==============================================================================
 
-require 'yaml'
-require 'hashie'
-require 'simple_jsonapi_client'
-require 'faraday'
-require 'faraday_middleware'
-require 'tty-table'
+module FlightAsset
+  module Commands
+    module Concerns
+      module HasAssetsRecord
+        def self.included(base)
+          base.rotate_table
+        end
 
-require_relative 'flight_asset/errors'
-require_relative 'flight_asset/config'
+        def table_procs
+          [
+            ['Name', ->(a) { a.name }],
+            ['Support Type', ->(a) { a.support_type }],
+            ['Decommissioned', ->(a) { a.decommissioned }]
+          ]
+        end
 
-require_relative 'flight_asset/records'
+        def pretty_table
+          parse_header_table(assets_record, table_procs)
+        end
 
-require_relative 'flight_asset/command'
-require_relative 'flight_asset/commands'
-
-Dir.glob(File.join(__dir__, 'flight_asset/commands/concerns', '*.rb')).each do |f|
-  require_relative f
+        def machine_table
+          parse_table(assets_record, table_procs.map { |p| p[1] })
+        end
+      end
+    end
+  end
 end
-
-Dir.glob(File.join(__dir__, 'flight_asset/commands', '*.rb')).each do |f|
-  require_relative f
-end
-
-# Ensures the CLI file is required last
-# NOTE: In most cases it has already been required
-require_relative 'flight_asset/cli'
 
