@@ -42,16 +42,18 @@ module FlightAsset
       command(name) do |c|
         c.syntax = "#{program :name} #{name} #{args_str}"
         c.hidden = true if args_str.split.length > 1
+
         c.action do |args, opts|
           require_relative '../flight_asset'
           cmd = Commands.build(name, *args, **opts.__hash__)
           cmd.run
           if $stdout.tty?
-            cmd.print_pretty
+            puts cmd.pretty_table.render(:ascii)
           else
-            cmd.print_machine
+            puts cmd.machine_table.render(:basic)
           end
         end
+
         yield c if block_given?
       end
     end

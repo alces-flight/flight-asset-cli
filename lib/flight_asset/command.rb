@@ -49,26 +49,26 @@ module FlightAsset
     end
 
     ##
-    # Outputs the prettified output intended for humans
+    # Table for generating the prettified output intended for humans
     # This output MAY change but should be avoided
-    def print_pretty
+    def pretty_table
       raise NotImplementedError
     end
 
     ##
-    # Machine readable output of the command
-    # This output MUST only be changed in machine compatible way
+    # Machine readable table for the command
+    # This table MUST only be changed in machine compatible way
     # This means the following
-    #   * Headers MUST not be printed to STDOUT
+    #   * Headers MUST not be returned
     #   * The column (/row) orders must be consistent
     #   * New columns/rows must be appended to the end
     #   * Tables MUST be TAB separated
     #   * The above can only be broken on major version bumps
     #
-    # NOTE: The column order MAY differ from the print_pretty
+    # NOTE: The column order MAY differ from the pretty_output
     # method due to the above restrictions, if and when this happens
     # a --headers global flag should be added to print the headers
-    def print_machine
+    def machine_table
       raise InternalError, 'No output available!'
     end
 
