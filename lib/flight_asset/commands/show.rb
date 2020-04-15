@@ -29,11 +29,12 @@ module FlightAsset
   module Commands
     class Show  < FlightAsset::Command
       rotate_table
+      define_args :name
 
       attr_reader :assets_record
 
       def run
-        @assets_record ||= request_assets_records.first
+        @assets_record ||= request_assets_record_by_name(name)
       end
 
       def table_procs

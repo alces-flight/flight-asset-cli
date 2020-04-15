@@ -102,6 +102,12 @@ module FlightAsset
       AssetsRecord.fetch_all(connection: connection, url: url)
     end
 
+    ##
+    # TODO: Crash out with an error if there is a duplicate asset OR missing
+    def request_assets_record_by_name(name)
+      request_assets_records.find { |a| a.name == name }
+    end
+
     # The procs should be a 2N array of headers to procs OR a hash
     def parse_header_table(elements, headers_and_procs_raw)
       headers_and_procs = headers_and_procs_raw.to_a
