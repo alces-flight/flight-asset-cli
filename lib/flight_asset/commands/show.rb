@@ -25,43 +25,32 @@
 # https://github.com/alces-flight/alces-flight/flight-asset-cli
 #==============================================================================
 
-require 'commander'
-
-require_relative 'version'
-
 module FlightAsset
-  module CLI
-    extend Commander::CLI
+  module Commands
+    class Show  < FlightAsset::Command
+      rotate_table
 
-    program :name, 'flight-asset'
-    program :version, "v#{FlightAsset::VERSION}"
-    program :description, 'Manage Alces Flight Center Assets'
-    program :help_paging, false
+      attr_reader :assets_record
 
-    def self.create_command(name, args_str = '')
-      command(name) do |c|
-        c.syntax = "#{program :name} #{name} #{args_str}"
-        c.hidden = true if args_str.split.length > 1
-
-        c.action do |args, opts|
-          require_relative '../flight_asset'
-          cmd = Commands.build(name, *args, **opts.__hash__)
-          cmd.run
-          if $stdout.tty?
-            puts cmd.pretty_table.render(:ascii)
-          else
-            puts cmd.machine_table.render(:basic)
-          end
-        end
-
-        yield c if block_given?
+      def run
+        @assets_record ||= request_assets_records.first
       end
-    end
 
-    create_command 'list' do |c|
-    end
+      def table_procs
+        [
+          ['Name', ->(a) { a.name }],
+          ['Support Type', ->(a) { a.support_type }],
+          ['Decommissioned', ->(a) { a.decommissioned }]
+        ]
+      end
 
-    create_command 'show', 'ASSET_NAME' do |c|
+      def pretty_table
+        parse_header_table(assets_record, table_procs)
+      end
+
+      def machine_table
+        parse_table(assets_record, table_procs.map { |p| p[1] })
+      end
     end
   end
 end

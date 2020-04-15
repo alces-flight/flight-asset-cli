@@ -35,6 +35,13 @@ module FlightAsset
       end
     end
 
+    ##
+    # Denotes if the table has been rotated
+    def self.rotate_table(fetch = nil)
+      @rotate_table = true unless fetch
+      @rotate_table || false
+    end
+
     def initialize(*args, **opts)
       @args = args.dup
       @opts = Hashie::Mash.new(**opts.dup)
@@ -90,6 +97,11 @@ module FlightAsset
       end
     end
 
+    def request_assets_records
+      url = "components/#{Config::CACHE.component_id}/assets"
+      AssetsRecord.fetch_all(connection: connection, url: url)
+    end
+
     # The procs should be a 2N array of headers to procs OR a hash
     def parse_header_table(elements, headers_and_procs_raw)
       headers_and_procs = headers_and_procs_raw.to_a
@@ -99,10 +111,25 @@ module FlightAsset
     end
 
     def parse_table(elements, procs, headers: nil)
+      elements = [elements] unless elements.is_a? Array
+
       rows = elements.map do |element|
         procs.map { |p| p.respond_to?(:call) ? p.call(element) : p }
       end
-      opts = { rows: rows }.tap { |o| o[:header] = headers if headers }
+
+      # flips the table if required
+      opts = if self.class.rotate_table(true)
+        temp_rows = rows.dup
+        temp_rows.unshift(headers) if headers
+        max = temp_rows.map(&:length).max
+        new_rows = (0...max).map do |idx|
+          temp_rows.map { |row| row[idx] }
+        end
+        { rows: new_rows }
+      else
+        { rows: rows }.tap { |o| o[:header] = headers if headers }
+      end
+
       TTY::Table.new(**opts)
     end
   end

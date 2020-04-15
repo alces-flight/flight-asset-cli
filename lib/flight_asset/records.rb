@@ -69,10 +69,6 @@ module FlightAsset
   end
 
   class AssetsRecord < AutoRecord
-    def self.fetch_all_in_component(component_id:, **opts)
-      fetch_all(url: "components/#{component_id}/assets", **opts)
-    end
-
     fallback_attributes :name, :support_type, :info, :created_at, :updated_at,
                         :decommissioned
 
