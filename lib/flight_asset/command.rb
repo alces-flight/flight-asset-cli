@@ -102,7 +102,7 @@ module FlightAsset
       rows = elements.map do |element|
         procs.map { |p| p.respond_to?(:call) ? p.call(element) : p }
       end
-      opts = { rows: rows }.tap { |o| o[:headers] = headers if headers }
+      opts = { rows: rows }.tap { |o| o[:header] = headers if headers }
       TTY::Table.new(**opts)
     end
   end
