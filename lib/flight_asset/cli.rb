@@ -41,7 +41,7 @@ module FlightAsset
     def self.create_command(name, args_str = '')
       command(name) do |c|
         c.syntax = "#{program :name} #{name} #{args_str}"
-        c.hidden = true if args_str.split.length > 1
+        c.hidden = true if name.split.length > 1
 
         c.action do |args, opts|
           require_relative '../flight_asset'
