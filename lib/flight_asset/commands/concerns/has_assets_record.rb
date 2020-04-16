@@ -42,11 +42,11 @@ module FlightAsset
         end
 
         def pretty_table
-          parse_header_table(assets_record, table_procs)
+          parse_header_table([assets_record], table_procs)
         end
 
         def machine_table
-          parse_table(assets_record, table_procs.map { |p| p[1] })
+          parse_table([assets_record], table_procs.map { |p| p[1] })
         end
       end
     end

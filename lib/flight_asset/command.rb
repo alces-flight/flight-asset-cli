@@ -133,8 +133,6 @@ module FlightAsset
     end
 
     def parse_table(elements, procs, headers: nil)
-      elements = [elements] unless elements.is_a? Array
-
       rows = elements.map do |element|
         procs.map { |p| p.respond_to?(:call) ? p.call(element) : p }
       end
