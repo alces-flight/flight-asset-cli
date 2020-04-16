@@ -85,7 +85,7 @@ module FlightAsset
       @connection ||= begin
         default_headers = {
           'Accept' => 'application/vnd.api+json',
-          'Content-Type' => 'application/vnd.api+json',
+          'Content-Type' => 'application/json',
           'Authorization' => "Bearer #{Config::CACHE.jwt}"
         }
 
@@ -100,6 +100,10 @@ module FlightAsset
       end
     end
 
+    def build_components_record
+      ComponentsRecord.new(id: Config::CACHE.component_id, connection: nil)
+    end
+
     def request_assets_records
       url = "components/#{Config::CACHE.component_id}/assets"
       AssetsRecord.fetch_all(connection: connection, url: url)
@@ -109,6 +113,15 @@ module FlightAsset
     # TODO: Crash out with an error if there is a duplicate asset OR missing
     def request_assets_record_by_name(name)
       request_assets_records.find { |a| a.name == name }
+    end
+
+    def request_asset_groups_records
+      url = "components/#{Config::CACHE.component_id}/asset_groups"
+      AssetGroupsRecord.fetch_all(connection: connection, url: url)
+    end
+
+    def request_asset_groups_record_by_name(name)
+      request_asset_groups_records.find { |a| a.name == name }
     end
 
     # The procs should be a 2N array of headers to procs OR a hash
