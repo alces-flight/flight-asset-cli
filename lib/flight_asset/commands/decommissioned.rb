@@ -25,49 +25,20 @@
 # https://github.com/alces-flight/alces-flight/flight-asset-cli
 #==============================================================================
 
-require 'commander'
-
-require_relative 'version'
-
 module FlightAsset
-  module CLI
-    extend Commander::CLI
+  module Commands
+    class Decommission < FlightAsset::Command
+      include Concerns::HasAssetsRecord
 
-    program :name, 'flight-asset'
-    program :version, "v#{FlightAsset::VERSION}"
-    program :description, 'Manage Alces Flight Center Assets'
-    program :help_paging, false
+      define_args :name
+      attr_reader :assets_record
 
-    def self.create_command(name, args_str = '')
-      command(name) do |c|
-        c.syntax = "#{program :name} #{name} #{args_str}"
-        c.hidden = true if name.split.length > 1
-
-        c.action do |args, opts|
-          require_relative '../flight_asset'
-          cmd = Commands.build(name, *args, **opts.__hash__)
-          cmd.run
-          if $stdout.tty?
-            puts cmd.pretty_table.render(:ascii)
-          else
-            puts cmd.machine_table.render(:basic)
-          end
+      def run
+        @assets_record ||= begin
+          a = request_assets_record_by_name(name)
+          a.update(decommissioned: true)
         end
-
-        yield c if block_given?
       end
-    end
-
-    create_command 'list' do |c|
-    end
-
-    create_command 'show', 'ASSET' do |c|
-    end
-
-    create_command 'create', 'ASSET GROUP' do |c|
-    end
-
-    create_command 'decommission', 'ASSET' do |c|
     end
   end
 end
