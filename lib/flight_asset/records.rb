@@ -28,9 +28,18 @@
 module FlightAsset
   class AutoRecord < SimpleJSONAPIClient::Base
     def self.inherited(klass)
-      klass.const_set('TYPE', klass.name.split('::').last.chomp('Record').downcase)
-      klass.const_set('COLLECTION_URL', "/#{klass::TYPE}")
-      klass.const_set('INDIVIDUAL_URL', "/#{klass::TYPE}/%{id}")
+      base = klass.name.split('::').last.chomp('Record')
+      camal = base.dup.tap { |b| b[0] = b[0].downcase }
+      snake = base.split(/(?=[A-Z])/).map(&:downcase).join('_')
+      klass.const_set('TYPE', camal)
+      klass.const_set('COLLECTION_URL', "#{snake}")
+      klass.const_set('INDIVIDUAL_URL', "#{snake}/%{id}")
+    end
+
+    def self.snake_to_camal(snake)
+      snake.to_s.split('_').each_with_index.map do |part, idx|
+        idx == 0 ? part : part.capitalize
+      end.join.to_sym
     end
 
     ##
@@ -40,10 +49,10 @@ module FlightAsset
     #
     def self.fallback_attributes(*attrs)
       attrs.each do |snake|
-        camal = snake.to_s.split('_').each_with_index.map do |part, idx|
-          idx == 0 ? part : part.capitalize
-        end.join.to_sym
+        camal = snake_to_camal(snake)
         snake = snake.to_sym
+
+        # Define the fallback getter
         define_method(snake) do
           camal_attr = attributes[camal]
           snake_attr = attributes[snake]
@@ -56,23 +65,46 @@ module FlightAsset
           end
         end
 
+        # Define the fallback setter
         define_method("#{snake}=") do |value|
           attributes[snake] = value
           attributes[camal] = value
         end
+
+        # Define the keys as an internal attribute
+        _attributes[snake] = true
+        _attributes[camal] = true
       end
+    end
+
+    def self.fallback_has_one(snake, opts)
+      has_one(snake, opts)
+      camal = snake_to_camal(snake)
+      relationships[camal.to_sym] = relationships[snake.to_sym]
     end
   end
 
   class ComponentsRecord < AutoRecord
-    has_many :assets, class_name: 'AssetsRecord'
+    has_many :assets, class_name: 'FlightAsset::AssetsRecord'
   end
 
   class AssetsRecord < AutoRecord
     fallback_attributes :name, :support_type, :info, :created_at, :updated_at,
                         :decommissioned
 
-    has_one :component, class_name: 'ComponentsRecord'
+    has_one :component, class_name: 'FlightAsset::ComponentsRecord'
+    fallback_has_one :asset_group, class_name: 'FlightAsset::AssetGroupsRecord'
+
+    def asset_group
+      send(:assetGroup)
+    end
+  end
+
+  class AssetGroupsRecord < AutoRecord
+    fallback_attributes :name
+
+    has_one :component, class_name: 'FlightAsset::ComponentsRecord'
+    has_many :assets, class_name: 'FlightAsset::AssetsRecord'
   end
 end
 
