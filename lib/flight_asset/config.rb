@@ -28,9 +28,35 @@
 
 module FlightAsset
   class Config < Hashie::Dash
+    def self.root_dir
+      File.expand_path('../..', __dir__)
+    end
+
     property :base_url, default: 'https://example.com/api/v1'
     property :jwt, default: ''
     property :component_id, required: true
+
+    property :log_path, default: File.join(self.root_dir, 'var/log/asset-cli.log')
+    property :log_level, default: 'error'
+
+    def logger
+      @logger ||= Logger.new(log_path).tap do |l|
+        l.level = case log_level
+        when 'fatal'
+          Logger::FATAL
+        when 'error'
+          Logger::ERROR
+        when 'warn'
+          Logger::WARN
+        when 'info'
+          Logger::INFO
+        when 'debug'
+          Logger::DEBUG
+        else
+          raise InternalError, 'Unrecognised log_level'
+        end
+      end
+    end
 
     # Define Constants Last
     Config::PATH = File.join(File.join(__dir__, '../../etc/config.yaml'))
