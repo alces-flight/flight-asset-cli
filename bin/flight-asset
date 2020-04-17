@@ -41,11 +41,12 @@ require 'bundler'
 
 # Sets up the load path
 if FlightAsset::Config::CACHE.debug?
-  Bundler.setup(:development)
+  Bundler.setup(:default, :development)
   require 'pry'
   require 'pry-byebug'
+else
+  Bundler.setup(:default)
 end
-Bundler.setup(:default)
 
 # Runs the CLI
 require_relative '../lib/flight_asset/cli'
