@@ -25,58 +25,20 @@
 # https://github.com/alces-flight/alces-flight/flight-asset-cli
 #==============================================================================
 
-require 'commander'
-
-require_relative 'version'
-
 module FlightAsset
-  module CLI
-    extend Commander::CLI
-
-    program :name, 'flight-asset'
-    program :version, "v#{FlightAsset::VERSION}"
-    program :description, 'Manage Alces Flight Center Assets'
-    program :help_paging, false
-
-    def self.create_command(name, args_str = '')
-      command(name) do |c|
-        c.syntax = "#{program :name} #{name} #{args_str}"
-        c.hidden = true if name.split.length > 1
-
-        c.action do |args, opts|
-          require_relative '../flight_asset'
-          cmd = Commands.build(name, *args, **opts.__hash__)
-          cmd.run
-          if $stdout.tty?
-            puts cmd.pretty_table.render(:ascii)
-          else
-            puts cmd.machine_table.render(:basic)
-          end
-        end
-
-        yield c if block_given?
+  module Commands
+    class Console < FlightAsset::Command
+      def run
+        binding.pry
       end
-    end
 
-    create_command 'list' do |c|
-    end
+      def pretty_table
+        TTY::Table.new
+      end
 
-    create_command 'show', 'ASSET' do |c|
-    end
-
-    create_command 'create', 'ASSET' do |c|
-      c.option '--group GROUP'
-    end
-
-    create_command 'decommission', 'ASSET' do |c|
-    end
-
-    create_command 'update', 'ASSET' do |c|
-      c.option '--support-type SUPPORT_TYPE'
-    end
-
-    if Config::CACHE.debug?
-      create_command 'console'
+      def machine_table
+        TTY::Table.new
+      end
     end
   end
 end
