@@ -26,9 +26,18 @@
 # https://github.com/alces-flight/alces-flight/flight-asset-cli
 #==============================================================================
 
+ENV['BUNDLE_GEMFILE'] ||= File.join(__FILE__, '../../Gemfile')
+
+require 'rubygems'
+require 'bundler'
 require_relative '../lib/flight_asset/config'
 
-require_relative '../lib/flight_asset/cli'
+if FlightAsset::Config::CACHE.debug?
+  Bundler.setup(:default, :development)
+else
+  Bundler.setup(:default)
+end
 
+require_relative '../lib/flight_asset/cli'
 FlightAsset::CLI.run!(*ARGV)
 

@@ -83,7 +83,7 @@ module FlightAsset
       end
 
       # Enable dev repos when debugging
-      if log_level == 'debug'
+      if debug?
         require 'pry'
         require 'pry-byebug'
       end
@@ -100,6 +100,10 @@ module FlightAsset
       $stderr
     end
     property :log_level, default: 'error'
+
+    def debug?
+      log_level == 'debug'
+    end
 
     def logger
       @logger ||= Logger.new(log_path || $stderr).tap do |l|
