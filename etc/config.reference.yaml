@@ -1,0 +1,49 @@
+# =============================================================================
+# This file is for references purposes only! It will not configure the
+# application. Editing this file will break the wizard
+#
+# The actual configuration file should be stored as:
+# etc/config.yaml
+# ============================================================================
+
+# =============================================================================
+# App Base Url
+# Specify the location where the API server is being hosted
+# =============================================================================
+base_url: 'URL to the FC asset API'
+
+# =============================================================================
+# Component ID
+# Specify the ID to the component the API will be tied to. Currently the
+# application can only function on a per component basis. The ID must be the
+# numeric value and not obfuscated.
+# =============================================================================
+component_id: 'Numeric ID for the FC component'
+
+# =============================================================================
+# Create Dummy Group Name
+# The group used in the create work around. It must be an existing FC asset
+# group and should be empty. The work around is required because all assets
+# must be created in a group.
+#
+# To allow the creation of assets without groups, they are first created in the
+# dummy group. Then they are unassigned from the dummy group. The dummy group
+# should be empty (your mileage my otherwise vary).
+# =============================================================================
+create_dummy_group_name: 'The asset group to use for the create workaround'
+
+# =============================================================================
+# Log Path
+# Specify the path to the log file. The directory must exist however the file
+# maybe missing.
+#
+# The application will log to standard error if left unset
+#=============================================================================
+log_path: 'Path to the log file'
+
+# =============================================================================
+# Log level
+# Set the severity in which the application logs:
+# =============================================================================
+log_level: 'Set the log level: fatal,error,warn,info,debug'
+

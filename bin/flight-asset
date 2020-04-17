@@ -26,12 +26,7 @@
 # https://github.com/alces-flight/alces-flight/flight-asset-cli
 #==============================================================================
 
-# Sets up the config with the hard coded path (if it exists)
-config_path = File.join(__dir__, '../etc/config.yaml')
-if File.exist? config_path
-  module FlightAsset; end
-  FlightAsset.const_set('CONFIG_PATH', config_path)
-end
+# Require the config file up front
 require_relative '../lib/flight_asset/config'
 
 # Sets up bundler
@@ -50,5 +45,5 @@ end
 
 # Runs the CLI
 require_relative '../lib/flight_asset/cli'
-FlightAsset::CLI.run!(*ARGV)
+FlightAsset::CLI.run_with_wizard(*ARGV)
 
