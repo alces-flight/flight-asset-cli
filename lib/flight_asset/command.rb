@@ -109,10 +109,12 @@ module FlightAsset
       AssetsRecord.fetch_all(connection: connection, url: url)
     end
 
-    ##
-    # TODO: Crash out with an error if there is a duplicate asset OR missing
-    def request_assets_record_by_name(name)
-      request_assets_records.find { |a| a.name == name }
+    def request_assets_record_by_name(name, error: true)
+      request_assets_records.find { |a| a.name == name }.tap do |a|
+        raise AssetMissing, <<~ERROR.chomp if a.nil? && error
+          Could not locate asset: #{name}
+        ERROR
+      end
     end
 
     def request_asset_groups_records
