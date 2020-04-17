@@ -90,6 +90,7 @@ module FlightAsset
     property :base_url, default: 'https://example.com/api/v1'
     property :jwt, default: ''
     property :component_id, required: true
+    property :create_dummy_group_name, required: true
 
     property :log_path, default: ->() do
       $stderr.puts <<~MSG
