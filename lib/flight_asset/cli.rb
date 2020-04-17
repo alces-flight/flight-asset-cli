@@ -64,7 +64,8 @@ module FlightAsset
     create_command 'show', 'ASSET' do |c|
     end
 
-    create_command 'create', 'ASSET GROUP' do |c|
+    create_command 'create', 'ASSET' do |c|
+      c.option '--group GROUP'
     end
 
     create_command 'decommission', 'ASSET' do |c|

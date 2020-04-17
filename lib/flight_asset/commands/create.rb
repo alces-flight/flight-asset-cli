@@ -30,7 +30,7 @@ module FlightAsset
     class Create < FlightAsset::Command
       include Concerns::HasAssetsRecord
 
-      define_args :name, :group_name
+      define_args :name
       attr_reader :assets_record
 
       def run
@@ -39,6 +39,10 @@ module FlightAsset
 
       def asset_groups_record
         @asset_groups_record ||= request_asset_groups_record_by_name(group_name)
+      end
+
+      def group_name
+        opts.group || Config::CACHE.create_dummy_group_name
       end
 
       def create_record
