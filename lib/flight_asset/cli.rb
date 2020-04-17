@@ -73,5 +73,15 @@ module FlightAsset
     create_command 'update', 'ASSET' do |c|
       c.option '--support-type SUPPORT_TYPE'
     end
+
+    if Config::CACHE.debug?
+      create_command 'console' do |c|
+        c.action do
+          require_relative '../flight_asset'
+          binding.pry
+          puts 'Exited Pry!'
+        end
+      end
+    end
   end
 end
