@@ -76,6 +76,7 @@ module FlightAsset
     end
 
     create_command 'move', 'ASSET' do |c|
+      c.option '--group GROUP'
     end
 
     if Config::CACHE.debug?

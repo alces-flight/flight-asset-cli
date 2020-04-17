@@ -126,9 +126,10 @@ module FlightAsset
       request_asset_groups_records.find { |a| a.name == name }
     end
 
-    def request_assets_record_move_asset_group(assets_record)
+    def request_assets_record_move_asset_group(assets_record, asset_groups_record = nil)
       rel_url = assets_record.asset_group_relationship_url
-      connection.patch(rel_url, body: { data: nil })
+      data = asset_groups_record ? asset_groups_record.to_relationship : nil
+      connection.patch(rel_url, { data: data })
       AssetsRecord.fetch(
         connection: connection, url_opts: { id: assets_record.id }
       )
