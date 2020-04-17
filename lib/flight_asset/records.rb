@@ -77,10 +77,15 @@ module FlightAsset
       end
     end
 
-    def self.fallback_has_one(snake, opts)
-      has_one(snake, opts)
-      camal = snake_to_camal(snake)
-      relationships[camal.to_sym] = relationships[snake.to_sym]
+    def asset_group_relationship_url
+      urls = ['asset_group', 'assetGroup'].map do |key|
+        next unless input_relationships.key? key
+        input_relationships[key]['links']['self']
+      end.reject(&:nil?).uniq
+      raise InternalError, <<~ERROR.chomp unless urls.length == 1
+        Failed to determine asset_group relationship URL
+      ERROR
+      urls.first
     end
   end
 
@@ -93,11 +98,8 @@ module FlightAsset
                         :decommissioned
 
     has_one :component, class_name: 'FlightAsset::ComponentsRecord'
-    fallback_has_one :asset_group, class_name: 'FlightAsset::AssetGroupsRecord'
-
-    def asset_group
-      send(:assetGroup)
-    end
+    has_one :asset_group, class_name: 'FlightAsset::AssetGroupsRecord'
+    has_one :assetGroup, class_name: 'FlightAsset::AssetGroupsRecord'
   end
 
   class AssetGroupsRecord < AutoRecord

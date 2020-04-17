@@ -124,6 +124,14 @@ module FlightAsset
       request_asset_groups_records.find { |a| a.name == name }
     end
 
+    def request_assets_record_unassigns_asset_group(assets_record)
+      rel_url = assets_record.asset_group_relationship_url
+      connection.patch(rel_url, body: { data: nil })
+      AssetsRecord.fetch(
+        connection: connection, url_opts: { id: assets_record.id }
+      )
+    end
+
     # The procs should be a 2N array of headers to procs OR a hash
     def parse_header_table(elements, headers_and_procs_raw)
       headers_and_procs = headers_and_procs_raw.to_a
