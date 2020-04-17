@@ -75,6 +75,9 @@ module FlightAsset
       c.option '--support-type SUPPORT_TYPE'
     end
 
+    create_command 'move', 'ASSET' do |c|
+    end
+
     if Config::CACHE.debug?
       create_command 'console'
     end

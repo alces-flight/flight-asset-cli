@@ -27,24 +27,18 @@
 
 module FlightAsset
   module Commands
-    class Create < FlightAsset::Command
+    class Move < FlightAsset::Command
       include Concerns::HasAssetsRecord
 
       define_args :name
       attr_accessor :assets_record
 
       def run
-        existing = request_assets_record_by_name(name, error: false)
-        raise InputError, <<~ERROR.chomp if existing
-          Can not create asset '#{name}' as it already exists!
-        ERROR
-
-        self.assets_record = create_record
-
-        # Removes the asset from the dummy group (if required)
-        unless opts.group
-          self.assets_record = \
-            request_assets_record_move_asset_group(self.assets_record)
+        initial = request_assets_record_by_name(name)
+        self.assets_record  = if opts.group
+          raise NotImplementedError
+        else
+          request_assets_record_move_asset_group(initial)
         end
       end
 
