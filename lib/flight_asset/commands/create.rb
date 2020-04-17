@@ -35,8 +35,6 @@ module FlightAsset
 
       def run
         @assets_record ||= create_record
-      rescue => e
-        raise e
       end
 
       def asset_groups_record

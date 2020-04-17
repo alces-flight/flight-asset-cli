@@ -28,19 +28,20 @@
 
 module FlightAsset
   class Config < Hashie::Dash
-    def self.root_dir
-      File.expand_path('../..', __dir__)
-    end
-
     property :base_url, default: 'https://example.com/api/v1'
     property :jwt, default: ''
     property :component_id, required: true
 
-    property :log_path, default: File.join(self.root_dir, 'var/log/asset-cli.log')
+    property :log_path, default: ->() do
+      $stderr.puts <<~MSG
+        Logging to Standard Error! This can be disabled by setting the 'log_path'
+      MSG
+      $stderr
+    end
     property :log_level, default: 'error'
 
     def logger
-      @logger ||= Logger.new(log_path).tap do |l|
+      @logger ||= Logger.new(log_path || $stderr).tap do |l|
         l.level = case log_level
         when 'fatal'
           Logger::FATAL
