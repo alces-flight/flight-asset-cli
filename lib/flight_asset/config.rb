@@ -31,8 +31,8 @@
 # before Bundler has been setup. As such any advanced config setup needs to be
 # implemented manually
 #
-require_relative 'errors'
 require 'yaml'
+require 'logger'
 
 module FlightAsset
   class Config < Hash
@@ -41,10 +41,10 @@ module FlightAsset
       required_keys << key
 
       define_method(key) do
-        if v = self[key] && !v.nil?
+        if (v = opts[key]) && !v.nil?
           v
         elsif default.respond_to?(:call)
-          default.call
+          opts[key] ||= default.call
         else
           default
         end
@@ -62,11 +62,13 @@ module FlightAsset
         $stderr.puts "Failed to load config: #{Config::PATH}"
         exit 1
       end
-      new(data)
+      new(**data)
     end
 
-    def initialize(*a)
-      super
+    attr_reader :opts
+
+    def initialize(**opts)
+      @opts = opts
 
       keys = self.class.required_keys
                        .map { |k| [k, send(k)] }
@@ -82,11 +84,7 @@ module FlightAsset
         exit 1
       end
 
-      # Enable dev repos when debugging
-      if debug?
-        require 'pry'
-        require 'pry-byebug'
-      end
+      logger # Ensures the logger is setup
     end
 
     property :base_url, default: 'https://example.com/api/v1'
@@ -119,18 +117,15 @@ module FlightAsset
         when 'debug'
           Logger::DEBUG
         else
-          raise InternalError, 'Unrecognised log_level'
+          $stderr.puts "Unrecognised log_level: #{log_level}"
+          exit 1
         end
       end
     end
 
-    # Define Constants Last
-    Config::PATH = File.join(File.join(__dir__, '../../etc/config.yaml'))
-    Config::CACHE = if File.file? Config::PATH
-                      read(Config::PATH)
-                    else
-                      new
-                    end
+    # Defines the CACHE last
+    CONFIG_PATH ||= nil
+    Config::CACHE = CONFIG_PATH ? read(CONFIG_PATH) : new
   end
 end
 
