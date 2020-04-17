@@ -35,3 +35,8 @@ gem 'hashie'
 gem 'simple_jsonapi_client'
 gem 'tty-table'
 
+group :development do
+  gem 'pry'
+  gem 'pry-byebug'
+end
+
