@@ -31,10 +31,16 @@ module FlightAsset
       include Concerns::HasAssetsRecord
 
       define_args :name
-      attr_reader :assets_record
+      attr_accessor :assets_record
 
       def run
-        @assets_record ||= create_record
+        self.assets_record = create_record
+
+        # Removes the asset from the dummy group (if required)
+        unless opts.group
+          self.assets_record = \
+            request_assets_record_unassigns_asset_group(self.assets_record)
+        end
       end
 
       def asset_groups_record
