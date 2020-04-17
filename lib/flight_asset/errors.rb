@@ -46,4 +46,5 @@ module FlightAsset
 
   InternalError = Error.define_class(1)
   GeneralError = Error.define_class(2)
+  InputError = GeneralError.define_class(3)
 end
