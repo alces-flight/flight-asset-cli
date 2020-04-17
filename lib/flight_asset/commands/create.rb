@@ -34,6 +34,11 @@ module FlightAsset
       attr_accessor :assets_record
 
       def run
+        existing = request_assets_record_by_name(name, error: false)
+        raise InputError, <<~ERROR.chomp if existing
+          Can not create asset '#{name}' as it already exists!
+        ERROR
+
         self.assets_record = create_record
 
         # Removes the asset from the dummy group (if required)
