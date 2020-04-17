@@ -42,6 +42,11 @@ module FlightAsset
       end
 
       def group_name
+        if opts.group == Config::CACHE.create_dummy_group_name
+          raise InputError, <<~ERROR.chomp
+            Cowardly refusing to create an asset in the dummy group!
+          ERROR
+        end
         opts.group || Config::CACHE.create_dummy_group_name
       end
 
