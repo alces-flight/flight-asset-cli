@@ -35,10 +35,13 @@ require 'yaml'
 require 'logger'
 
 module FlightAsset
-  class Config < Hash
+  # Allow the Config base classes to be switched out
+  Config ||= Class.new(Hash)
+
+  class Config
     def self.property(key, default: nil, required: false)
       key = key.to_sym
-      required_keys << key
+      requires[key] = true if required
 
       define_method(key) do
         if (v = opts[key]) && !v.nil?
@@ -51,8 +54,8 @@ module FlightAsset
       end
     end
 
-    def self.required_keys
-      @required_keys ||= []
+    def self.requires
+      @requires ||= {}
     end
 
     def self.read(path)
@@ -69,54 +72,51 @@ module FlightAsset
 
     def initialize(**opts)
       @opts = opts
-
-      keys = self.class.required_keys
-                       .map { |k| [k, send(k)] }
-                       .select { |_, v| v.nil? }
-                       .to_h
-                       .keys
-
-      unless keys.empty?
-        $stderr.puts <<~ERROR
-          Failed to load configuration file as the following are required:
-          #{keys.join(',')}
-        ERROR
-        exit 1
-      end
-
-      logger # Ensures the logger is setup
     end
 
-    property :base_url, default: 'https://example.com/api/v1'
+    property :base_url, default: 'https://center.alces-flight.com/api/v1'
+    property :create_dummy_group_name, default: 'ignore-me'
     property :jwt, default: ''
-    property :component_id, required: true
-    property :create_dummy_group_name, required: true
 
-    property :log_path, default: ->() do
-      $stderr.puts <<~MSG
-        Logging to Standard Error! This can be disabled by setting the 'log_path'
-      MSG
-      $stderr
-    end
+    property :component_id, required: true
+
+    property :log_path
     property :log_level, default: 'error'
 
     def debug?
       log_level == 'debug'
     end
 
+    def configured?
+      keys = self.class.requires
+                 .keys
+                 .map { |k| [k, send(k)] }
+                 .select { |_, v| v.nil? }
+                 .to_h
+                 .keys
+
+      keys.empty?
+    end
+
+    def log_level_const
+      case log_level
+      when 'fatal'
+        Logger::FATAL
+      when 'error'
+        Logger::ERROR
+      when 'warn'
+        Logger::WARN
+      when 'info'
+        Logger::INFO
+      when 'debug'
+        Logger::DEBUG
+      end
+    end
+
     def logger
       @logger ||= Logger.new(log_path || $stderr).tap do |l|
-        l.level = case log_level
-        when 'fatal'
-          Logger::FATAL
-        when 'error'
-          Logger::ERROR
-        when 'warn'
-          Logger::WARN
-        when 'info'
-          Logger::INFO
-        when 'debug'
-          Logger::DEBUG
+        if level = log_level_const
+          l.level = level
         else
           $stderr.puts "Unrecognised log_level: #{log_level}"
           exit 1
@@ -125,8 +125,10 @@ module FlightAsset
     end
 
     # Defines the CACHE last
-    CONFIG_PATH ||= nil
-    Config::CACHE = CONFIG_PATH ? read(CONFIG_PATH) : new
+    Config::PATH ||= File.expand_path('../../etc/config.yaml', __dir__)
+    Config::CACHE = File.exists?(PATH) ? read(PATH) : new
+    Config::REFERENCE_PATH = File.expand_path('../../etc/config.reference.yaml', __dir__)
+    Config::REFERENCE_OPTS = YAML.load(File.read(REFERENCE_PATH))
   end
 end
 
