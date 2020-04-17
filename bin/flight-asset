@@ -26,6 +26,8 @@
 # https://github.com/alces-flight/alces-flight/flight-asset-cli
 #==============================================================================
 
+require_relative '../lib/flight_asset/config'
+
 require_relative '../lib/flight_asset/cli'
 
 FlightAsset::CLI.run!(*ARGV)
