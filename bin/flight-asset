@@ -26,18 +26,28 @@
 # https://github.com/alces-flight/alces-flight/flight-asset-cli
 #==============================================================================
 
-ENV['BUNDLE_GEMFILE'] ||= File.join(__FILE__, '../../Gemfile')
-
-require 'rubygems'
-require 'bundler'
+# Sets up the config with the hard coded path (if it exists)
+config_path = File.join(__dir__, '../etc/config.yaml')
+if File.exist? config_path
+  module FlightAsset; end
+  FlightAsset.const_set('CONFIG_PATH', config_path)
+end
 require_relative '../lib/flight_asset/config'
 
-if FlightAsset::Config::CACHE.debug?
-  Bundler.setup(:default, :development)
-else
-  Bundler.setup(:default)
-end
+# Sets up bundler
+ENV['BUNDLE_GEMFILE'] ||= File.join(__dir__, '../Gemfile')
+require 'rubygems'
+require 'bundler'
 
+# Sets up the load path
+if FlightAsset::Config::CACHE.debug?
+  Bundler.setup(:development)
+  require 'pry'
+  require 'pry-byebug'
+end
+Bundler.setup(:default)
+
+# Runs the CLI
 require_relative '../lib/flight_asset/cli'
 FlightAsset::CLI.run!(*ARGV)
 
