@@ -26,8 +26,69 @@
 # https://github.com/alces-flight/alces-flight/flight-asset-cli
 #==============================================================================
 
+#
+# NOTE: This file MUST NOT have external GEM dependencies has it will be loaded
+# before Bundler has been setup. As such any advanced config setup needs to be
+# implemented manually
+#
+require_relative 'errors'
+require 'yaml'
+
 module FlightAsset
-  class Config < Hashie::Dash
+  class Config < Hash
+    def self.property(key, default: nil, required: false)
+      key = key.to_sym
+      required_keys << key
+
+      define_method(key) do
+        if v = self[key] && !v.nil?
+          v
+        elsif default.respond_to?(:call)
+          default.call
+        else
+          default
+        end
+      end
+    end
+
+    def self.required_keys
+      @required_keys ||= []
+    end
+
+    def self.read(path)
+      data ||= begin
+        YAML.load(File.read(path), symbolize_names: true)
+      rescue
+        $stderr.puts "Failed to load config: #{Config::PATH}"
+        exit 1
+      end
+      new(data)
+    end
+
+    def initialize(*a)
+      super
+
+      keys = self.class.required_keys
+                       .map { |k| [k, send(k)] }
+                       .select { |_, v| v.nil? }
+                       .to_h
+                       .keys
+
+      unless keys.empty?
+        $stderr.puts <<~ERROR
+          Failed to load configuration file as the following are required:
+          #{keys.join(',')}
+        ERROR
+        exit 1
+      end
+
+      # Enable dev repos when debugging
+      if log_level == 'debug'
+        require 'pry'
+        require 'pry-byebug'
+      end
+    end
+
     property :base_url, default: 'https://example.com/api/v1'
     property :jwt, default: ''
     property :component_id, required: true
@@ -62,11 +123,7 @@ module FlightAsset
     # Define Constants Last
     Config::PATH = File.join(File.join(__dir__, '../../etc/config.yaml'))
     Config::CACHE = if File.file? Config::PATH
-                      begin
-                        new YAML.load(File.read(Config::PATH), symbolize_names: true)
-                      rescue
-                        raise InternalError, "Failed to load config: #{Config::PATH}"
-                      end
+                      read(Config::PATH)
                     else
                       new
                     end

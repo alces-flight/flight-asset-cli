@@ -25,6 +25,12 @@
 # https://github.com/alces-flight/alces-flight/flight-asset-cli
 #==============================================================================
 
+#
+# NOTE: This file MUST NOT have external GEM dependencies has it will be loaded
+# before Bundler has been setup. As such any advanced setup needs to be implemented
+# manually
+#
+
 module FlightAsset
   class Error < RuntimeError
     def self.define_class(code)
