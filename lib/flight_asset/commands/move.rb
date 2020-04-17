@@ -35,24 +35,13 @@ module FlightAsset
 
       def run
         initial = request_assets_record_by_name(name)
-        self.assets_record  = if opts.group
-          raise NotImplementedError
+        ag = if opts.group
+          request_asset_groups_record_by_name(opts.group)
         else
-          request_assets_record_move_asset_group(initial)
+          nil
         end
-      end
-
-      def asset_groups_record
-        @asset_groups_record ||= request_asset_groups_record_by_name(group_name)
-      end
-
-      def group_name
-        if opts.group == Config::CACHE.create_dummy_group_name
-          raise InputError, <<~ERROR.chomp
-            Cowardly refusing to create an asset in the dummy group!
-          ERROR
-        end
-        opts.group || Config::CACHE.create_dummy_group_name
+        self.assets_record = \
+          request_assets_record_move_asset_group(initial, ag)
       end
 
       def create_record
