@@ -43,23 +43,6 @@ module FlightAsset
         self.assets_record = \
           request_assets_record_move_asset_group(initial, ag)
       end
-
-      def create_record
-        AssetsRecord.create(
-          connection: connection,
-          relationships: {
-            component: build_components_record,
-            assetGroup: asset_groups_record,
-            asset_group: asset_groups_record
-          },
-          attributes: {
-            name: name,
-            info: 'some info',
-            support_type: 'advice',
-            supportType: 'advice'
-          }
-        )
-      end
     end
   end
 end
