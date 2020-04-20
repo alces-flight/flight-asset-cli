@@ -21,6 +21,13 @@ base_url: 'URL to the FC asset API'
 component_id: 'Numeric ID for the FC component'
 
 # =============================================================================
+# Authorization JSON Web Token
+# The API token generated through the Alces Flight Center management portal.
+# Please contact your support team on how to generate this token.
+# =============================================================================
+jwt: 'Your Alces Flight Center API access token'
+
+# =============================================================================
 # Create Dummy Group Name
 # The group used in the create work around. It must be an existing FC asset
 # group and should be empty. The work around is required because all assets
@@ -46,4 +53,5 @@ log_path: 'Path to the log file'
 # Set the severity in which the application logs:
 # =============================================================================
 log_level: 'Set the log level: fatal,error,warn,info,debug'
+
 
