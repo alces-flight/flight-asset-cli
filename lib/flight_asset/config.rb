@@ -36,8 +36,8 @@ require 'logger'
 
 module FlightAsset
   # Dynamically define the base config class and PATH
-  Config ||= Class.new(Hash) do
-    PATH = File.expand_path('../../etc/config.yaml', __dir__)
+  Config ||= Class.new(Hash) do |klass|
+    klass::PATH = File.expand_path('../../etc/config.yaml', __dir__)
   end
 
   class Config
