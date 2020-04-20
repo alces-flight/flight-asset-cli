@@ -158,7 +158,7 @@ module FlightAsset
       c.option '--group GROUP'
     end
 
-    if Config::CACHE.debug?
+    if Config::CACHE.development?
       create_command 'console'
     end
   end

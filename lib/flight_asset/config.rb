@@ -83,8 +83,8 @@ module FlightAsset
     property :log_path
     property :log_level, default: 'error'
 
-    def debug?
-      log_level == 'debug'
+    def development?
+      log_level == 'development'
     end
 
     def configured?
@@ -110,11 +110,24 @@ module FlightAsset
         Logger::INFO
       when 'debug'
         Logger::DEBUG
+      when 'development'
+        Logger::DEBUG
+      end
+    end
+
+    def log_path_or_stderr
+      if development?
+        $stderr
+      elsif log_path
+        FileUtils.mkdir_p File.dirname(log_path)
+        log_path
+      else
+        $stderr
       end
     end
 
     def logger
-      @logger ||= Logger.new(log_path || $stderr).tap do |l|
+      @logger ||= Logger.new(log_path_or_stderr).tap do |l|
         if level = log_level_const
           l.level = level
         else
