@@ -26,29 +26,19 @@
 #==============================================================================
 
 module FlightAsset
-  class Error < RuntimeError
-    def self.define_class(code)
-      Class.new(self).tap do |klass|
-        klass.instance_variable_set(:@exit_code, code)
-      end
-    end
+  module Commands
+    class DecommissionGroup < FlightAsset::Command
+      include Concerns::HasAssetGroupsRecord
 
-    def self.exit_code
-      @exit_code || begin
-        parent.respond_to?(:exit_code) ? parent.exit_code : 2
-      end
-    end
+      define_args :name
+      attr_reader :asset_groups_record
 
-    def exit_code
-      self.class.exit_code
+      def run
+        @asset_groups_record ||= begin
+          a = request_asset_groups_record_by_name(name)
+          a.update(decommissioned: true)
+        end
+      end
     end
   end
-
-  InternalError = Error.define_class(1)
-  GeneralError = Error.define_class(2)
-  InputError = GeneralError.define_class(3)
-
-  MissingError = GeneralError.define_class(20)
-  AssetMissing = MissingError.define_class(21)
-  AssetGroupMissing = MissingError.define_class(21)
 end

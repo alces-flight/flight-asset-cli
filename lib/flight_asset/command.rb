@@ -122,8 +122,12 @@ module FlightAsset
       AssetGroupsRecord.fetch_all(connection: connection, url: url)
     end
 
-    def request_asset_groups_record_by_name(name)
-      request_asset_groups_records.find { |a| a.name == name }
+    def request_asset_groups_record_by_name(name, error: true)
+      request_asset_groups_records.find { |a| a.name == name }.tap do |g|
+        raise AssetGroupMissing, <<~ERROR.chomp if g.nil? && error
+          Could not locate asset group: #{name}
+        ERROR
+      end
     end
 
     def request_assets_record_move_asset_group(assets_record, asset_groups_record = nil)

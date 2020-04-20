@@ -30,7 +30,7 @@ module FlightAsset
     def self.inherited(klass)
       base = klass.name.split('::').last.chomp('Record')
       camal = base.dup.tap { |b| b[0] = b[0].downcase }
-      snake = base.split(/(?=[A-Z])/).map(&:downcase).join('_')
+      snake = base.split(/(?=[A-Z])/).map(&:downcase).join('-')
       klass.const_set('TYPE', camal)
       klass.const_set('COLLECTION_URL', "#{snake}")
       klass.const_set('INDIVIDUAL_URL', "#{snake}/%{id}")
