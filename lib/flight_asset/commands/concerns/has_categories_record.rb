@@ -26,30 +26,28 @@
 #==============================================================================
 
 module FlightAsset
-  class Error < RuntimeError
-    def self.define_class(code)
-      Class.new(self).tap do |klass|
-        klass.instance_variable_set(:@exit_code, code)
-      end
-    end
+  module Commands
+    module Concerns
+      module HasCategoriesRecord
+        def self.included(base)
+          base.rotate_table
+        end
 
-    def self.exit_code
-      @exit_code || begin
-        parent.respond_to?(:exit_code) ? parent.exit_code : 2
-      end
-    end
+        def table_procs
+          [
+            ['Name', ->(a) { a.name }]
+          ]
+        end
 
-    def exit_code
-      self.class.exit_code
+        def pretty_table
+          parse_header_table([categories_record], table_procs)
+        end
+
+        def machine_table
+          parse_table([categories_record], table_procs.map { |p| p[1] })
+        end
+      end
     end
   end
-
-  InternalError = Error.define_class(1)
-  GeneralError = Error.define_class(2)
-  InputError = GeneralError.define_class(3)
-
-  MissingError = GeneralError.define_class(20)
-  AssetMissing = MissingError.define_class(21)
-  GroupMissing = MissingError.define_class(21)
-  CategoryMissing = MissingError.define_class(22)
 end
+

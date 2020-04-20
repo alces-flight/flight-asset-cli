@@ -76,17 +76,6 @@ module FlightAsset
         _attributes[camal] = true
       end
     end
-
-    def asset_group_relationship_url
-      urls = ['asset_group', 'assetGroup'].map do |key|
-        next unless input_relationships.key? key
-        input_relationships[key]['links']['self']
-      end.reject(&:nil?).uniq
-      raise InternalError, <<~ERROR.chomp unless urls.length == 1
-        Failed to determine asset_group relationship URL
-      ERROR
-      urls.first
-    end
   end
 
   class ComponentsRecord < AutoRecord
@@ -100,6 +89,17 @@ module FlightAsset
     has_one :component, class_name: 'FlightAsset::ComponentsRecord'
     has_one :asset_group, class_name: 'FlightAsset::AssetGroupsRecord'
     has_one :assetGroup, class_name: 'FlightAsset::AssetGroupsRecord'
+
+    def asset_group_relationship_url
+      urls = ['asset_group', 'assetGroup'].map do |key|
+        next unless input_relationships.key? key
+        input_relationships[key]['links']['self']
+      end.reject(&:nil?).uniq
+      raise InternalError, <<~ERROR.chomp unless urls.length == 1
+        Failed to determine asset_group relationship URL
+      ERROR
+      urls.first
+    end
   end
 
   class AssetGroupsRecord < AutoRecord
@@ -107,6 +107,17 @@ module FlightAsset
 
     has_one :component, class_name: 'FlightAsset::ComponentsRecord'
     has_many :assets, class_name: 'FlightAsset::AssetsRecord'
+    has_one :assetGroupCategory, class_name: 'FlightAsset::CategoriesRecord'
+  end
+
+  class CategoriesRecord < SimpleJSONAPIClient::Base
+    TYPE = 'assetGroupCategories'
+    COLLECTION_URL = 'asset_group_categories'
+    INDIVIDUAL_URL = 'asset_group_categories/%{id}'
+
+    attributes :name
+
+    has_many :assetGroups, class_name: 'FlightAsset::AssetGroupsRecord'
   end
 end
 

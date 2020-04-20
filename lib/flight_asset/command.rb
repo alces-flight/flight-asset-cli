@@ -52,7 +52,6 @@ module FlightAsset
     # This method must not print to StandardOut as this gets in the way of output
     # toggling
     def run
-      raise NotImplementedError
     end
 
     ##
@@ -124,8 +123,21 @@ module FlightAsset
 
     def request_asset_groups_record_by_name(name, error: true)
       request_asset_groups_records.find { |a| a.name == name }.tap do |g|
-        raise AssetGroupMissing, <<~ERROR.chomp if g.nil? && error
-          Could not locate asset group: #{name}
+        raise GroupMissing, <<~ERROR.chomp if g.nil? && error
+          Could not locate group: #{name}
+        ERROR
+      end
+    end
+
+    def request_categories_records
+      url = "asset-group-categories?sort=name"
+      CategoriesRecord.fetch_all(connection: connection, url: url)
+    end
+
+    def request_categories_record_by_name(name, error: true)
+      request_categories_records.find { |c| c.name == name }.tap do |c|
+        raise CategoryMissing, <<~ERROR.chomp if c.nil? && error
+          Could not locate category: #{name}
         ERROR
       end
     end
