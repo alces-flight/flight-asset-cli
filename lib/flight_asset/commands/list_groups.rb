@@ -37,6 +37,11 @@ module FlightAsset
       def table_procs
         [
           ['Name', ->(a) { a.name }],
+          ['Category', ->(a) do
+            if a.send(:input_relationships)['assetGroupCategory']['data']
+              a.assetGroupCategory&.name
+            end
+          end],
           ['Decommissioned', ->(a) { a.decommissioned }]
         ]
       end
