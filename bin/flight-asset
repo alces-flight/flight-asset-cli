@@ -32,7 +32,15 @@ require 'rubygems'
 require 'bundler'
 Bundler.setup(:default)
 
-# Require the config
+# Load the config file
+# NOTE: Moving this file name to *-with-config makes the  first postional
+# argument the config path
+args = ARGV.dup
+if /.*-with-config\Z/.match? __FILE__
+  module FlightAsset; end
+  class FlightAsset::Config < Hash; end
+  FlightAsset::Config.const_set('PATH', args.shift)
+end
 require_relative '../lib/flight_asset/config'
 
 # Require gems in development mode
@@ -44,5 +52,5 @@ end
 
 # Runs the CLI
 require_relative '../lib/flight_asset/cli'
-FlightAsset::CLI.run_with_wizard(*ARGV)
+FlightAsset::CLI.run_with_wizard(*args)
 

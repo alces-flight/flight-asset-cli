@@ -35,8 +35,10 @@ require 'yaml'
 require 'logger'
 
 module FlightAsset
-  # Allow the Config base classes to be switched out
-  Config ||= Class.new(Hash)
+  # Dynamically define the base config class and PATH
+  Config ||= Class.new(Hash) do
+    PATH = File.expand_path('../../etc/config.yaml', __dir__)
+  end
 
   class Config
     def self.property(key, default: nil, required: false)
@@ -138,7 +140,6 @@ module FlightAsset
     end
 
     # Defines the CACHE last
-    Config::PATH ||= File.expand_path('../../etc/config.yaml', __dir__)
     Config::CACHE = File.exists?(PATH) ? read(PATH) : new
     Config::REFERENCE_PATH = File.expand_path('../../etc/config.reference.yaml', __dir__)
     Config::REFERENCE_OPTS = YAML.load(File.read(REFERENCE_PATH))
