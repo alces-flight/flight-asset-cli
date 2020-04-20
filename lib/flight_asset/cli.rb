@@ -183,6 +183,9 @@ module FlightAsset
       c.option '--group GROUP'
     end
 
+    create_command 'list-groups' do |c|
+    end
+
     if Config::CACHE.development?
       create_command 'console'
     end

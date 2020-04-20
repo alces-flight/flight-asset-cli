@@ -37,7 +37,6 @@ module FlightAsset
       def table_procs
         [
           ['Name', ->(a) { a.name }],
-          ['Support Type', ->(a) { a.support_type }],
           ['Decommissioned', ->(a) { a.decommissioned }]
         ]
       end
