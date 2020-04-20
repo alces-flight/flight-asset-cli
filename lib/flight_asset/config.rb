@@ -78,12 +78,16 @@ module FlightAsset
 
     property :base_url, default: 'https://center.alces-flight.com/api/v1'
     property :create_dummy_group_name, default: 'ignore-me'
-    property :jwt, default: ''
+    property :jwt, required: true
 
     property :component_id, required: true
 
     property :log_path
     property :log_level, default: 'error'
+
+    def finished?
+      opts.key?(:finished)
+    end
 
     def development?
       log_level == 'development'
