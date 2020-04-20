@@ -27,33 +27,22 @@
 
 module FlightAsset
   module Commands
-    module Concerns
-      module HasAssetGroupsRecord
-        def self.included(base)
-          base.rotate_table
-        end
+    class MoveGroup < FlightAsset::Command
+      include Concerns::HasAssetGroupsRecord
 
-        def table_procs
-          [
-            ['Name', ->(a) { a.name }],
-            ['Category', ->(a) do
-              if a.send(:input_relationships)['assetGroupCategory']['data']
-                a.assetGroupCategory&.name
-              end
-            end],
-            ['Decommissioned', ->(a) { a.decommissioned }]
-          ]
-        end
+      define_args :name
+      attr_accessor :asset_groups_record
 
-        def pretty_table
-          parse_header_table([asset_groups_record], table_procs)
+      def run
+        initial = request_asset_groups_record_by_name(name)
+        cat = if opts.category
+          request_categories_record_by_name(opts.category)
+        else
+          nil
         end
-
-        def machine_table
-          parse_table([asset_groups_record], table_procs.map { |p| p[1] })
-        end
+        self.assets_record = \
+          request_asset_groups_record_move_category(initial, cat)
       end
     end
   end
 end
-

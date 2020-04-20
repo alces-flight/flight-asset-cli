@@ -108,6 +108,17 @@ module FlightAsset
     has_one :component, class_name: 'FlightAsset::ComponentsRecord'
     has_many :assets, class_name: 'FlightAsset::AssetsRecord'
     has_one :assetGroupCategory, class_name: 'FlightAsset::CategoriesRecord'
+
+    def category_relationship_url
+      urls = ['asset_group_category', 'assetGroupCategory'].map do |key|
+        next unless input_relationships.key? key
+        input_relationships[key]['links']['self']
+      end.reject(&:nil?).uniq
+      raise InternalError, <<~ERROR.chomp unless urls.length == 1
+        Failed to determine category relationship URL
+      ERROR
+      urls.first
+    end
   end
 
   class CategoriesRecord < SimpleJSONAPIClient::Base

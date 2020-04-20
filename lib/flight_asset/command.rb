@@ -117,7 +117,7 @@ module FlightAsset
     end
 
     def request_asset_groups_records
-      url = "components/#{Config::CACHE.component_id}/asset_groups?sort=name"
+      url = "components/#{Config::CACHE.component_id}/asset_groups?sort=name&&include=assetGroupCategory,asset_group_category"
       AssetGroupsRecord.fetch_all(connection: connection, url: url)
     end
 
@@ -144,10 +144,19 @@ module FlightAsset
 
     def request_assets_record_move_asset_group(assets_record, asset_groups_record = nil)
       rel_url = assets_record.asset_group_relationship_url
-      data = asset_groups_record ? asset_groups_record.to_relationship : nil
+      data = asset_groups_record&.to_relationship
       connection.patch(rel_url, { data: data })
       AssetsRecord.fetch(
         connection: connection, url_opts: { id: assets_record.id }
+      )
+    end
+
+    def request_asset_groups_record_move_category(asset_groups_record, category_record = nil)
+      rel_url = asset_groups_record.category_relationship_url
+      data = category_record&.to_relationship
+      connection.patch(rel_url, { data: data })
+      AssetGroupsRecord.fetch(
+        connection: connection, url_opts: { id: asset_groups_record.id }
       )
     end
 
