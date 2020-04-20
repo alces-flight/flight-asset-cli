@@ -103,7 +103,7 @@ module FlightAsset
   end
 
   class AssetGroupsRecord < AutoRecord
-    fallback_attributes :name
+    fallback_attributes :name, :decommissioned
 
     has_one :component, class_name: 'FlightAsset::ComponentsRecord'
     has_many :assets, class_name: 'FlightAsset::AssetsRecord'
