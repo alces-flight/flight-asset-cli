@@ -73,7 +73,7 @@ module FlightAsset
     end
 
     def self.wizard?
-      !(Config::CACHE.configured? && Config::CACHE.finished?)
+      !Config::CACHE.finished?
     end
 
     def self.commands_or_wizzard
@@ -143,6 +143,11 @@ module FlightAsset
           # Notifies the user
           #
           $stderr.puts "Created Config: #{Config::PATH}"
+          $stderr.puts <<~WARN if new_config.configured? && !opts[:finished]
+
+          The application appears to be fully configured. Use the
+          --finished flag to exit the wizard.
+          WARN
           $stderr.puts <<~WARN if opts[:finished] && !new_config.finished?
 
             Ignoring the --finished flag as the application has not
