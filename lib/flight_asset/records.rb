@@ -79,6 +79,8 @@ module FlightAsset
   end
 
   class ComponentsRecord < AutoRecord
+    attributes :name
+
     has_many :assets, class_name: 'FlightAsset::AssetsRecord'
   end
 
