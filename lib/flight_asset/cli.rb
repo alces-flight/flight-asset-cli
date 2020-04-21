@@ -48,7 +48,7 @@ module FlightAsset
           cmd = Commands.build(name, *args, **opts.__hash__)
           cmd.run
           if $stdout.tty?
-            puts cmd.pretty_table.render(:ascii)
+            puts cmd.pretty_table.render(:ascii, multiline: true)
           else
             cmd.machine_table.rows.each do |rows|
               puts rows.join("\t")
@@ -165,8 +165,9 @@ module FlightAsset
     end
 
     create_command 'create', 'ASSET' do |c|
-      c.option '--group GROUP'
+      c.option '--group GROUP', 'Add the asset to an existing group'
       c.option '--support-type SUPPORT_TYPE', 'Set the support type', default: 'advice'
+      c.option '--info INFO', 'Additional information about the asset', default: ''
     end
 
     create_command 'decommission', 'ASSET' do |c|

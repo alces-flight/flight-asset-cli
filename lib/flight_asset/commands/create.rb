@@ -71,7 +71,7 @@ module FlightAsset
           },
           attributes: {
             name: name,
-            info: 'some info',
+            info: opts.info,
             support_type: opts.support_type,
             supportType: opts.support_type
           }
