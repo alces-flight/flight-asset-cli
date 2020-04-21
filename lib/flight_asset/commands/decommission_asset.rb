@@ -27,14 +27,17 @@
 
 module FlightAsset
   module Commands
-    class Show  < FlightAsset::Command
+    class DecommissionAsset < FlightAsset::Command
       include Concerns::HasAssetsRecord
 
       define_args :name
       attr_reader :assets_record
 
       def run
-        @assets_record ||= request_assets_record_by_name(name)
+        @assets_record ||= begin
+          a = request_assets_record_by_name(name)
+          a.update(decommissioned: true)
+        end
       end
     end
   end
