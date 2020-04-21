@@ -50,7 +50,9 @@ module FlightAsset
           if $stdout.tty?
             puts cmd.pretty_table.render(:ascii)
           else
-            puts cmd.machine_table.render(:basic)
+            cmd.machine_table.rows.each do |rows|
+              puts rows.join("\t")
+            end
           end
         end
 
