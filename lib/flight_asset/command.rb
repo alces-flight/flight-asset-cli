@@ -117,8 +117,11 @@ module FlightAsset
     end
 
     def request_asset_groups_records
-      url = "components/#{Config::CACHE.component_id}/asset_groups?sort=name&&include=assetGroupCategory,asset_group_category"
-      AssetGroupsRecord.fetch_all(connection: connection, url: url)
+      AssetGroupsRecord.fetch_all(
+        connection: connection,
+        url: "components/#{Config::CACHE.component_id}/asset_groups",
+        includes: ['assetGroupCategroy', 'asset_group_category']
+      )
     end
 
     def request_asset_groups_record_by_name(name, error: true)

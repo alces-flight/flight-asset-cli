@@ -31,7 +31,7 @@ module FlightAsset
       attr_reader :categories_records
 
       def run
-        @categories_records ||= request_categories_records.sort(&:name)
+        @categories_records ||= request_categories_records.sort_by(&:name)
       end
 
       def table_procs
