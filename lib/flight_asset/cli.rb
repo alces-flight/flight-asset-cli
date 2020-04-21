@@ -167,7 +167,8 @@ module FlightAsset
     create_command 'create', 'ASSET' do |c|
       c.option '--group GROUP', 'Add the asset to an existing group'
       c.option '--support-type SUPPORT_TYPE', 'Set the support type', default: 'advice'
-      c.option '--info INFO', 'Additional information about the asset', default: ''
+      c.option '--info INFO', 'Additional information about the asset'
+      c.option '--info-path PATH', 'Override --info with contents of a file'
     end
 
     create_command 'decommission', 'ASSET' do |c|
