@@ -147,6 +147,12 @@ module FlightAsset
     Config::CACHE = File.exists?(PATH) ? read(PATH) : new
     Config::REFERENCE_PATH = File.expand_path('../../etc/config.reference.yaml', __dir__)
     Config::REFERENCE_OPTS = YAML.load(File.read(REFERENCE_PATH))
+    Config::COMMENT_BLOCK = <<~CONF
+      # This config has been auto generated!
+      #
+      # Any modifications to the configuration values will be preserved
+      # However comments will be removed the next time this file is updated
+    CONF
   end
 end
 
