@@ -108,6 +108,11 @@ module FlightAsset
       AssetsRecord.fetch_all(connection: connection, url: url)
     end
 
+    def request_assets_records_by_asset_group(asset_group_record)
+      url = asset_group_record.assets_relationship_url
+      AssetsRecord.fetch_all(connection: connection, url: url)
+    end
+
     def request_assets_record_by_name(name, error: true)
       request_assets_records.find { |a| a.name == name }.tap do |a|
         raise AssetMissing, <<~ERROR.chomp if a.nil? && error

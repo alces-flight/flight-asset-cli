@@ -109,6 +109,10 @@ module FlightAsset
     has_many :assets, class_name: 'FlightAsset::AssetsRecord'
     has_one :assetGroupCategory, class_name: 'FlightAsset::CategoriesRecord'
 
+    def assets_relationship_url
+      input_relationships['assets']['links']['self']
+    end
+
     def category_relationship_url
       urls = ['asset_group_category', 'assetGroupCategory'].map do |key|
         next unless input_relationships.key? key
