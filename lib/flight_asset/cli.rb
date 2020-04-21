@@ -167,6 +167,7 @@ module FlightAsset
     end
 
     create_command 'create-asset', 'ASSET' do |c|
+      c.summary = 'Define a new asset'
       c.option '--group GROUP', 'Add the asset to an existing group'
       c.option '--support-type SUPPORT_TYPE', 'Set the support type', default: 'advice'
       c.option '--info INFO', 'Additional information about the asset'
