@@ -166,13 +166,14 @@ module FlightAsset
 
     create_command 'create', 'ASSET' do |c|
       c.option '--group GROUP'
+      c.option '--support-type SUPPORT_TYPE', 'Set the support type', default: 'advice'
     end
 
     create_command 'decommission', 'ASSET' do |c|
     end
 
     create_command 'update', 'ASSET' do |c|
-      c.option '--support-type SUPPORT_TYPE'
+      c.option '--support-type SUPPORT_TYPE', 'Update the support type'
     end
 
     create_command 'move', 'ASSET' do |c|

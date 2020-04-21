@@ -72,8 +72,8 @@ module FlightAsset
           attributes: {
             name: name,
             info: 'some info',
-            support_type: 'advice',
-            supportType: 'advice'
+            support_type: opts.support_type,
+            supportType: opts.support_type
           }
         )
       end
