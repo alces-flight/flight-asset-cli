@@ -165,6 +165,7 @@ module FlightAsset
     end
 
     create_command 'list' do |c|
+      c.option '--group GROUP', 'Filter the assets by GROUP name'
     end
 
     create_command 'show', 'ASSET' do |c|
