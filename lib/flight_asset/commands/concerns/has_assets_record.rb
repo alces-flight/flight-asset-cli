@@ -37,7 +37,10 @@ module FlightAsset
           [
             ['Name', ->(a) { a.name }],
             ['Support Type', ->(a) { a.support_type }],
-            ['Decommissioned', ->(a) { a.decommissioned }]
+            ['Decommissioned', ->(a) { a.decommissioned }],
+            ['Component', ->(a) { a.component.name } ],
+            ['Asset Groups', ->(a) { a.assetGroup.name }],
+            ['Additional Information', ->(a) { a.info }]
           ]
         end
 
