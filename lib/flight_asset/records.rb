@@ -123,8 +123,8 @@ module FlightAsset
 
   class CategoriesRecord < SimpleJSONAPIClient::Base
     TYPE = 'assetGroupCategories'
-    COLLECTION_URL = 'asset_group_categories'
-    INDIVIDUAL_URL = 'asset_group_categories/%{id}'
+    COLLECTION_URL = 'asset-group-categories'
+    INDIVIDUAL_URL = 'asset-group-categories/%{id}'
 
     attributes :name
 
