@@ -194,6 +194,10 @@ module FlightAsset
     create_command 'decommission-group', 'ASSET_GROUP' do |c|
     end
 
+    create_command 'move-group', 'ASSET_GROUP' do |c|
+      c.option '--category CATEGORY'
+    end
+
     create_command 'list-categories' do |c|
     end
 
