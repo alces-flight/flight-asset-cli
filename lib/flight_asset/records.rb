@@ -92,6 +92,13 @@ module FlightAsset
     has_one :asset_group, class_name: 'FlightAsset::AssetGroupsRecord'
     has_one :assetGroup, class_name: 'FlightAsset::AssetGroupsRecord'
 
+    def asset_group_or_missing
+      key = ['asset_group', 'assetGroup'].find do |key|
+        input_relationships[key]&.[]('data')
+      end
+      key ? send(key) : nil
+    end
+
     def asset_group_relationship_url
       urls = ['asset_group', 'assetGroup'].map do |key|
         next unless input_relationships.key? key
