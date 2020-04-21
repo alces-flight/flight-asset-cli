@@ -71,11 +71,29 @@ module FlightAsset
           },
           attributes: {
             name: name,
-            info: opts.info,
+            info: info,
             support_type: opts.support_type,
             supportType: opts.support_type
           }
         )
+      end
+
+      def info
+        if opts.info && opts.info_path
+          raise InputError, <<~ERROR.chomp
+            --info and --info-path can not be used together
+          ERROR
+        elsif opts.info_path && File.exists?(opts.info_path)
+          File.read opts.info_path
+        elsif opts.info_path
+          raise InvalidInput, <<~ERROR.chomp
+            Could not locate: #{opts.info_path}
+          ERROR
+        elsif opts.info
+          opts.info
+        else
+          ''
+        end
       end
     end
   end
