@@ -157,32 +157,32 @@ module FlightAsset
       end
     end
 
-    create_command 'list' do |c|
+    create_command 'list-assets' do |c|
       c.summary = 'Return all the assets'
       c.option '--group GROUP', 'Filter the assets by GROUP'
     end
 
-    create_command 'show', 'ASSET' do |c|
+    create_command 'show-asset', 'ASSET' do |c|
       c.summary = 'Return the detailed description of an asset'
     end
 
-    create_command 'create', 'ASSET' do |c|
+    create_command 'create-asset', 'ASSET' do |c|
       c.option '--group GROUP', 'Add the asset to an existing group'
       c.option '--support-type SUPPORT_TYPE', 'Set the support type', default: 'advice'
       c.option '--info INFO', 'Additional information about the asset'
       c.option '--info-path PATH', 'Override --info with contents of a file'
     end
 
-    create_command 'decommission', 'ASSET' do |c|
+    create_command 'decommission-asset', 'ASSET' do |c|
       c.summary = 'Flag that an asset has been decommissioned'
     end
 
-    create_command 'update', 'ASSET' do |c|
+    create_command 'update-asset', 'ASSET' do |c|
       c.summary = 'Modify the support type for an asset'
       c.option '--support-type SUPPORT_TYPE', 'Update the support type'
     end
 
-    create_command 'move', 'ASSET' do |c|
+    create_command 'move-asset', 'ASSET' do |c|
       c.summary = 'Modify which group an asset belongs to'
       c.description = <<~DESC.chomp
         By default this will unassign the asset from its group. The asset will
@@ -225,6 +225,11 @@ module FlightAsset
     create_command 'set-token', 'TOKEN' do |c|
       c.summary = 'Update the API access token'
     end
+
+    alias_regex = /-assets?\Z/
+    commands.keys
+            .select { |c| c.match?(alias_regex) }
+            .each { |c| alias_command c.sub(alias_regex, ''), c }
 
     if Config::CACHE.development?
       create_command 'console'

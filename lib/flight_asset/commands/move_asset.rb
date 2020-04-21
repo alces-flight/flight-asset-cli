@@ -27,17 +27,21 @@
 
 module FlightAsset
   module Commands
-    class Decommission < FlightAsset::Command
+    class MoveAsset < FlightAsset::Command
       include Concerns::HasAssetsRecord
 
       define_args :name
-      attr_reader :assets_record
+      attr_accessor :assets_record
 
       def run
-        @assets_record ||= begin
-          a = request_assets_record_by_name(name)
-          a.update(decommissioned: true)
+        initial = request_assets_record_by_name(name)
+        ag = if opts.group
+          request_asset_groups_record_by_name(opts.group)
+        else
+          nil
         end
+        self.assets_record = \
+          request_assets_record_move_asset_group(initial, ag)
       end
     end
   end

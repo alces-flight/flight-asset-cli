@@ -27,22 +27,32 @@
 
 module FlightAsset
   module Commands
-    class Update < FlightAsset::Command
-      include Concerns::HasAssetsRecord
+    class ListAsset < FlightAsset::Command
+      attr_reader :assets_records
 
-      define_args :name
-      attr_reader :assets_record
+      def assets_records
+        @assets_records ||= if opts.group
+          ag = request_asset_groups_record_by_name(opts.group)
+          request_assets_records_by_asset_group(ag)
+        else
+          request_assets_records
+        end.sort_by(&:name)
+      end
 
-      def run
-        @assets_record ||= begin
-          a = request_assets_record_by_name(name)
-          updates = {}
-          if opts.support_type
-            updates[:support_type] = opts.support_type
-            updates[:supportType] = opts.support_type
-          end
-          a.update(**updates)
-        end
+      def table_procs
+        [
+          ['Name', ->(a) { a.name }],
+          ['Support Type', ->(a) { a.support_type }],
+          ['Decommissioned', ->(a) { a.decommissioned }]
+        ]
+      end
+
+      def pretty_table
+        parse_header_table(assets_records, table_procs)
+      end
+
+      def machine_table
+        parse_table(assets_records, table_procs.map { |p| p[1] })
       end
     end
   end

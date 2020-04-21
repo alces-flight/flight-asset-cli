@@ -27,7 +27,7 @@
 
 module FlightAsset
   module Commands
-    class Create < FlightAsset::Command
+    class CreateAsset < FlightAsset::Command
       include Concerns::HasAssetsRecord
 
       define_args :name

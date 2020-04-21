@@ -27,21 +27,14 @@
 
 module FlightAsset
   module Commands
-    class Move < FlightAsset::Command
+    class ShowAsset  < FlightAsset::Command
       include Concerns::HasAssetsRecord
 
       define_args :name
-      attr_accessor :assets_record
+      attr_reader :assets_record
 
       def run
-        initial = request_assets_record_by_name(name)
-        ag = if opts.group
-          request_asset_groups_record_by_name(opts.group)
-        else
-          nil
-        end
-        self.assets_record = \
-          request_assets_record_move_asset_group(initial, ag)
+        @assets_record ||= request_assets_record_by_name(name)
       end
     end
   end
