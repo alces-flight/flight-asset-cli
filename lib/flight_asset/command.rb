@@ -104,7 +104,7 @@ module FlightAsset
     end
 
     def request_assets_records
-      url = "components/#{Config::CACHE.component_id}/assets?sort=name"
+      url = "components/#{Config::CACHE.component_id}/assets"
       AssetsRecord.fetch_all(connection: connection, url: url)
     end
 
@@ -130,8 +130,7 @@ module FlightAsset
     end
 
     def request_categories_records
-      url = "asset-group-categories?sort=name"
-      CategoriesRecord.fetch_all(connection: connection, url: url)
+      CategoriesRecord.fetch_all(connection: connection)
     end
 
     def request_categories_record_by_name(name, error: true)
