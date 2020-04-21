@@ -40,7 +40,7 @@ module FlightAsset
         else
           nil
         end
-        self.assets_record = \
+        self.asset_groups_record = \
           request_asset_groups_record_move_category(initial, cat)
       end
     end
