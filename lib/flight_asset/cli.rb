@@ -158,10 +158,12 @@ module FlightAsset
     end
 
     create_command 'list' do |c|
-      c.option '--group GROUP', 'Filter the assets by GROUP name'
+      c.summary = 'Return all the assets'
+      c.option '--group GROUP', 'Filter the assets by GROUP'
     end
 
     create_command 'show', 'ASSET' do |c|
+      c.summary = 'Return the detailed description of an asset'
     end
 
     create_command 'create', 'ASSET' do |c|
@@ -172,37 +174,57 @@ module FlightAsset
     end
 
     create_command 'decommission', 'ASSET' do |c|
+      c.summary = 'Flag that an asset has been decommissioned'
     end
 
     create_command 'update', 'ASSET' do |c|
+      c.summary = 'Modify the support type for an asset'
       c.option '--support-type SUPPORT_TYPE', 'Update the support type'
     end
 
     create_command 'move', 'ASSET' do |c|
-      c.option '--group GROUP'
+      c.summary = 'Modify which group an asset belongs to'
+      c.description = <<~DESC.chomp
+        By default this will unassign the asset from its group. The asset will
+        be reassigned to a new group if the --group flag has been provided.
+      DESC
+      c.option '--group GROUP', 'Reassign the asset to GROUP'
     end
 
     create_command 'list-groups' do |c|
-      c.option '--category CATEGORY'
+      c.summary = 'Return all the groups'
+      c.option '--category CATEGORY', 'Filter the groups be CATEGORY'
     end
 
     create_command 'show-group', 'ASSET_GROUP' do |c|
+      c.summary = 'Return the detailed description of a group'
     end
 
     create_command 'decommission-group', 'ASSET_GROUP' do |c|
+      c.summary = 'Flag that a group has been decommissioned'
     end
 
     create_command 'move-group', 'ASSET_GROUP' do |c|
-      c.option '--category CATEGORY'
+      c.summary = 'Modify which category a group belongs to'
+      c.description = <<~DESC.chomp
+        By default this will unassign the group from its category. The group
+        will be reassigned to a new category if the --category flag has been
+        provided.
+      DESC
+      c.option '--category CATEGORY', 'Reassign the group to CATEGORY'
     end
 
     create_command 'list-categories' do |c|
+      c.summary = 'Return all the categories'
     end
 
     create_command 'show-category', 'CATEGORY' do |c|
+      c.summary = 'Return the detailed description of a category'
     end
 
-    create_command 'set-token', 'TOKEN'
+    create_command 'set-token', 'TOKEN' do |c|
+      c.summary = 'Update the API access token'
+    end
 
     if Config::CACHE.development?
       create_command 'console'
