@@ -187,6 +187,7 @@ module FlightAsset
     end
 
     create_command 'list-groups' do |c|
+      c.option '--category CATEGORY'
     end
 
     create_command 'show-group', 'ASSET_GROUP' do |c|

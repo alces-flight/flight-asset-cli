@@ -129,6 +129,11 @@ module FlightAsset
       )
     end
 
+    def request_asset_groups_records_by_category(category)
+      url = category.asset_groups_relationship_url
+      AssetGroupsRecord.fetch_all(connection: connection, url: url)
+    end
+
     def request_asset_groups_record_by_name(name, error: true)
       request_asset_groups_records.find { |a| a.name == name }.tap do |g|
         raise GroupMissing, <<~ERROR.chomp if g.nil? && error

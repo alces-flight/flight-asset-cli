@@ -30,8 +30,13 @@ module FlightAsset
     class ListGroups < FlightAsset::Command
       attr_reader :asset_groups_records
 
-      def run
-        @asset_groups_records ||= request_asset_groups_records
+      def asset_groups_records
+        @asset_groups_records ||= if opts.category
+          cat = request_categories_record_by_name(opts.category)
+          request_asset_groups_records_by_category(cat)
+        else
+          request_asset_groups_records
+        end.sort_by(&:name)
       end
 
       def table_procs

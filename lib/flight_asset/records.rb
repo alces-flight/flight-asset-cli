@@ -133,6 +133,17 @@ module FlightAsset
     attributes :name
 
     has_many :assetGroups, class_name: 'FlightAsset::AssetGroupsRecord'
+
+    def asset_groups_relationship_url
+      urls = ['asset_groups', 'assetGroups'].map do |key|
+        next unless input_relationships.key? key
+        input_relationships[key]['links']['self']
+      end.reject(&:nil?).uniq
+      raise InternalError, <<~ERROR.chomp unless urls.length == 1
+        Failed to determine asset_groups relationship URL
+      ERROR
+      urls.first
+    end
   end
 end
 
