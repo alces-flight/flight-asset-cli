@@ -50,6 +50,9 @@ if FlightAsset::Config::CACHE.development?
   require 'pry-byebug'
 end
 
+# Display the help by default
+args << '--help' if args.empty?
+
 # Runs the CLI
 require_relative '../lib/flight_asset/cli'
 FlightAsset::CLI.run_with_wizard(*args)
