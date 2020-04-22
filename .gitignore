@@ -1,4 +1,5 @@
 etc/config.yaml
 var
 .bundle
+vendor
 bin/*-with-config
