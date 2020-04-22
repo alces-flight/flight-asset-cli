@@ -14,8 +14,8 @@ This command line utility manages Alces Flight Center assets including the follo
 
 The application requires a modern(ish) version of `ruby`/`bundler`. It has been designed with the following versions in mind:
 * centos7
-* ruby 2.6.1
-* bundler 1.17.3
+* ruby 2.7.1
+* bundler 2.1.4
 
 After downloading the source code (via git or other means), the gems need to be installed using bundler:
 
