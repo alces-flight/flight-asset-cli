@@ -4,11 +4,42 @@ Manage Alces Flight Center Assets
 
 ## Overview
 
+This command line utility manages Alces Flight Center assets including the following:
+* View and list the assets, groups, and categories,
+* Create a new asset,
+* Modify the asset's support type, and
+* Decommission assets and groups.
+
 ## Installation
+
+The application requires a modern(ish) version of `ruby`/`bundler`. It has been designed with the following versions in mind:
+* centos7
+* ruby 2.6.1
+* bundler 1.17.3
+
+After downloading the source code (via git or other means), the gems need to be installed using bundler:
+
+```
+cd /path/to/source
+bundle install --with default --without development --path vendor
+```
 
 ## Configuration
 
+By default this application will look for `etc/config.yaml` as its configuration file. This config can be easily created using the `wizard` utility. It is not possible to exit the wizard until all the `REQUIRED` flags have been provided (see `wizard --help` for details). The `--finished` flag will exit the wizard after all the required flags have been provided.
+
+```
+# The the list of required configuration flags
+bin/flight-asset wizard --help
+
+# Example command setting configs
+# NOTE: The --finished flag is required to exit the wizard
+bin/flight-asset wizard --jwt foo --component-id bar --finished
+```
+
 ## Operation
+
+WIP
 
 # Contributing
 
