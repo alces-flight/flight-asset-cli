@@ -37,6 +37,18 @@ bin/flight-asset wizard --help
 bin/flight-asset wizard --jwt foo --component-id bar --finished
 ```
 
+### Advanced: Change the config path
+
+It is possible to move the config file by renaming the executable to `flight-asset-with-config`. This makes the first argument to the script the config path. The config path must be provided with every execution of this script.
+
+```
+# Create the executable
+ln -s bin/flight-asset bin/flight-asset-with-config
+
+# Execute the CLI with a different config
+bin/flight-asset-with-config /tmp/other.yaml
+```
+
 ## Operation
 
 WIP
