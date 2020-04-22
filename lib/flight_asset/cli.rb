@@ -227,10 +227,12 @@ module FlightAsset
       c.summary = 'Update the API access token'
     end
 
-    alias_regex = /-assets?\Z/
-    commands.keys
-            .select { |c| c.match?(alias_regex) }
-            .each { |c| alias_command c.sub(alias_regex, ''), c }
+    unless wizard?
+      alias_regex = /-assets?\Z/
+      commands.keys
+              .select { |c| c.match?(alias_regex) }
+              .each { |c| alias_command c.sub(alias_regex, ''), c }
+    end
 
     if Config::CACHE.development?
       create_command 'console'
