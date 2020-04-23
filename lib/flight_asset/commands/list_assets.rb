@@ -27,7 +27,7 @@
 
 module FlightAsset
   module Commands
-    class ListAsset < FlightAsset::Command
+    class ListAssets < FlightAsset::Command
       attr_reader :assets_records
 
       def assets_records
