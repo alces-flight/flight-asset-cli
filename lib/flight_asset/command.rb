@@ -111,7 +111,7 @@ module FlightAsset
 
     def request_assets_records_by_asset_group(asset_group_record)
       url = asset_group_record.assets_relationship_url
-      AssetsRecord.fetch_all(connection: connection, url: url)
+      AssetsRecord.index_enum(connection: connection, url: url)
     end
 
     def request_assets_record_by_name(name, error: true)
@@ -123,7 +123,7 @@ module FlightAsset
     end
 
     def request_asset_groups_records
-      AssetGroupsRecord.fetch_all(
+      AssetGroupsRecord.index_enum(
         connection: connection,
         url: "components/#{Config::CACHE.component_id}/asset_groups",
         includes: ['assetGroupCategroy', 'asset_group_category']
@@ -132,7 +132,7 @@ module FlightAsset
 
     def request_asset_groups_records_by_category(category)
       url = category.asset_groups_relationship_url
-      AssetGroupsRecord.fetch_all(connection: connection, url: url)
+      AssetGroupsRecord.index_enum(connection: connection, url: url)
     end
 
     def request_asset_groups_record_by_name(name, error: true)
@@ -144,7 +144,7 @@ module FlightAsset
     end
 
     def request_categories_records
-      CategoriesRecord.fetch_all(connection: connection)
+      CategoriesRecord.index_enum(connection: connection)
     end
 
     def request_categories_record_by_name(name, error: true)

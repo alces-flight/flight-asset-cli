@@ -26,7 +26,55 @@
 #==============================================================================
 
 module FlightAsset
-  class AutoRecord < SimpleJSONAPIClient::Base
+  class BaseRecord < SimpleJSONAPIClient::Base
+    # Defines a method to index a particular URL, very few protections are in
+    # place. However it should page responses correctly
+    def self.index_enum(**base_opts)
+      Enumerator.new do |yielder|
+        nxt = ''
+        known = {}
+
+        # Pages the subsequent requests
+        while nxt do
+          # Extracts the opts from the next request
+          #
+          # HACK: BUG IN PAGING RESULTS
+          # The API links sometimes returns nxt links like the following.
+          # Note how there are two sets of query parameters:
+          # https://example.com/api/v1/components/3/assets?page%5Bnumber%5D=3&page%5Bsize%5D=10?page%5Bnumber%5D=2&page%5Bsize%5D=10
+          #
+          # The first set of query parameters are from the request and can
+          # be considered junk. The last set are the actual `page[number]`
+          # and `page[size]` for the next request. The next URL must be
+          # reformed otherwise all sorts of erroneous requests could be made
+          nxt_params = CGI.parse(nxt.split('?').last || '')
+          new_opts = ['size', 'number'].map do |key|
+            [key, nxt_params.fetch("page[#{key}]", []).first]
+          end.reject { |_, v| v.nil? }.to_h
+          opts = base_opts.merge(page_opts: new_opts)
+
+          # Makes the next request
+          res = operation(:fetch_all_request, :plural, **opts)
+
+          # Extracts the required links
+          slf, nxt = ['self', 'next'].map do |key|
+            res['links'].fetch(key, nil)
+          end
+
+          # Registers the response as known and errors on duplicates
+          raise InternalError, <<~ERROR.chomp if known[slf]
+            Caught in request loop for: #{slf}
+          ERROR
+          known[slf] = true
+
+          # Register the records on the enumerator
+          res['data'].each { |d| yielder << d }
+        end
+      end
+    end
+  end
+
+  class AutoRecord < BaseRecord
     def self.inherited(klass)
       base = klass.name.split('::').last.chomp('Record')
       camal = base.dup.tap { |b| b[0] = b[0].downcase }
@@ -74,54 +122,6 @@ module FlightAsset
         # Define the keys as an internal attribute
         _attributes[snake] = true
         _attributes[camal] = true
-      end
-    end
-
-    # Defines a method to index a particular URL, very few protections are in
-    # place. However it should page responses correctly
-    def self.index_enum(url: nil, connection:)
-      Enumerator.new do |yielder|
-        base_opts = { connection: connection}
-        base_opts[:url] = url if url
-        nxt = ''
-        known = {}
-
-        # Pages the subsequent requests
-        while nxt do
-          # Extracts the opts from the next request
-          #
-          # HACK: BUG IN PAGING RESULTS
-          # The API links sometimes returns nxt links like the following.
-          # Note how there are two sets of query parameters:
-          # https://example.com/api/v1/components/3/assets?page%5Bnumber%5D=3&page%5Bsize%5D=10?page%5Bnumber%5D=2&page%5Bsize%5D=10
-          #
-          # The first set of query parameters are from the request and can
-          # be considered junk. The last set are the actual `page[number]`
-          # and `page[size]` for the next request. The next URL must be
-          # reformed otherwise all sorts of erroneous requests could be made
-          nxt_params = CGI.parse(nxt.split('?').last || '')
-          new_opts = ['size', 'number'].map do |key|
-            [key, nxt_params.fetch("page[#{key}]", []).first]
-          end.reject { |_, v| v.nil? }.to_h
-          opts = base_opts.merge(page_opts: new_opts)
-
-          # Makes the next request
-          res = operation(:fetch_all_request, :plural, **opts)
-
-          # Extracts the required links
-          slf, nxt = ['self', 'next'].map do |key|
-            res['links'].fetch(key, nil)
-          end
-
-          # Registers the response as known and errors on duplicates
-          raise InternalError, <<~ERROR.chomp if known[slf]
-            Caught in request loop for: #{slf}
-          ERROR
-          known[slf] = true
-
-          # Register the records on the enumerator
-          res['data'].each { |d| yielder << d }
-        end
       end
     end
   end
@@ -182,7 +182,7 @@ module FlightAsset
     end
   end
 
-  class CategoriesRecord < SimpleJSONAPIClient::Base
+  class CategoriesRecord < BaseRecord
     TYPE = 'assetGroupCategories'
     COLLECTION_URL = 'asset-group-categories'
     INDIVIDUAL_URL = 'asset-group-categories/%{id}'
