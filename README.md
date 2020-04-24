@@ -51,7 +51,19 @@ bin/flight-asset-with-config /tmp/other.yaml
 
 ## Operation
 
-WIP
+See the help text for the main commands list:
+
+```
+bin/flight-asset --help
+```
+
+The commonly used commands have been aliased:
+* `list`          => `list-assets`
+* `show`          => `show-asset`
+* `create`        => `create-asset`
+* `decommission`  => `decommission-asset`
+* `update`        => `update-asset`
+* `move`          => `move-asset`
 
 # Known Issues
 
