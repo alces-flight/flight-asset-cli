@@ -83,13 +83,23 @@ module FlightAsset
       Enumerator.new do |yielder|
         base_opts = { connection: connection}
         base_opts[:url] = url if url
-        nxt = '?'
+        nxt = ''
         known = {}
 
         # Pages the subsequent requests
         while nxt do
           # Extracts the opts from the next request
-          nxt_params = CGI.parse(nxt.split('?', 2).last)
+          #
+          # HACK: BUG IN PAGING RESULTS
+          # The API links sometimes returns nxt links like the following.
+          # Note how there are two sets of query parameters:
+          # https://example.com/api/v1/components/3/assets?page%5Bnumber%5D=3&page%5Bsize%5D=10?page%5Bnumber%5D=2&page%5Bsize%5D=10
+          #
+          # The first set of query parameters are from the request and can
+          # be considered junk. The last set are the actual `page[number]`
+          # and `page[size]` for the next request. The next URL must be
+          # reformed otherwise all sorts of erroneous requests could be made
+          nxt_params = CGI.parse(nxt.split('?').last || '')
           new_opts = ['size', 'number'].map do |key|
             [key, nxt_params.fetch("page[#{key}]", []).first]
           end.reject { |_, v| v.nil? }.to_h

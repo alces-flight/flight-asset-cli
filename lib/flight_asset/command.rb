@@ -105,7 +105,7 @@ module FlightAsset
 
     def request_assets_records
       url = "components/#{Config::CACHE.component_id}/assets"
-      AssetsRecord.fetch_all(connection: connection, url: url)
+      AssetsRecord.index_enum(connection: connection, url: url)
     end
 
     def request_assets_records_by_asset_group(asset_group_record)
