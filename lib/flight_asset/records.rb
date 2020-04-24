@@ -76,6 +76,44 @@ module FlightAsset
         _attributes[camal] = true
       end
     end
+
+    # Defines a method to index a particular URL, very few protections are in
+    # place. However it should page responses correctly
+    def self.index_enum(url: nil, connection:)
+      Enumerator.new do |yielder|
+        base_opts = { connection: connection}
+        base_opts[:url] = url if url
+        nxt = '?'
+        known = {}
+
+        # Pages the subsequent requests
+        while nxt do
+          # Extracts the opts from the next request
+          nxt_params = CGI.parse(nxt.split('?', 2).last)
+          new_opts = ['size', 'number'].map do |key|
+            [key, nxt_params.fetch("page[#{key}]", []).first]
+          end.reject { |_, v| v.nil? }.to_h
+          opts = base_opts.merge(page_opts: new_opts)
+
+          # Makes the next request
+          res = operation(:fetch_all_request, :plural, **opts)
+
+          # Extracts the required links
+          slf, nxt = ['self', 'next'].map do |key|
+            res['links'].fetch(key, nil)
+          end
+
+          # Registers the response as known and errors on duplicates
+          raise InternalError, <<~ERROR.chomp if known[slf]
+            Caught in request loop for: #{slf}
+          ERROR
+          known[slf] = true
+
+          # Register the records on the enumerator
+          res['data'].each { |d| yielder << d }
+        end
+      end
+    end
   end
 
   class ComponentsRecord < AutoRecord

@@ -35,7 +35,7 @@ module FlightAsset
           ag = request_asset_groups_record_by_name(opts.group)
           request_assets_records_by_asset_group(ag)
         else
-          request_assets_records
+          AssetsRecord.index_enum(connection: connection).to_a
         end.sort_by(&:name)
       end
 

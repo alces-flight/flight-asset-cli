@@ -30,6 +30,7 @@ require 'hashie'
 require 'simple_jsonapi_client'
 require 'faraday'
 require 'faraday_middleware'
+require 'cgi'
 require 'tty-table'
 
 require_relative 'flight_asset/errors'
