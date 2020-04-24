@@ -76,7 +76,8 @@ module FlightAsset
       @opts = opts
     end
 
-    property :base_url, default: 'https://center.alces-flight.com/api/v1'
+    property :base_url, default: 'https://center.alces-flight.com/api'
+    property :api_prefix, default: 'v1'
     property :create_dummy_group_name, default: 'ignore-me'
     property :jwt, required: true
 

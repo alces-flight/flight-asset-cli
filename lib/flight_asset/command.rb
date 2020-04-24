@@ -88,7 +88,8 @@ module FlightAsset
           'Authorization' => "Bearer #{Config::CACHE.jwt}"
         }
 
-        Faraday.new(url: Config::CACHE.base_url, headers: default_headers) do |c|
+        url = File.join(Config::CACHE.base_url, Config::CACHE.api_prefix)
+        Faraday.new(url: url, headers: default_headers) do |c|
           c.use Faraday::Response::Logger, Config::CACHE.logger, { bodies: true } do |logger|
             logger.filter(/(Authorization:)(.*)/, '\1 [REDACTED]')
           end

@@ -8,9 +8,18 @@
 
 # =============================================================================
 # App Base Url
-# Specify the location where the API server is being hosted
+# Specify the location where the API server is being hosted. The API version
+# prefix will be appended to the base url. The all most always means the
+# version should not be included in the URL
 # =============================================================================
 base_url: 'URL to the FC asset API'
+
+# =============================================================================
+# API Version Prefix
+# Change the API version prefix. The prefix is normally static to the
+# application version and should not need modifications.
+# =============================================================================
+api_prefix: 'Set the API version prefix [CAUTION]'
 
 # =============================================================================
 # Component ID
