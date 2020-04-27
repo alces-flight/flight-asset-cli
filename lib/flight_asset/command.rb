@@ -76,35 +76,6 @@ module FlightAsset
       $stdout.tty?
     end
 
-    # The procs should be a 2N array of headers to procs OR a hash
-    def parse_header_table(elements, headers_and_procs_raw, rotate: false)
-      headers_and_procs = headers_and_procs_raw.to_a
-      headers = headers_and_procs.map { |h| h[0] }
-      procs = headers_and_procs.map { |h| h[1] }
-      parse_table(elements, procs, headers: headers, rotate: rotate)
-    end
-
-    def parse_table(elements, procs, headers: nil, rotate: false)
-      rows = elements.map do |element|
-        procs.map { |p| p.respond_to?(:call) ? p.call(element) : p }
-      end
-
-      # flips the table if required
-      opts = if rotate
-        temp_rows = rows.dup
-        temp_rows.unshift(headers) if headers
-        max = temp_rows.map(&:length).max
-        new_rows = (0...max).map do |idx|
-          temp_rows.map { |row| row[idx] }
-        end
-        { rows: new_rows }
-      else
-        { rows: rows }.tap { |o| o[:header] = headers if headers }
-      end
-
-      TTY::Table.new(**opts)
-    end
-
     ##
     # Faraday Connection To the Remote service
     def connection

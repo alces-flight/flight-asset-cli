@@ -33,7 +33,14 @@ module FlightAsset
 
         included do
           after(if: :tty?) do
-            table = parse_header_table(table_elements, table_procs)
+            heads, procs = table_procs.each_with_object([[], []]) do |(k, p), m|
+              m[0] << k
+              m[1] << p
+            end
+            table = TTY::Table.new(header: heads)
+            table_elements.each do |element|
+              table << procs.map { |p| p.call(element) }
+            end
             puts table.render(:ascii, multiline: table_multiline?)
           end
 
@@ -42,10 +49,6 @@ module FlightAsset
               puts table_procs.map { |_, p| p.call(element) }.join("\t")
             end
           end
-        end
-
-        def tty?
-          $stdout.tty?
         end
 
         def table_multiline?
