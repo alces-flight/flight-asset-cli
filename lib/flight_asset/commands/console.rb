@@ -31,14 +31,6 @@ module FlightAsset
       def run
         binding.pry
       end
-
-      def pretty_table
-        TTY::Table.new
-      end
-
-      def machine_table
-        TTY::Table.new
-      end
     end
   end
 end

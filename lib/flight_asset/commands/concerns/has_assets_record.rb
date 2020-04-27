@@ -29,8 +29,11 @@ module FlightAsset
   module Commands
     module Concerns
       module HasAssetsRecord
-        def self.included(base)
-          base.rotate_table
+        extend ActiveSupport::Concern
+        include HasTableElement
+
+        def table_element
+          assets_record
         end
 
         def table_procs
@@ -42,14 +45,6 @@ module FlightAsset
             ['Asset Group', ->(a) { a.asset_group_or_missing&.name }],
             ['Additional Information', ->(a) { a.info }]
           ]
-        end
-
-        def pretty_table
-          parse_header_table([assets_record], table_procs)
-        end
-
-        def machine_table
-          parse_table([assets_record], table_procs.map { |p| p[1] })
         end
       end
     end

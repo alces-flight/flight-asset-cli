@@ -37,16 +37,6 @@ module FlightAsset
       end
     end
 
-    after(if: :tty?) do
-      puts pretty_table.render(:ascii, multiline: true)
-    end
-
-    after(unless: :tty?) do
-      machine_table.rows.each do |rows|
-        puts rows.join("\t")
-      end
-    end
-
     attr_reader :args, :opts
 
     def self.define_args(*names)
@@ -56,10 +46,8 @@ module FlightAsset
     end
 
     ##
-    # Denotes if the table has been rotated
+    # TODO: Remove completely
     def self.rotate_table(fetch = nil)
-      @rotate_table = true unless fetch
-      @rotate_table || false
     end
 
     def initialize(*args, **opts)
@@ -88,29 +76,33 @@ module FlightAsset
       $stdout.tty?
     end
 
-    ##
-    # DEPRECATED: Use Callbacks
-    # Table for generating the prettified output intended for humans
-    # This output MAY change but should be avoided
-    def pretty_table
-      raise NotImplementedError
+    # The procs should be a 2N array of headers to procs OR a hash
+    def parse_header_table(elements, headers_and_procs_raw, rotate: false)
+      headers_and_procs = headers_and_procs_raw.to_a
+      headers = headers_and_procs.map { |h| h[0] }
+      procs = headers_and_procs.map { |h| h[1] }
+      parse_table(elements, procs, headers: headers, rotate: rotate)
     end
 
-    ##
-    # Machine readable table for the command
-    # This table MUST only be changed in machine compatible way
-    # This means the following
-    #   * Headers MUST not be returned
-    #   * The column (/row) orders must be consistent
-    #   * New columns/rows must be appended to the end
-    #   * Tables MUST be TAB separated
-    #   * The above can only be broken on major version bumps
-    #
-    # NOTE: The column order MAY differ from the pretty_output
-    # method due to the above restrictions, if and when this happens
-    # a --headers global flag should be added to print the headers
-    def machine_table
-      raise InternalError, 'No output available!'
+    def parse_table(elements, procs, headers: nil, rotate: false)
+      rows = elements.map do |element|
+        procs.map { |p| p.respond_to?(:call) ? p.call(element) : p }
+      end
+
+      # flips the table if required
+      opts = if rotate
+        temp_rows = rows.dup
+        temp_rows.unshift(headers) if headers
+        max = temp_rows.map(&:length).max
+        new_rows = (0...max).map do |idx|
+          temp_rows.map { |row| row[idx] }
+        end
+        { rows: new_rows }
+      else
+        { rows: rows }.tap { |o| o[:header] = headers if headers }
+      end
+
+      TTY::Table.new(**opts)
     end
 
     ##
@@ -206,35 +198,6 @@ module FlightAsset
       AssetGroupsRecord.fetch(
         connection: connection, url_opts: { id: asset_groups_record.id }
       )
-    end
-
-    # The procs should be a 2N array of headers to procs OR a hash
-    def parse_header_table(elements, headers_and_procs_raw)
-      headers_and_procs = headers_and_procs_raw.to_a
-      headers = headers_and_procs.map { |h| h[0] }
-      procs = headers_and_procs.map { |h| h[1] }
-      parse_table(elements, procs, headers: headers)
-    end
-
-    def parse_table(elements, procs, headers: nil)
-      rows = elements.map do |element|
-        procs.map { |p| p.respond_to?(:call) ? p.call(element) : p }
-      end
-
-      # flips the table if required
-      opts = if self.class.rotate_table(true)
-        temp_rows = rows.dup
-        temp_rows.unshift(headers) if headers
-        max = temp_rows.map(&:length).max
-        new_rows = (0...max).map do |idx|
-          temp_rows.map { |row| row[idx] }
-        end
-        { rows: new_rows }
-      else
-        { rows: rows }.tap { |o| o[:header] = headers if headers }
-      end
-
-      TTY::Table.new(**opts)
     end
   end
 end

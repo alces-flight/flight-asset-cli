@@ -58,7 +58,7 @@ module FlightAsset
 
           # Extracts the required links
           slf, nxt = ['self', 'next'].map do |key|
-            res['links'].fetch(key, nil)
+            (res['links'] || {}).fetch(key, nil)
           end
 
           # Registers the response as known and errors on duplicates

@@ -27,17 +27,37 @@
 
 module FlightAsset
   module Commands
-    class SetToken < FlightAsset::Command
-      define_args :token
+    module Concerns
+      module HasTableElement
+        extend ActiveSupport::Concern
 
-      def run
-        data = YAML.load File.read(Config::PATH)
-        data['jwt'] = token
-        File.write Config::PATH, <<~CONF
-          #{Config::COMMENT_BLOCK}
-          #{YAML.dump data}
-        CONF
-        $stderr.puts 'Updated the access token'
+        included do
+          after(if: :tty?) do
+            table = parse_header_table([table_element], table_procs, rotate: true)
+            puts table.render(:ascii, multiline: table_multiline?)
+          end
+
+          after(unless: :tty?) do
+            element = table_element
+            puts table_procs.map { |_, p| p.call(element) }.join("\n")
+          end
+        end
+
+        def tty?
+          $stdout.tty?
+        end
+
+        def table_multiline?
+          true
+        end
+
+        def table_procs
+          raise NotImplementedError
+        end
+
+        def table_element
+          raise NotImplementedError
+        end
       end
     end
   end

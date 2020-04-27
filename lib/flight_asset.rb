@@ -34,6 +34,7 @@ require 'cgi'
 require 'tty-table'
 
 require 'active_support/callbacks'
+require 'active_support/concern'
 
 require_relative 'flight_asset/errors'
 require_relative 'flight_asset/config'
@@ -42,6 +43,10 @@ require_relative 'flight_asset/records'
 
 require_relative 'flight_asset/command'
 require_relative 'flight_asset/commands'
+
+# TODO: Move these core concerns to a shared library
+require_relative 'flight_asset/commands/concerns/has_table_element'
+require_relative 'flight_asset/commands/concerns/has_table_elements'
 
 Dir.glob(File.join(__dir__, 'flight_asset/commands/concerns', '*.rb')).each do |f|
   require_relative f

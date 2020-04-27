@@ -28,24 +28,16 @@
 module FlightAsset
   module Commands
     class ListCategories < FlightAsset::Command
-      attr_reader :categories_records
+      include Concerns::HasTableElements
 
-      def run
-        @categories_records ||= request_categories_records.sort_by(&:name)
+      def table_elements
+        @table_elements ||= request_categories_records.sort_by(&:name)
       end
 
       def table_procs
         [
           ['Name', ->(a) { a.name }]
         ]
-      end
-
-      def pretty_table
-        parse_header_table(categories_records, table_procs)
-      end
-
-      def machine_table
-        parse_table(categories_records, table_procs.map { |p| p[1] })
       end
     end
   end

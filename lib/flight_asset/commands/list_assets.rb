@@ -28,10 +28,10 @@
 module FlightAsset
   module Commands
     class ListAssets < FlightAsset::Command
-      attr_reader :assets_records
+      include Concerns::HasTableElements
 
-      def assets_records
-        @assets_records ||= if opts.group
+      def table_elements
+        @table_elements ||= if opts.group
           ag = request_asset_groups_record_by_name(opts.group)
           request_assets_records_by_asset_group(ag)
         else
@@ -45,14 +45,6 @@ module FlightAsset
           ['Support Type', ->(a) { a.support_type }],
           ['Decommissioned', ->(a) { a.decommissioned }]
         ]
-      end
-
-      def pretty_table
-        parse_header_table(assets_records, table_procs)
-      end
-
-      def machine_table
-        parse_table(assets_records, table_procs.map { |p| p[1] })
       end
     end
   end

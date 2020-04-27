@@ -29,22 +29,17 @@ module FlightAsset
   module Commands
     module Concerns
       module HasCategoriesRecord
-        def self.included(base)
-          base.rotate_table
+        extend ActiveSupport::Concern
+        include HasTableElement
+
+        def table_element
+          categories_record
         end
 
         def table_procs
           [
             ['Name', ->(a) { a.name }]
           ]
-        end
-
-        def pretty_table
-          parse_header_table([categories_record], table_procs)
-        end
-
-        def machine_table
-          parse_table([categories_record], table_procs.map { |p| p[1] })
         end
       end
     end
