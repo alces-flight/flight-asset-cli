@@ -33,6 +33,8 @@ require 'faraday_middleware'
 require 'cgi'
 require 'tty-table'
 
+require 'active_support/callbacks'
+
 require_relative 'flight_asset/errors'
 require_relative 'flight_asset/config'
 

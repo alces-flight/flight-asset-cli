@@ -45,15 +45,7 @@ module FlightAsset
 
         c.action do |args, opts|
           require_relative '../flight_asset'
-          cmd = Commands.build(name, *args, **opts.__hash__)
-          cmd.run
-          if $stdout.tty?
-            puts cmd.pretty_table.render(:ascii, multiline: true)
-          else
-            cmd.machine_table.rows.each do |rows|
-              puts rows.join("\t")
-            end
-          end
+          Commands.build(name, *args, **opts.__hash__).run!
         end
 
         yield c if block_given?

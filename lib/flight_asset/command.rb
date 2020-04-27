@@ -27,6 +27,26 @@
 
 module FlightAsset
   class Command
+    include ActiveSupport::Callbacks
+
+    define_callbacks :run
+
+    CALLBACK_FILTER_TYPES.each do |type|
+      define_singleton_method(type) do |**opts, &block|
+        set_callback(:run, type, **opts, &block)
+      end
+    end
+
+    after(if: :tty?) do
+      puts pretty_table.render(:ascii, multiline: true)
+    end
+
+    after(unless: :tty?) do
+      machine_table.rows.each do |rows|
+        puts rows.join("\t")
+      end
+    end
+
     attr_reader :args, :opts
 
     def self.define_args(*names)
@@ -48,13 +68,28 @@ module FlightAsset
     end
 
     ##
+    # Runs the man 'run' method with the callbacks
+    #
+    def run!
+      run_callbacks(:run) { run }
+    end
+
+    ##
     # The main runner method that preforms the action
-    # This method must not print to StandardOut as this gets in the way of output
-    # toggling
+    # NOTE: This method must not print to StandardOut
+    #       Printing to stdout should be controlled with callbacks
     def run
     end
 
     ##
+    # Checks if standard out is going to a TTY
+    #
+    def tty?
+      $stdout.tty?
+    end
+
+    ##
+    # DEPRECATED: Use Callbacks
     # Table for generating the prettified output intended for humans
     # This output MAY change but should be avoided
     def pretty_table
