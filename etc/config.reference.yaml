@@ -63,4 +63,8 @@ log_path: 'Path to the log file'
 # =============================================================================
 log_level: 'Set the log level: fatal,error,warn,info,debug'
 
-
+# =============================================================================
+# Temporary Filename/Path
+# Set the base file name and path for temporary files
+# =============================================================================
+tmp_path: 'Base path to temporary files'

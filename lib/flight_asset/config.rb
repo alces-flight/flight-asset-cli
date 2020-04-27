@@ -85,6 +85,7 @@ module FlightAsset
 
     property :log_path
     property :log_level, default: 'error'
+    property :tmp_path, default: '/tmp/flight-asset'
 
     def finished?
       opts.key?(:finished)

@@ -25,40 +25,35 @@
 # https://github.com/alces-flight/alces-flight/flight-asset-cli
 #==============================================================================
 
-require 'yaml'
-require 'hashie'
-require 'simple_jsonapi_client'
-require 'faraday'
-require 'faraday_middleware'
-require 'cgi'
-require 'tempfile'
-require 'tty-editor'
-require 'tty-table'
+module FlightAsset
+  module Commands
+    class EditAssetInfo < FlightAsset::Command
+      include Concerns::HasAssetsRecord
 
-require 'active_support/callbacks'
-require 'active_support/concern'
+      define_args :name
 
-require_relative 'flight_asset/errors'
-require_relative 'flight_asset/config'
+      before(unless: :tty?) { raise InteractiveOnly }
 
-require_relative 'flight_asset/records'
+      def assets_record
+        @assets_record ||= begin
+          a = request_assets_record_by_name(name)
+          a.update(info: with_editor(a.info))
+        end
+      end
 
-require_relative 'flight_asset/command'
-require_relative 'flight_asset/commands'
-
-# TODO: Move these core concerns to a shared library
-require_relative 'flight_asset/commands/concerns/has_table_element'
-require_relative 'flight_asset/commands/concerns/has_table_elements'
-
-Dir.glob(File.join(__dir__, 'flight_asset/commands/concerns', '*.rb')).each do |f|
-  require_relative f
+      def with_editor(data)
+        file = Tempfile.new(
+          File.basename(Config::CACHE.tmp_path),
+          File.dirname(Config::CACHE.tmp_path)
+        )
+        file.write(data || '')
+        file.rewind
+        TTY::Editor.open(file.path)
+        file.read
+      ensure
+        file.close
+        file.unlink
+      end
+    end
+  end
 end
-
-Dir.glob(File.join(__dir__, 'flight_asset/commands', '*.rb')).each do |f|
-  require_relative f
-end
-
-# Ensures the CLI file is required last
-# NOTE: In most cases it has already been required
-require_relative 'flight_asset/cli'
-

@@ -35,7 +35,7 @@ module FlightAsset
 
     def self.exit_code
       @exit_code || begin
-        parent.respond_to?(:exit_code) ? parent.exit_code : 2
+        superclass.respond_to?(:exit_code) ? superclass.exit_code : 2
       end
     end
 
@@ -47,6 +47,14 @@ module FlightAsset
   InternalError = Error.define_class(1)
   GeneralError = Error.define_class(2)
   InputError = GeneralError.define_class(3)
+
+  class InteractiveOnly < InputError
+    MSG = 'This command requires an interactive terminal'
+
+    def initialize(msg = MSG)
+      super
+    end
+  end
 
   MissingError = GeneralError.define_class(20)
   AssetMissing = MissingError.define_class(21)

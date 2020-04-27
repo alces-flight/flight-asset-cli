@@ -170,6 +170,10 @@ module FlightAsset
       c.summary = 'Flag that an asset has been decommissioned'
     end
 
+    create_command 'edit-asset-info', 'Asset' do |c|
+      c.summary = "Update an asset's info field via the system editor"
+    end
+
     create_command 'update-asset', 'ASSET' do |c|
       c.summary = 'Modify the support type for an asset'
       c.option '--support-type SUPPORT_TYPE', 'Update the support type'
@@ -224,6 +228,9 @@ module FlightAsset
       commands.keys
               .select { |c| c.match?(alias_regex) }
               .each { |c| alias_command c.sub(alias_regex, ''), c }
+
+      alias_command 'edit',       'edit-asset-info'
+      alias_command 'edit-asset', 'edit-asset-info'
     end
 
     if Config::CACHE.development?
