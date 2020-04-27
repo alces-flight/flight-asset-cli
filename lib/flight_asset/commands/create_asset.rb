@@ -28,10 +28,20 @@
 module FlightAsset
   module Commands
     class CreateAsset < FlightAsset::Command
+      include Concerns::HasInfo
       include Concerns::HasAssetsRecord
 
       define_args :name
       attr_accessor :assets_record
+
+      before do
+        dummy = Config::CACHE.create_dummy_group_name
+        if opts.group == dummy
+          raise InputError, <<~ERROR.chomp
+            Cowardly refusing to create an asset in: #{dummy}
+          ERROR
+        end
+      end
 
       def run
         existing = request_assets_record_by_name(name, error: false)
@@ -53,11 +63,6 @@ module FlightAsset
       end
 
       def group_name
-        if opts.group == Config::CACHE.create_dummy_group_name
-          raise InputError, <<~ERROR.chomp
-            Cowardly refusing to create an asset in the dummy group!
-          ERROR
-        end
         opts.group || Config::CACHE.create_dummy_group_name
       end
 
@@ -71,29 +76,11 @@ module FlightAsset
           },
           attributes: {
             name: name,
-            info: info,
+            info: info || '',
             support_type: opts.support_type,
             supportType: opts.support_type
           }
         )
-      end
-
-      def info
-        if opts.info && opts.info_path
-          raise InputError, <<~ERROR.chomp
-            --info and --info-path can not be used together
-          ERROR
-        elsif opts.info_path && File.exists?(opts.info_path)
-          File.read opts.info_path
-        elsif opts.info_path
-          raise InvalidInput, <<~ERROR.chomp
-            Could not locate: #{opts.info_path}
-          ERROR
-        elsif opts.info
-          opts.info
-        else
-          ''
-        end
       end
     end
   end

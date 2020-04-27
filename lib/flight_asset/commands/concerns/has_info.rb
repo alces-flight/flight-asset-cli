@@ -27,25 +27,29 @@
 
 module FlightAsset
   module Commands
-    class UpdateAsset < FlightAsset::Command
-      include Concerns::HasInfo
-      include Concerns::HasAssetsRecord
+    module Concerns
+      module HasInfo
+        extend ActiveSupport::Concern
 
-      define_args :name
-      attr_reader :assets_record
+        included do
+          # Errors out of the command if the flags are invalid
+          before if: -> { opts.info && opts.info_path },
+                 do: -> do
+            raise InputError, <<~ERROR.chomp
+              --info and --info-path can not be used together
+            ERROR
+          end
 
-      def run
-        @assets_record ||= begin
-          a = request_assets_record_by_name(name)
-          updates = {}
-          if opts.support_type
-            updates[:support_type] = opts.support_type
-            updates[:supportType] = opts.support_type
+          before if: -> { opts.info_path && !File.exists?(opts.info_path) },
+                 do: -> do
+            raise InputError, <<~ERROR.chomp
+              Could not locate: #{opts.info_path}
+            ERROR
           end
-          if i = info
-            updates[:info] = i
-          end
-          a.update(**updates)
+        end
+
+        def info
+          (p = opts.info_path) ? File.read(p) : opts.info
         end
       end
     end

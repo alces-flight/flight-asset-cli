@@ -33,7 +33,8 @@ module FlightAsset
 
     CALLBACK_FILTER_TYPES.each do |type|
       define_singleton_method(type) do |**opts, &block|
-        set_callback(:run, type, **opts, &block)
+        do_block = opts.delete(:do)
+        set_callback(:run, type, **opts, &(do_block || block))
       end
     end
 

@@ -149,6 +149,11 @@ module FlightAsset
       end
     end
 
+    INFO_FLAGS = ->(c) do
+      c.option '--info INFO', 'Additional information about the asset'
+      c.option '--info-path PATH', 'Override --info with contents of a file'
+    end
+
     create_command 'list-assets' do |c|
       c.summary = 'Return all the assets'
       c.option '--group GROUP', 'Filter the assets by GROUP'
@@ -162,8 +167,7 @@ module FlightAsset
       c.summary = 'Define a new asset'
       c.option '--group GROUP', 'Add the asset to an existing group'
       c.option '--support-type SUPPORT_TYPE', 'Set the support type', default: 'advice'
-      c.option '--info INFO', 'Additional information about the asset'
-      c.option '--info-path PATH', 'Override --info with contents of a file'
+      INFO_FLAGS.call(c)
     end
 
     create_command 'decommission-asset', 'ASSET' do |c|
@@ -177,6 +181,7 @@ module FlightAsset
     create_command 'update-asset', 'ASSET' do |c|
       c.summary = 'Modify the support type for an asset'
       c.option '--support-type SUPPORT_TYPE', 'Update the support type'
+      INFO_FLAGS.call(c)
     end
 
     create_command 'move-asset', 'ASSET' do |c|
