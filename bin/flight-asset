@@ -55,5 +55,5 @@ args << '--help' if args.empty?
 
 # Runs the CLI
 require_relative '../lib/flight_asset/cli'
-FlightAsset::CLI.run_with_wizard(*args)
+FlightAsset::CLI.run!(*args)
 

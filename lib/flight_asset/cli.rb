@@ -52,40 +52,7 @@ module FlightAsset
       end
     end
 
-    ##
-    # NOTE: This overrides the Commander::CLI method to allow the wizard to work.
-    # This should be integrated into Commander at some point
-    def self.run_with_wizard(*args)
-      cmds = wizard? ? { "wizard" => wizard_command } : commands
-      instance = Commander::Runner.new(
-        @program, cmds, default_command, global_options, aliases, args
-      )
-      instance.run
-    rescue StandardError, Interrupt => e
-      $stderr.puts e.backtrace.reverse if args.include?('--trace')
-      error_handler(instance, e)
-    end
-
-    def self.wizard?
-      !Config::CACHE.finished?
-    end
-
-    def self.commands_or_wizzard
-      commands
-    end
-
-    def self.wizard_command(&b)
-      if b
-        @wizard_command = Commander::Command.new('wizard').tap do |cmd|
-          b.call(cmd)
-        end
-      else
-        @wizard_command
-      end
-    end
-
-    wizard_command do |c|
-      c.syntax = "#{program :name} wizard"
+    create_command 'configure' do |c|
       c.summary = 'Set the configuration keys'
       c.option '--finished', 'Exit the configuration wizard'
       Config::REFERENCE_OPTS.each do |key, msg|
@@ -104,48 +71,6 @@ module FlightAsset
                    'REQUIRED'
                  end
         c.option "--#{key.gsub('_', '-')} #{ suffix }", cli_msg
-        c.action do |_, opts|
-          # Extracts the data
-          opts = opts.__hash__
-          data = Config::REFERENCE_OPTS.keys.map do |key|
-            [key, (opts[key.to_sym] || Config::CACHE.send(key)).to_s]
-          end.reject { |_, v| v.empty? }
-             .to_h
-
-          # Sets the finished flag if appropriate
-          if opts[:finished] && Config::CACHE.configured?
-            data['finished'] = true
-          end
-
-          # Writes the config
-          FileUtils.mkdir_p File.dirname(FlightAsset::Config::PATH)
-          File.write Config::PATH, <<~CONF
-            #{Config::COMMENT_BLOCK}
-
-            #{YAML.dump(data)}
-          CONF
-
-          new_config = Config.read(Config::PATH)
-
-          # Notifies the user
-          #
-          $stderr.puts "Created Config: #{Config::PATH}"
-          $stderr.puts <<~WARN if new_config.configured? && !opts[:finished]
-
-          The application appears to be fully configured. Use the
-          --finished flag to exit the wizard.
-          WARN
-          $stderr.puts <<~WARN if opts[:finished] && !new_config.finished?
-
-            Ignoring the --finished flag as the application has not
-            been fully configured.
-          WARN
-          $stderr.puts <<~WARN unless Config.read(Config::PATH).configured?
-
-            The application does not appear to be fully configured!
-            Please rerun the 'wizard --help' for the required flags
-          WARN
-        end
       end
     end
 
@@ -228,15 +153,14 @@ module FlightAsset
       c.summary = 'Update the API access token'
     end
 
-    unless wizard?
-      alias_regex = /-assets?\Z/
-      commands.keys
-              .select { |c| c.match?(alias_regex) }
-              .each { |c| alias_command c.sub(alias_regex, ''), c }
+    # NOTE: Disabled due to parsing bug
+    # alias_regex = /-assets?\Z/
+    # commands.keys
+    #         .select { |c| c.match?(alias_regex) }
+    #         .each { |c| alias_command c.sub(alias_regex, ''), c }
 
-      alias_command 'edit',       'edit-asset-info'
-      alias_command 'edit-asset', 'edit-asset-info'
-    end
+    # alias_command 'edit',       'edit-asset-info'
+    # alias_command 'edit-asset', 'edit-asset-info'
 
     if Config::CACHE.development?
       create_command 'console'
