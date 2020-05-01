@@ -71,13 +71,16 @@ module FlightAsset
     end
 
     define :shared do
+      def self.configure_command
+        commands['configure'].tap { |c| yield(c) if block_given? }
+      end
+
       program :name, 'flight-asset'
       program :version, "v#{FlightAsset::VERSION}"
       program :description, 'Manage Alces Flight Center Assets'
       program :help_paging, false
 
       create_command 'configure' do |c|
-        c.summary = 'Set the configuration keys'
         c.option '--finished', 'Exit the configuration wizard'
         Config::REFERENCE_OPTS.each do |key, msg|
           next if key == 'finished'
@@ -99,7 +102,50 @@ module FlightAsset
       end
     end
 
+    define :configure do
+      def self.missing_help_text
+        <<~HELP.chomp
+The following flags are missing:
+#{Config::CACHE.missing_keys.map { |k| "  --#{k.to_s.gsub('_', '-')}" }.join("\n")}
+HELP
+      end
+
+      configure_command do |c|
+        c.summary = 'Bootstrap the config generation and configuration'
+        c.description = <<~DESC.chomp
+The other commands have been disabled as the application has not been configured!
+
+#{missing_help_text}
+DESC
+      end
+
+      create_command '__missing__', '...' do |c|
+        c.summary = 'Special internal missing helper'
+        c.hidden = true
+        c.action do |args, _|
+          require_relative '../flight_asset/errors.rb'
+
+          raise InputError, <<~ERROR.chomp
+The following command can not be processed at this time:
+#{program(:name)} #{args.first}
+
+The application needs to be configured before any further commands
+are enabled. Please refer to the configuration help for futher details:
+#{program(:name)} configure --help
+
+#{missing_help_text}
+ERROR
+        end
+      end
+
+      default_command '__missing__'
+    end
+
     define :main do
+      configure_command do |c|
+        c.summary = 'Reconfigure the application'
+      end
+
       INFO_FLAGS = ->(c) do
         c.option '--info INFO', 'Additional information about the asset'
         c.option '--info-path PATH', 'Override --info with contents of a file'
@@ -138,9 +184,9 @@ module FlightAsset
       create_command 'move-asset', 'ASSET' do |c|
         c.summary = 'Modify which group an asset belongs to'
         c.description = <<~DESC.chomp
-          By default this will unassign the asset from its group. The asset will
-          be reassigned to a new group if the --group flag has been provided.
-        DESC
+  By default this will unassign the asset from its group. The asset will be
+  reassigned to a new group if the --group flag has been provided.
+DESC
         c.option '--group GROUP', 'Reassign the asset to GROUP'
       end
 
@@ -160,10 +206,9 @@ module FlightAsset
       create_command 'move-group', 'ASSET_GROUP' do |c|
         c.summary = 'Modify which category a group belongs to'
         c.description = <<~DESC.chomp
-          By default this will unassign the group from its category. The group
-          will be reassigned to a new category if the --category flag has been
-          provided.
-        DESC
+  By default this will unassign the group from its category. The group will be
+  reassigned to a new category if the --category flag has been provided.
+DESC
         c.option '--category CATEGORY', 'Reassign the group to CATEGORY'
       end
 

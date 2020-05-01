@@ -91,15 +91,17 @@ module FlightAsset
       log_level == 'development'
     end
 
-    def configured?
-      keys = self.class.requires
-                 .keys
-                 .map { |k| [k, send(k)] }
-                 .select { |_, v| v.nil? }
-                 .to_h
-                 .keys
+    def missing_keys
+      self.class.requires
+                .keys
+                .map { |k| [k, send(k)] }
+                .select { |_, v| v.nil? }
+                .to_h
+                .keys
+    end
 
-      keys.empty?
+    def configured?
+      missing_keys.empty?
     end
 
     def log_level_const

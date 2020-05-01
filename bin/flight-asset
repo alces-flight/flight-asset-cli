@@ -57,6 +57,8 @@ args << '--help' if args.empty?
 parts = [:shared]
 if FlightAsset::Config::CACHE.configured?
   parts << :main
+else
+  parts << :configure
 end
 if FlightAsset::Config::CACHE.development?
   parts << :development
