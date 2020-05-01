@@ -40,6 +40,9 @@ module FlightAsset
           data['finished'] = true
         end
 
+        # Sets the verb
+        verb = File.exists?(Config::PATH) ? 'Updated' : 'Created'
+
         # Writes the config
         FileUtils.mkdir_p File.dirname(FlightAsset::Config::PATH)
         File.write Config::PATH, <<~CONF
@@ -48,25 +51,12 @@ module FlightAsset
           #{YAML.dump(data)}
         CONF
 
-        new_config = Config.read(Config::PATH)
-
         # Notifies the user
         #
-        $stderr.puts "Created Config: #{Config::PATH}"
-        $stderr.puts <<~WARN if new_config.configured? && !opts[:finished]
+        $stderr.puts "#{verb} Config: #{Config::PATH}"
 
-        The application appears to be fully configured. Use the
-        --finished flag to exit the wizard.
-        WARN
-        $stderr.puts <<~WARN if opts[:finished] && !new_config.finished?
-
-          Ignoring the --finished flag as the application has not
-          been fully configured.
-        WARN
         $stderr.puts <<~WARN unless Config.read(Config::PATH).configured?
-
           The application does not appear to be fully configured!
-          Please rerun the 'wizard --help' for the required flags
         WARN
       end
     end

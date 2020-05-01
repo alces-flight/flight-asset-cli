@@ -53,7 +53,16 @@ end
 # Display the help by default
 args << '--help' if args.empty?
 
-# Runs the CLI
+# Selects the CLI components
+parts = [:shared]
+if FlightAsset::Config::CACHE.configured?
+  parts << :main
+end
+if FlightAsset::Config::CACHE.development?
+  parts << :development
+end
+
+# Builds and runs the CLI
 require_relative '../lib/flight_asset/cli'
-FlightAsset::CLI.run!(*args)
+FlightAsset::CLI.build(*parts).run!(*args)
 
