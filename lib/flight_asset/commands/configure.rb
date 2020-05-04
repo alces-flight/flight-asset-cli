@@ -50,7 +50,7 @@ module FlightAsset
 
         # Validates the new config
         errors = config.__meta__.generate_error_messages
-        if opts.allow_errors
+        if opts.force
           $stderr.puts <<~ERRORS
             #{verb} the config with the following errors:
 
@@ -59,7 +59,7 @@ module FlightAsset
         else
           raise InternalError, <<~ERROR unless errors.empty?
             The config has not been #{verb.downcase} as the following error(s) have occurred!
-            Validation can be bypassed with the --allow-errors flag
+            Validation can be bypassed with the --force flag
 
             #{errors.join("\n\n")}
           ERROR

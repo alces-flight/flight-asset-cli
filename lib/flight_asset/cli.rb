@@ -81,7 +81,7 @@ module FlightAsset
       program :help_paging, false
 
       create_command 'configure' do |c|
-        c.option '--allow-errors', 'Save the config even if there are errors'
+        c.option '--force', 'Ignore validation errors and save the config'
         Config::CACHE.__meta__.commander_option_helper(c)
       end
     end

@@ -177,17 +177,20 @@ module FlightAsset
 
       def generate_error_messages
         [].tap do |errors|
-          unless (requires = nil_required_defaulted_keys).empty?
+          unless (missing = missing_keys_without_defaults).empty?
             errors << <<~ERROR.chomp
-              The following flag(s) should not override their defaults to be blank:
-              #{requires.map { |k| flags[k] }.join(', ')}
+              The following flag(s) should not be blank:
+              #{missing.map { |k| flags[k] }.join(' ')}
             ERROR
           end
 
-          unless (missing = missing_keys_without_defaults).empty?
+          unless (requires = nil_required_defaulted_keys).empty?
             errors << <<~ERROR.chomp
-              The following flag(s) can not be blank:
-              #{missing.map { |k| flags[k] }.join(', ')}
+              The following flag(s) should not override their defaults to be blank:
+              #{requires.map { |k| flags[k] }.join(' ')}
+
+              Did you mean?
+              #{requires.map { |k| flags[k].sub('--', '--reset-') }.join(' ')}
             ERROR
           end
 
