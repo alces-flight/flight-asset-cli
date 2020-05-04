@@ -285,6 +285,8 @@ module FlightAsset
 
     def log_level_const
       case log_level
+      when 'disabled'
+        Logger::FATAL
       when 'fatal'
         Logger::FATAL
       when 'error'
@@ -303,6 +305,8 @@ module FlightAsset
     def log_path_or_stderr
       if development?
         $stderr
+      elsif log_level == 'disabled'
+        '/dev/null'
       elsif log_path
         FileUtils.mkdir_p File.dirname(log_path)
         log_path

@@ -100,11 +100,9 @@ end
 config :log_path do
   summary 'Path to the log file'
   description <<~DESC
-Specify the path to the log file. The file does not have to exist but the
-directory does. By default the application will print to standard error.
+Specify the path to the log file. The application will log to standard error
+if left blank.
 DESC
-  required
-  default $stderr
   volatile 'ensure logrotate has been setup'
 end
 
@@ -115,7 +113,7 @@ Set at which severity the application will log
 DESC
   required
   default 'error'
-  whitelist 'fatal', 'error', 'warn', 'info', 'debug', 'development'
+  whitelist 'disabled', 'fatal', 'error', 'warn', 'info', 'debug', 'development'
 end
 
 config :tmp_path do
