@@ -1,0 +1,125 @@
+# frozen_string_literal: true
+# vim: set filetype=ruby:
+#==============================================================================
+# Copyright (C) 2019-present Alces Flight Ltd.
+#
+# This file is part of Flight Asset.
+#
+# This program and the accompanying materials are made available under
+# the terms of the Eclipse Public License 2.0 which is available at
+# <https://www.eclipse.org/legal/epl-2.0>, or alternative license
+# terms made available by Alces Flight Ltd - please direct inquiries
+# about licensing to licensing@alces-flight.com.
+#
+# Flight Asset is distributed in the hope that it will be useful, but
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, EITHER EXPRESS OR
+# IMPLIED INCLUDING, WITHOUT LIMITATION, ANY WARRANTIES OR CONDITIONS
+# OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY OR FITNESS FOR A
+# PARTICULAR PURPOSE. See the Eclipse Public License 2.0 for more
+# details.
+#
+# You should have received a copy of the Eclipse Public License 2.0
+# along with Flight Asset. If not, see:
+#
+#  https://opensource.org/licenses/EPL-2.0
+#
+# For more information on Flight Asset, please visit:
+# https://github.com/alces-flight/alces-flight/flight-asset-cli
+#==============================================================================
+
+#==============================================================================
+# This file is for references purposes only! It will not configure the
+# application. Editing this file will break the wizard
+#
+# The actual configuration file should be stored as:
+# etc/config.yaml
+#=============================================================================
+
+#=============================================================================
+# API Request URLS
+# All API calls are made to the following URL:
+# <base_url>/<api_prefix>/...
+#=============================================================================
+
+config :base_url do
+  summary 'URL to the Flight Center Asset API'
+  description <<~DESC
+Specify the location where the API server is being hosted. The API version
+prefix will be appended to the base url. The all most always means the version
+should not be included in the URL
+DESC
+  required
+  default 'https://center.alces-flight.com/api'
+end
+
+config :api_prefix do
+  summary 'Set the API version prefix [CAUTION]'
+  description <<~DESC
+Change the API version prefix. The prefix is normally static to the application
+version and should not need modifications.
+DESC
+  default 'v1'
+end
+
+config :component_id do
+  summary 'Numeric ID for the FC component'
+  description <<~DESC
+Specify the ID to the component the API will be tied to. Currently the
+application can only function on a per component basis. The ID must be the
+numeric value and not obfuscated.
+DESC
+  required
+end
+
+config :jwt do
+  summary 'Your Alces Flight Center API access token'
+  description <<~DESC
+The API token generated through the Alces Flight Center management portal.
+Please contact your support team on how to generate this token.
+DESC
+  required
+end
+
+config :create_dummy_group_name do
+  summary 'The asset group to use for the create workaround'
+  description <<~DESC
+The group used in the create work around. It must be an existing FC asset
+group and should be empty. The work around is required because all assets
+must be created in a group.
+
+To allow the creation of assets without groups, they are first created in the
+dummy group. Then they are unassigned from the dummy group. The dummy group
+should be empty (your mileage my otherwise vary).
+DESC
+  required
+  default 'ignore-me'
+end
+
+config :log_path do
+  summary 'Path to the log file'
+  description <<~DESC
+Specify the path to the log file. The file does not have to exist but the
+directory does. By default the application will print to standard error.
+DESC
+  required
+  default $stderr
+end
+
+config :log_level do
+  summary 'Set the log level: fatal,error,warn,info,debug'
+  description <<~DESC
+Set at which severity the application will log
+DESC
+  required
+  default 'error'
+  whitelist 'fatal', 'error', 'warn', 'info', 'debug', 'development'
+end
+
+config :tmp_path do
+  summary 'Base path to temporary files'
+  description <<~DESC
+Set the base file name and path for temporary files
+DESC
+  required
+  default '/tmp/flight-asset'
+end

@@ -35,58 +35,109 @@ require 'yaml'
 require 'logger'
 
 module FlightAsset
-  # Dynamically define the base config class and PATH
-  Config ||= Class.new(Hash) do |klass|
-    klass::PATH = File.expand_path('../../etc/config.yaml', __dir__)
-  end
+  class ConfigDSL
+    KeyDSL = Struct.new(:klass, :key) do
+      def summary(value)
+        klass.summaries[key]
+      end
 
-  class Config
-    def self.property(key, default: nil, required: false)
-      key = key.to_sym
-      requires[key] = true if required
+      def description(value)
+        klass.descriptions[key] = value
+      end
 
-      define_method(key) do
-        if (v = opts[key]) && !v.nil?
-          v
-        elsif default.respond_to?(:call)
-          opts[key] ||= default.call
+      def default(value)
+        klass.defaults[key] = value
+      end
+
+      def required
+        klass.requires[key] = true
+      end
+
+      def whilelist(*args)
+        klass.whitelists[key] = args
+      end
+    end
+
+    module ClassMethods
+      def keys
+        @keys ||= []
+      end
+
+      def requires
+        @requires ||= {}
+      end
+
+      def summaries
+        @summaries ||= {}
+      end
+
+      def descriptions
+        @descriptions ||= {}
+      end
+
+      def defaults
+        @defaults ||= {}
+      end
+
+      def whitelists
+        @whitelists ||= {}
+      end
+
+      def config(key, &b)
+        sym = key.to_sym
+        self.keys << sym
+        KeyDSL.new(self, sym) { |k| k.instance_exec(&b) if b }
+        define_method(sym) { self[sym] }
+      end
+    end
+
+    module InstanceMethods
+      def initialize(**data)
+        @__data__ = data.map { |k, v| [k.to_sym, v] }.to_h
+      end
+
+      def [](raw_key)
+        key = raw_key.to_sym
+        v = __data__.key?(key) ? __data__[key] : self.class.defaults[key]
+        if v.respond_to?(:empty?) && v.empty?
+          nil
         else
-          default
+          v
         end
       end
-    end
 
-    def self.requires
-      @requires ||= {}
-    end
+      private
 
-    def self.read(path)
-      data ||= begin
-        YAML.load(File.read(path), symbolize_names: true)
-      rescue
-        $stderr.puts "Failed to load config: #{Config::PATH}"
-        exit 1
+      def __data__
+        @__data__ || {}
       end
-      new(**data)
     end
 
-    attr_reader :opts
+    def self.build(reference_path, config_path, &b)
+      Class.new do
+        extend ClassMethods
+        include InstanceMethods
 
-    def initialize(**opts)
-      @opts = opts
+        self.class_eval(File.read reference_path)
+        self.class_exec(&b) if b
+      end.tap do |klass|
+        data = if File.exists?(config_path)
+          YAML.load(File.read(config_path), symbolize_names: true)
+        else
+          {}
+        end
+        klass.const_set('CACHE', klass.new(**data))
+      end
     end
+  end
 
-    property :base_url, default: 'https://center.alces-flight.com/api'
-    property :api_prefix, default: 'v1'
-    property :create_dummy_group_name, default: 'ignore-me'
-    property :jwt, required: true
+  # Define the reference and config paths. The config_path if dynamic
+  # allowing it to be moved
+  REFERENCE_PATH = File.expand_path('../../etc/config.reference', __dir__)
+  CONFIG_PATH ||= File.expand_path('../../etc/config.yaml', __dir__)
 
-    property :component_id, required: true
-
-    property :log_path
-    property :log_level, default: 'error'
-    property :tmp_path, default: '/tmp/flight-asset'
-
+  # Constructs the Config class and cache
+  Config = ConfigDSL.build(REFERENCE_PATH, CONFIG_PATH) do
     def development?
       log_level == 'development'
     end
@@ -142,17 +193,13 @@ module FlightAsset
         end
       end
     end
-
-    # Defines the CACHE last
-    Config::CACHE = File.exists?(PATH) ? read(PATH) : new
-    Config::REFERENCE_PATH = File.expand_path('../../etc/config.reference.yaml', __dir__)
-    Config::REFERENCE_OPTS = YAML.load(File.read(REFERENCE_PATH))
-    Config::COMMENT_BLOCK = <<~CONF
-      # This config has been auto generated!
-      #
-      # Any modifications to the configuration values will be preserved
-      # However comments will be removed the next time this file is updated
-    CONF
   end
+
+  Config::COMMENT_BLOCK = <<~CONF
+    # This config has been auto generated!
+    #
+    # Any modifications to the configuration values will be preserved
+    # However comments will be removed the next time this file is updated
+  CONF
 end
 
