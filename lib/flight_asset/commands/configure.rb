@@ -32,6 +32,29 @@ module FlightAsset
         # Extracts the existing config data
         old = cache.__data__
 
+        # Refuse to update volatile flags by default
+        sym_opts = opts.keys.map(&:to_sym)
+        reset_volatiles = Config.volatiles.keys.map { |k| :"reset_#{k}" }
+        reset_vol_opts = sym_opts & reset_volatiles
+        vol_opts = sym_opts & Config.volatiles.keys
+        unless opts.volatile || [*reset_vol_opts, *vol_opts].empty?
+          msgs = []
+          unless vol_opts.empty?
+            msgs << "The following flags are volatile, please ensure:"
+            vol_opts.each do |key|
+              msgs << "#{Config.flags[key]}: #{Config.volatiles[key]}"
+            end
+            msgs << ''
+          end
+          unless reset_vol_opts.empty?
+            msgs << 'The following will reset a volatile flag:'
+            msgs << reset_vol_opts.map { |k| Config.flags[k] }.join(' ')
+            msgs << ''
+          end
+          msgs << 'Use the --volatile flag to proceed.'
+          raise InternalError, msgs.join("\n")
+        end
+
         # Extracts the merge data
         merge = Config.keys.each_with_object({}) do |k, memo|
           memo[k] = opts[k] if opts.key?(k)

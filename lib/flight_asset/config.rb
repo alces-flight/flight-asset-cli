@@ -54,6 +54,10 @@ module FlightAsset
         klass.requires[key] = true
       end
 
+      def volatile(value)
+        klass.volatiles[key] = value
+      end
+
       def whitelist(*args)
         klass.whitelists[key] = args
       end
@@ -78,6 +82,10 @@ module FlightAsset
 
       def defaults
         @defaults ||= {}
+      end
+
+      def volatiles
+        @volatiles ||= {}
       end
 
       def whitelists
@@ -134,16 +142,15 @@ module FlightAsset
           full_msg = summaries[key].dup
           if instance.__data__.key?(key)
             current = instance[key]
-            if current.nil? && defaults.key?(key)
-              full_msg << "\nBLANK - RESETTABLE"
-            elsif current.nil?
+            if current.nil?
               full_msg << "\nBLANK"
             else
               full_msg << "\nCURRENT: #{current}"
             end
-          elsif default = defaults[key]
-            full_msg << "\nDEFAULT: #{default}"
           end
+          full_msg << "\nDEFAULT: #{defaults[key]}" if defaults.key?(key)
+          full_msg << "\nVALUES: #{whitelists[key].join(',')}" if whitelists.key?(key)
+          full_msg << "\nVOLATILE: #{volatiles[key]}" if volatiles.key?(key)
 
           cmd.option "#{full_flag}", "#{full_msg}".chomp
         end

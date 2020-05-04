@@ -69,15 +69,17 @@ should not be included in the URL
 DESC
   required
   default 'https://center.alces-flight.com/api'
+  volatile 'do not send requests to an unknown location'
 end
 
 config :api_prefix do
-  summary 'Set the API version prefix [CAUTION]'
+  summary 'Set the API version prefix'
   description <<~DESC
 Change the API version prefix. The prefix is normally static to the application
 version and should not need modifications.
 DESC
   default 'v1'
+  volatile 'check the target api for compatibility'
 end
 
 config :create_dummy_group_name do
@@ -103,10 +105,11 @@ directory does. By default the application will print to standard error.
 DESC
   required
   default $stderr
+  volatile 'ensure logrotate has been setup'
 end
 
 config :log_level do
-  summary 'Set the log level: fatal,error,warn,info,debug'
+  summary 'Set the log level'
   description <<~DESC
 Set at which severity the application will log
 DESC
