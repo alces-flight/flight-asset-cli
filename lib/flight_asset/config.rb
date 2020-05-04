@@ -134,7 +134,9 @@ module FlightAsset
           full_msg = summaries[key].dup
           if instance.__data__.key?(key)
             current = instance[key]
-            if current.nil?
+            if current.nil? && defaults.key?(key)
+              full_msg << "\nBLANK - RESETTABLE"
+            elsif current.nil?
               full_msg << "\nBLANK"
             else
               full_msg << "\nCURRENT: #{current}"
@@ -177,7 +179,7 @@ module FlightAsset
         [].tap do |errors|
           unless (requires = nil_required_keys).empty?
             errors << <<~ERROR.chomp
-              Update failed as the following flag(s) can not be blank:
+              The following flags should not override their default to be blank:
               #{requires.map { |k| flags[k] }.join(', ')}
             ERROR
           end

@@ -46,9 +46,15 @@ module FlightAsset
         config = Config.new(**data)
 
         # Validates the new config
-        errors = config.__meta__.generate_error_messages
+        unless opts.skip
+          errors = config.__meta__.generate_error_messages
+          raise InternalError, <<~ERROR unless errors.empty?
+            The following errors have occurred!
+            Validation can be bypassed with the --skip flag
 
-        raise InternalError, errors.join("\n\n") unless errors.empty?
+            #{errors.join("\n\n")}
+          ERROR
+        end
 
         # Sets the verb
         verb = File.exists?(CONFIG_PATH) ? 'Updated' : 'Created'
