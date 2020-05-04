@@ -145,6 +145,15 @@ module FlightAsset
 
           cmd.option "#{full_flag}", "#{full_msg}".chomp
         end
+
+        keys.each do |key|
+          reset_msg = if defaults.key?(key)
+            "Revert to the default value"
+          else
+            "Revert to a blank value"
+          end
+          cmd.option "#{flags[key].sub('--', '--reset-')}", reset_msg
+        end
       end
 
       def missing_keys

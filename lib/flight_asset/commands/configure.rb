@@ -37,8 +37,12 @@ module FlightAsset
           memo[k] = opts[k] if opts.key?(k)
         end
 
+        # Extracts the reset data
+        resets = Config.keys.select { |k| opts[:"reset_#{k}"] }
+
         # Creates the new data and config
         data = old.dup.merge(merge)
+        resets.each { |k| data.delete(k) }
         config = Config.new(**data)
 
         # Validates the new config
