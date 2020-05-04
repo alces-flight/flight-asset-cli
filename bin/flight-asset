@@ -48,7 +48,7 @@ args << '--help' if args.empty?
 
 # Selects the CLI components
 parts = [:shared]
-if FlightAsset::Config::CACHE.configured?
+if FlightAsset::Config::CACHE.__meta__.generate_error_messages.empty?
   parts << :main
 else
   parts << :configure

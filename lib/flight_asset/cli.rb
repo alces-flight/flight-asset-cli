@@ -87,11 +87,8 @@ module FlightAsset
     end
 
     define :configure do
-      def self.missing_help_text
-        <<~HELP.chomp
-The following flags are missing:
-#{Config::CACHE.missing_keys.map { |k| "  --#{k.to_s.gsub('_', '-')}" }.join("\n")}
-HELP
+      def self.additional_help_text
+        @additional_help_text ||= Config::CACHE.__meta__.generate_error_messages.join("\n\n")
       end
 
       configure_command do |c|
@@ -99,7 +96,7 @@ HELP
         c.description = <<~DESC.chomp
 The other commands have been disabled as the application has not been configured!
 
-#{missing_help_text}
+#{additional_help_text}
 DESC
       end
 
@@ -117,7 +114,7 @@ The application needs to be configured before any further commands
 are enabled. Please refer to the configuration help for futher details:
 #{program(:name)} configure --help
 
-#{missing_help_text}
+#{additional_help_text}
 ERROR
         end
       end

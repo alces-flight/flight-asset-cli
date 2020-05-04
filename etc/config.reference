@@ -41,6 +41,25 @@
 # <base_url>/<api_prefix>/...
 #=============================================================================
 
+config :component_id do
+  summary 'Numeric ID for the FC component'
+  description <<~DESC
+Specify the ID to the component the API will be tied to. Currently the
+application can only function on a per component basis. The ID must be the
+numeric value and not obfuscated.
+DESC
+  required
+end
+
+config :jwt do
+  summary 'Your Alces Flight Center API access token'
+  description <<~DESC
+The API token generated through the Alces Flight Center management portal.
+Please contact your support team on how to generate this token.
+DESC
+  required
+end
+
 config :base_url do
   summary 'URL to the Flight Center Asset API'
   description <<~DESC
@@ -59,25 +78,6 @@ Change the API version prefix. The prefix is normally static to the application
 version and should not need modifications.
 DESC
   default 'v1'
-end
-
-config :component_id do
-  summary 'Numeric ID for the FC component'
-  description <<~DESC
-Specify the ID to the component the API will be tied to. Currently the
-application can only function on a per component basis. The ID must be the
-numeric value and not obfuscated.
-DESC
-  required
-end
-
-config :jwt do
-  summary 'Your Alces Flight Center API access token'
-  description <<~DESC
-The API token generated through the Alces Flight Center management portal.
-Please contact your support team on how to generate this token.
-DESC
-  required
 end
 
 config :create_dummy_group_name do

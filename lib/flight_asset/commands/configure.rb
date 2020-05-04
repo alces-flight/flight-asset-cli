@@ -45,19 +45,19 @@ module FlightAsset
         resets.each { |k| data.delete(k) }
         config = Config.new(**data)
 
+        # Sets the verb
+        verb = File.exists?(CONFIG_PATH) ? 'Updated' : 'Created'
+
         # Validates the new config
         unless opts.skip
           errors = config.__meta__.generate_error_messages
           raise InternalError, <<~ERROR unless errors.empty?
-            The following errors have occurred!
+            The config has not been #{verb.downcase} as the following error(s) have occurred!
             Validation can be bypassed with the --skip flag
 
             #{errors.join("\n\n")}
           ERROR
         end
-
-        # Sets the verb
-        verb = File.exists?(CONFIG_PATH) ? 'Updated' : 'Created'
 
         # Writes the config
         FileUtils.mkdir_p File.dirname(CONFIG_PATH)

@@ -158,14 +158,14 @@ module FlightAsset
         end
       end
 
-      def missing_keys
-        requires.keys.reject do |k|
-          defaults[k] || instance.__data__.key?(k)
+      def missing_keys_without_defaults
+        requires.keys.select do |k|
+          instance[k].nil? && !defaults.key?(k)
         end
       end
 
-      def nil_required_keys
-        requires.keys.select { |k| instance[k].nil? }
+      def nil_required_defaulted_keys
+        requires.keys.select { |k| defaults.key?(k) && instance[k].nil? }
       end
 
       def bad_whitelist_keys
@@ -177,26 +177,26 @@ module FlightAsset
 
       def generate_error_messages
         [].tap do |errors|
-          unless (requires = nil_required_keys).empty?
+          unless (requires = nil_required_defaulted_keys).empty?
             errors << <<~ERROR.chomp
-              The following flags should not override their default to be blank:
+              The following flag(s) should not override their defaults to be blank:
               #{requires.map { |k| flags[k] }.join(', ')}
             ERROR
           end
 
-          unless (missing = missing_keys).empty?
+          unless (missing = missing_keys_without_defaults).empty?
             errors << <<~ERROR.chomp
-              Update failed as the following flag(s) are still blank:
+              The following flag(s) can not be blank:
               #{missing.map { |k| flags[k] }.join(', ')}
             ERROR
           end
 
           unless (bads = bad_whitelist_keys).empty?
             msgs = bads.map do |k|
-              "#{flags[k]} #{instance[k]} # Valid: #{whitelists[k].join(', ')}"
+              "#{flags[k]} #{instance[k]} # VALID: #{whitelists[k].join(',')}"
             end
             errors << <<~ERROR.chomp
-              Update failed as the followings flag(s) have invalid values:
+              The following flag(s) are invalid:
               #{msgs.join("\n")}
             ERROR
           end
