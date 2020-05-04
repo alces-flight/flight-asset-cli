@@ -55,11 +55,15 @@ else
 end
 
 # Enables the development mode
-if FlightAsset::Config::CACHE.development?
-  Bundler.setup(:default, :development)
-  require 'pry'
-  require 'pry-byebug'
-  parts << :development
+begin
+  if FlightAsset::Config::CACHE.development?
+    Bundler.setup(:default, :development)
+    require 'pry'
+    require 'pry-byebug'
+    parts << :development
+  end
+rescue StandardError, LoadError
+  $stderr.puts "Could not start development mode!"
 end
 
 # Builds and runs the CLI
