@@ -49,11 +49,17 @@ module FlightAsset
         verb = File.exists?(CONFIG_PATH) ? 'Updated' : 'Created'
 
         # Validates the new config
-        unless opts.skip
-          errors = config.__meta__.generate_error_messages
+        errors = config.__meta__.generate_error_messages
+        if opts.allow_errors
+          $stderr.puts <<~ERRORS
+            #{verb} the config with the following errors:
+
+            #{errors.join("\n\n")}
+          ERRORS
+        else
           raise InternalError, <<~ERROR unless errors.empty?
             The config has not been #{verb.downcase} as the following error(s) have occurred!
-            Validation can be bypassed with the --skip flag
+            Validation can be bypassed with the --allow-errors flag
 
             #{errors.join("\n\n")}
           ERROR
