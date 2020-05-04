@@ -161,7 +161,35 @@ module FlightAsset
         whitelists.map { |k, values| [k, values, instance[k]] }
                   .reject { |_k, _v, value| value.nil? }
                   .reject { |_, values, value| values.include?(value) }
-                  .map { |key, _, _v| k }
+                  .map { |key, _, _v| key }
+      end
+
+      def generate_error_messages
+        [].tap do |errors|
+          unless (requires = nil_required_keys).empty?
+            errors << <<~ERROR.chomp
+              Update failed as the following flag(s) can not be blank:
+              #{requires.map { |k| flags[k] }.join(', ')}
+            ERROR
+          end
+
+          unless (missing = missing_keys).empty?
+            errors << <<~ERROR.chomp
+              Update failed as the following flag(s) are still blank:
+              #{missing.map { |k| flags[k] }.join(', ')}
+            ERROR
+          end
+
+          unless (bads = bad_whitelist_keys).empty?
+            msgs = bads.map do |k|
+              "#{flags[k]} #{instance[k]} # Valid: #{whitelists[k].join(', ')}"
+            end
+            errors << <<~ERROR.chomp
+              Update failed as the followings flag(s) have invalid values:
+              #{msgs.join("\n")}
+            ERROR
+          end
+        end
       end
     end
 

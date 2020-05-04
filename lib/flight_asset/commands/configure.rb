@@ -42,19 +42,9 @@ module FlightAsset
         config = Config.new(**data)
 
         # Validates the new config
-        unless (requires = config.__meta__.nil_required_keys).empty?
-          raise InternalError, <<~ERROR.chomp
-            Update failed as the following flag(s) can not be blank:
-            #{requires.map { |k| Config.flags[k] }.join(', ')}
-          ERROR
-        end
+        errors = config.__meta__.generate_error_messages
 
-        unless (missing = config.__meta__.missing_keys).empty?
-          raise InternalError, <<~ERROR.chomp
-            Update failed as the following flag(s) are still blank:
-            #{missing.map { |k| Config.flags[k] }.join(', ')}
-          ERROR
-        end
+        raise InternalError, errors.join("\n\n") unless errors.empty?
 
         # Sets the verb
         verb = File.exists?(CONFIG_PATH) ? 'Updated' : 'Created'
