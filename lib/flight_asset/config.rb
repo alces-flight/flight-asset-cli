@@ -33,12 +33,13 @@
 #
 require 'yaml'
 require 'logger'
+require 'delegate'
 
 module FlightAsset
   class ConfigDSL
     KeyDSL = Struct.new(:klass, :key) do
       def summary(value)
-        klass.summaries[key]
+        klass.summaries[key] = value
       end
 
       def description(value)
@@ -53,7 +54,7 @@ module FlightAsset
         klass.requires[key] = true
       end
 
-      def whilelist(*args)
+      def whitelist(*args)
         klass.whitelists[key] = args
       end
     end
@@ -83,33 +84,111 @@ module FlightAsset
         @whitelists ||= {}
       end
 
+      def flags
+        @flags ||= Hash.new do |h, k|
+          h[k] = "--#{k.to_s.gsub('_', '-')}"
+        end
+      end
+
+      # TODO: Make this settable
+      def conversions
+        Hash.new(:to_s)
+      end
+
       def config(key, &b)
         sym = key.to_sym
         self.keys << sym
-        KeyDSL.new(self, sym) { |k| k.instance_exec(&b) if b }
+        KeyDSL.new(self, sym).tap { |k| k.instance_exec(&b) } if b
         define_method(sym) { self[sym] }
       end
     end
 
+    class MetaConfig < SimpleDelegator
+      attr_reader :instance
+
+      def initialize(instance)
+        @instance = instance
+        super(instance.class)
+      end
+
+      def full_flags
+        @full_flags ||= Hash.new do |_, flag|
+        end
+      end
+
+      def flag_helps
+        @flag_helps
+      end
+
+      def commander_option_helper(cmd)
+        keys.each do |key|
+          arg = if requires[key] && instance[key]
+                  'FILLED'
+                elsif requires[key]
+                  'REQUIRED'
+                else
+                  'OPTIONAL'
+                end
+          full_flag = "#{flags[key]} #{arg}"
+
+          full_msg = summaries[key].dup
+          if instance.__data__.key?(key)
+            current = instance[key]
+            if current.nil?
+              full_msg << "\nBLANK"
+            else
+              full_msg << "\nCURRENT: #{current}"
+            end
+          elsif default = defaults[key]
+            full_msg << "\nDEFAULT: #{default}"
+          end
+
+          cmd.option "#{full_flag}", "#{full_msg}".chomp
+        end
+      end
+
+      def missing_keys
+        requires.keys.reject do |k|
+          defaults[k] || instance.__data__.key?(k)
+        end
+      end
+
+      def nil_required_keys
+        requires.keys.select { |k| instance[k].nil? }
+      end
+
+      def bad_whitelist_keys
+        whitelists.map { |k, values| [k, values, instance[k]] }
+                  .reject { |_k, _v, value| value.nil? }
+                  .reject { |_, values, value| values.include?(value) }
+                  .map { |key, _, _v| k }
+      end
+    end
+
     module InstanceMethods
+      attr_reader :__data__, :__converted__, :__meta__
+
       def initialize(**data)
         @__data__ = data.map { |k, v| [k.to_sym, v] }.to_h
+        @__converted__ = {}
+        @__meta__ = MetaConfig.new(self)
       end
 
       def [](raw_key)
         key = raw_key.to_sym
-        v = __data__.key?(key) ? __data__[key] : self.class.defaults[key]
-        if v.respond_to?(:empty?) && v.empty?
-          nil
+        if __converted__.key?(key)
+          __converted__[key]
         else
-          v
+          __converted__[key] = begin
+            if __data__.key?(key) && [nil, ''].include?(__data__[key])
+              nil
+            elsif __data__.key?(key)
+              __data__[key].send(self.class.conversions[key])
+            else
+              self.class.defaults[key]
+            end
+          end
         end
-      end
-
-      private
-
-      def __data__
-        @__data__ || {}
       end
     end
 
@@ -194,12 +273,5 @@ module FlightAsset
       end
     end
   end
-
-  Config::COMMENT_BLOCK = <<~CONF
-    # This config has been auto generated!
-    #
-    # Any modifications to the configuration values will be preserved
-    # However comments will be removed the next time this file is updated
-  CONF
 end
 

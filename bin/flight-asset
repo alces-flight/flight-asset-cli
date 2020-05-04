@@ -43,13 +43,6 @@ if /.*-with-config\Z/.match? __FILE__
 end
 require_relative '../lib/flight_asset/config'
 
-# Require gems in development mode
-if FlightAsset::Config::CACHE.development?
-  Bundler.setup(:default, :development)
-  require 'pry'
-  require 'pry-byebug'
-end
-
 # Display the help by default
 args << '--help' if args.empty?
 
@@ -60,7 +53,12 @@ if FlightAsset::Config::CACHE.configured?
 else
   parts << :configure
 end
+
+# Enables the development mode
 if FlightAsset::Config::CACHE.development?
+  Bundler.setup(:default, :development)
+  require 'pry'
+  require 'pry-byebug'
   parts << :development
 end
 

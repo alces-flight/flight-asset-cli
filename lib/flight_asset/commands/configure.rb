@@ -29,35 +29,54 @@ module FlightAsset
   module Commands
     class Configure < Command
       def run
-        # Extracts the data
-        data = Config::REFERENCE_OPTS.keys.map do |key|
-          [key, (opts[key.to_sym] || Config::CACHE.send(key)).to_s]
-        end.reject { |_, v| v.empty? }
-           .to_h
+        # Extracts the existing config data
+        old = cache.__data__
 
-        # Sets the finished flag if appropriate
-        if opts[:finished] && Config::CACHE.configured?
-          data['finished'] = true
+        # Extracts the merge data
+        merge = Config.keys.each_with_object({}) do |k, memo|
+          memo[k] = opts[k] if opts.key?(k)
+        end
+
+        # Creates the new data and config
+        data = old.dup.merge(merge)
+        config = Config.new(**data)
+
+        # Validates the new config
+        unless (requires = config.__meta__.nil_required_keys).empty?
+          raise InternalError, <<~ERROR.chomp
+            Update failed as the following flag(s) can not be blank:
+            #{requires.map { |k| Config.flags[k] }.join(', ')}
+          ERROR
+        end
+
+        unless (missing = config.__meta__.missing_keys).empty?
+          raise InternalError, <<~ERROR.chomp
+            Update failed as the following flag(s) are still blank:
+            #{missing.map { |k| Config.flags[k] }.join(', ')}
+          ERROR
         end
 
         # Sets the verb
-        verb = File.exists?(Config::PATH) ? 'Updated' : 'Created'
+        verb = File.exists?(CONFIG_PATH) ? 'Updated' : 'Created'
 
         # Writes the config
-        FileUtils.mkdir_p File.dirname(FlightAsset::Config::PATH)
-        File.write Config::PATH, <<~CONF
-          #{Config::COMMENT_BLOCK}
+        FileUtils.mkdir_p File.dirname(CONFIG_PATH)
+        File.write CONFIG_PATH, <<~CONF
+          # This config has been auto generated!
+          #
+          # Any modifications to the configuration values will be preserved
+          # However comments will be removed the next time this file is updated
 
           #{YAML.dump(data)}
         CONF
 
         # Notifies the user
         #
-        $stderr.puts "#{verb} Config: #{Config::PATH}"
+        $stderr.puts "#{verb} Config: #{CONFIG_PATH}"
+      end
 
-        $stderr.puts <<~WARN unless Config.read(Config::PATH).configured?
-          The application does not appear to be fully configured!
-        WARN
+      def cache
+        Config::CACHE
       end
     end
   end

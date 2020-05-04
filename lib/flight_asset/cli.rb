@@ -81,24 +81,7 @@ module FlightAsset
       program :help_paging, false
 
       create_command 'configure' do |c|
-        c.option '--finished', 'Exit the configuration wizard'
-        Config.keys.each do |key|
-          msg = Config.summaries[key]
-          required = Config::CACHE.class.requires[key]
-          default = Config::CACHE.send(key).to_s
-          default = nil if default.empty?
-          cli_msg = if default
-                      "#{msg}\nDEFAULT: #{default}"
-                    else
-                      msg
-                    end
-          suffix = if default || !required
-                     'OPTIONAL'
-                   else
-                     'REQUIRED'
-                   end
-          c.option "--#{key.to_s.gsub('_', '-')} #{ suffix }", cli_msg
-        end
+        Config::CACHE.__meta__.commander_option_helper(c)
       end
     end
 
