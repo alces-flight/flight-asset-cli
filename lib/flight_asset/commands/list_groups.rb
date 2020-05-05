@@ -31,7 +31,9 @@ module FlightAsset
       include Concerns::HasTableElements
 
       def table_elements
-        @table_elements ||= if opts.category
+        @table_elements ||= if ['', true].include?(opts.category)
+          request_asset_groups_records.reject(&:category_or_missing)
+        elsif opts.category
           cat = request_categories_record_by_name(opts.category)
           request_asset_groups_records_by_category(cat)
         else
@@ -42,11 +44,7 @@ module FlightAsset
       def table_procs
         [
           ['Name', ->(a) { a.name }],
-          ['Category', ->(a) do
-            if a.send(:input_relationships)['assetGroupCategory']['data']
-              a.assetGroupCategory&.name
-            end
-          end],
+          ['Category', ->(a) { a.category_or_missing&.name }],
           ['Decommissioned', ->(a) { a.decommissioned }]
         ]
       end

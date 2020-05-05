@@ -175,7 +175,8 @@ DESC
 
       create_command 'list-groups' do |c|
         c.summary = 'Return all the groups'
-        c.option '--category CATEGORY', 'Filter the groups be CATEGORY'
+        c.option '--category [CATEGORY]',
+                 'Filter the groups be CATEGORY (or no category if omitted)'
       end
 
       create_command 'show-group', 'ASSET_GROUP' do |c|

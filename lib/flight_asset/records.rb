@@ -170,6 +170,13 @@ module FlightAsset
       input_relationships['assets']['links']['self']
     end
 
+    def category_or_missing
+      key = ['asset_group_category', 'assetGroupCategory'].find do |key|
+        input_relationships[key]&.[]('data')
+      end
+      key ? send(key) : nil
+    end
+
     def category_relationship_url
       urls = ['asset_group_category', 'assetGroupCategory'].map do |key|
         next unless input_relationships.key? key
