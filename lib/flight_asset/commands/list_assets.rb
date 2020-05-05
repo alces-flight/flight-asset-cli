@@ -31,7 +31,20 @@ module FlightAsset
       include Concerns::HasTableElements
 
       def table_elements
-        @table_elements ||= if ['', true].include? opts.group
+        @table_elements ||= begin
+          assets = fetch_assets.sort_by(&:name)
+          if opts.decommissioned
+            assets.select(&:decommissioned)
+          elsif opts.decommissioned == false
+            assets.reject(&:decommissioned)
+          else
+            assets
+          end
+        end
+      end
+
+      def fetch_assets
+        if ['', true].include? opts.group
           request_assets_records(**req_opts).reject(&:asset_group_or_missing)
         elsif opts.group
           ag = request_asset_groups_record_by_name(opts.group)

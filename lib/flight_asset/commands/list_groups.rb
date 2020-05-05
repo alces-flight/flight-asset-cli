@@ -31,14 +31,27 @@ module FlightAsset
       include Concerns::HasTableElements
 
       def table_elements
-        @table_elements ||= if ['', true].include?(opts.category)
+        @table_elements ||= begin
+          groups = fetch_groups.sort_by(&:name)
+          if opts.decommissioned
+            groups.select(&:decommissioned)
+          elsif opts.decommissioned == false
+            groups.reject(&:decommissioned)
+          else
+            groups
+          end
+        end
+      end
+
+      def fetch_groups
+        if ['', true].include?(opts.category)
           request_asset_groups_records.reject(&:category_or_missing)
         elsif opts.category
           cat = request_categories_record_by_name(opts.category)
           request_asset_groups_records_by_category(cat)
         else
           request_asset_groups_records
-        end.sort_by(&:name)
+        end
       end
 
       def table_procs

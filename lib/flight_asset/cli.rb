@@ -133,10 +133,19 @@ ERROR
         c.option '--info-path PATH', 'Override --info with contents of a file'
       end
 
+      DECOMMISSION_FILTER = ->(c, type: 'records') do
+        c.option '--[no-]decommissioned', <<~DESC.chomp
+          Explicitly filter the #{type} by the decomissioned flag:
+            * --decommissioned    exclusively decommissioned
+            * --no-decommissioned exclusively (re)commissioned
+        DESC
+      end
+
       create_command 'list-assets' do |c|
         c.summary = 'Return all the assets'
         c.option '--group [GROUP]',
                  'Filter the assets by GROUP (or no group if omitted)'
+        DECOMMISSION_FILTER.call(c, type: 'assets')
       end
 
       create_command 'show-asset', 'ASSET' do |c|
@@ -181,6 +190,7 @@ DESC
         c.summary = 'Return all the groups'
         c.option '--category [CATEGORY]',
                  'Filter the groups be CATEGORY (or no category if omitted)'
+        DECOMMISSION_FILTER.call(c, type: 'groups')
       end
 
       create_command 'show-group', 'ASSET_GROUP' do |c|
