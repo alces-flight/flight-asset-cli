@@ -61,6 +61,10 @@ module FlightAsset
       def whitelist(*args)
         klass.whitelists[key] = args
       end
+
+      def sensitive
+        klass.sensitives[key] = true
+      end
     end
 
     module ClassMethods
@@ -90,6 +94,10 @@ module FlightAsset
 
       def whitelists
         @whitelists ||= {}
+      end
+
+      def sensitives
+        @sensitives ||= {}
       end
 
       def flags
@@ -140,15 +148,18 @@ module FlightAsset
           full_flag = "#{flags[key]} #{arg}"
 
           full_msg = summaries[key].dup
-          if instance.__data__.key?(key)
+          if sensitives.key?(key)
+            full_msg << "\nSENSITIVE"
+          elsif instance.__data__.key?(key)
             current = instance[key]
             if current.nil?
               full_msg << "\nBLANK"
             else
               full_msg << "\nCURRENT: #{current}"
             end
+          elsif defaults.key?(key)
+            full_msg << "\nDEFAULT: #{defaults[key]}"
           end
-          full_msg << "\nDEFAULT: #{defaults[key]}" if defaults.key?(key)
           full_msg << "\nVALUES: #{whitelists[key].join(',')}" if whitelists.key?(key)
           full_msg << "\nVOLATILE: #{volatiles[key]}" if volatiles.key?(key)
 
