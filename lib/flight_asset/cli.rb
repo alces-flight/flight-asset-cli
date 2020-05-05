@@ -154,6 +154,10 @@ ERROR
         c.summary = 'Flag that an asset has been decommissioned'
       end
 
+      create_command 'recommission-asset', 'ASSET' do |c|
+        c.summary = 'Unsets the decommissioned flag on an asset'
+      end
+
       create_command 'edit-asset-info', 'Asset' do |c|
         c.summary = "Update an asset's info field via the system editor"
       end
@@ -190,6 +194,10 @@ DESC
 
       create_command 'decommission-group', 'ASSET_GROUP' do |c|
         c.summary = 'Flag that a group has been decommissioned'
+      end
+
+      create_command 'recommission-group', 'ASSET_GROUP' do |c|
+        c.summary = 'Unsets the decommissioned flag on a group'
       end
 
       create_command 'move-group', 'ASSET_GROUP' do |c|
