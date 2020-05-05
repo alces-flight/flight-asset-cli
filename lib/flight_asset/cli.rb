@@ -181,6 +181,11 @@ DESC
         c.summary = 'Return the detailed description of a group'
       end
 
+      create_command 'create-group', 'ASSET_GROUP' do |c|
+        c.summary = 'Define a new group'
+        c.option '--category CATEGORY', 'Add the group to an existing category'
+      end
+
       create_command 'decommission-group', 'ASSET_GROUP' do |c|
         c.summary = 'Flag that a group has been decommissioned'
       end
