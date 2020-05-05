@@ -38,8 +38,7 @@ Bundler.setup(:default)
 args = ARGV.dup
 if /.*-with-config\Z/.match? __FILE__
   module FlightAsset; end
-  class FlightAsset::Config < Hash; end
-  FlightAsset::Config.const_set('PATH', args.shift)
+  FlightAsset.const_set('CONFIG_PATH', args.shift)
 end
 require_relative '../lib/flight_asset/config'
 
@@ -51,7 +50,7 @@ parts = [:shared]
 if FlightAsset::Config::CACHE.__meta__.generate_error_messages.empty?
   parts << :main
 else
-  parts << :configure
+  parts << :unconfigured
 end
 
 # Enables the development mode

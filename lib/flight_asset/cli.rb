@@ -87,7 +87,7 @@ module FlightAsset
       end
     end
 
-    define :configure do
+    define :unconfigured do
       def self.additional_help_text
         @additional_help_text ||= Config::CACHE.__meta__.generate_error_messages.join("\n\n")
       end
