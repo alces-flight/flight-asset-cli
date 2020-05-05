@@ -114,10 +114,21 @@ module FlightAsset
     end
 
     def request_assets_record_by_name(name, error: true)
-      request_assets_records.find { |a| a.name == name }.tap do |a|
-        raise AssetMissing, <<~ERROR.chomp if a.nil? && error
+      assets = request_assets_records.select { |a| a.name == name }
+      if error && assets.empty?
+        raise AssetMissing, <<~ERROR.chomp
           Could not locate asset: #{name}
         ERROR
+      elsif assets.length > 1
+        # NOTE: This error is unrecoverable and can not be skipped
+        raise DuplicateError, <<~ERROR.chomp
+          Found multiple copies of asset: #{name}
+          Contact your system administrator for further assistance
+        ERROR
+      elsif assets.length == 1
+        assets.first
+      else
+        nil
       end
     end
 
@@ -135,10 +146,21 @@ module FlightAsset
     end
 
     def request_asset_groups_record_by_name(name, error: true)
-      request_asset_groups_records.find { |a| a.name == name }.tap do |g|
-        raise GroupMissing, <<~ERROR.chomp if g.nil? && error
+      groups = request_asset_groups_records.select { |a| a.name == name }
+      if error && groups.empty?
+        raise GroupMissing, <<~ERROR.chomp
           Could not locate group: #{name}
         ERROR
+      elsif groups.length > 1
+        # NOTE: This error is unrecoverable and can not be skipped
+        raise DuplicateError, <<~ERROR.chomp
+          Found multiple copies of group: #{name}
+          Contact your system administrator for further assistance
+        ERROR
+      elsif groups.length == 1
+        groups.first
+      else
+        nil
       end
     end
 
@@ -147,10 +169,21 @@ module FlightAsset
     end
 
     def request_categories_record_by_name(name, error: true)
-      request_categories_records.find { |c| c.name == name }.tap do |c|
-        raise CategoryMissing, <<~ERROR.chomp if c.nil? && error
+      categories = request_categories_records.select { |c| c.name == name }
+      if error && categories.empty?
+        raise CategoriesMissing, <<~ERROR.chomp
           Could not locate category: #{name}
         ERROR
+      elsif categories.length > 1
+        # NOTE: This error is unrecoverable and can not be skipped
+        raise DuplicateError, <<~ERROR.chomp
+          Found multiple category: #{name}
+          Contact your system administrator for further assistance
+        ERROR
+      elsif categories.length == 1
+        categories.first
+      else
+        nil
       end
     end
 
