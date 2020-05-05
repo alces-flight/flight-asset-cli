@@ -135,7 +135,8 @@ ERROR
 
       create_command 'list-assets' do |c|
         c.summary = 'Return all the assets'
-        c.option '--group GROUP', 'Filter the assets by GROUP'
+        c.option '--group [GROUP]',
+                 'Filter the assets by GROUP (or no group if omitted)'
       end
 
       create_command 'show-asset', 'ASSET' do |c|

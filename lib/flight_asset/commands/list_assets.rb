@@ -31,7 +31,9 @@ module FlightAsset
       include Concerns::HasTableElements
 
       def table_elements
-        @table_elements ||= if opts.group
+        @table_elements ||= if ['', true].include? opts.group
+          request_assets_records(**req_opts).reject(&:asset_group_or_missing)
+        elsif opts.group
           ag = request_asset_groups_record_by_name(opts.group)
           request_assets_records_by_asset_group(ag, **req_opts)
         else
