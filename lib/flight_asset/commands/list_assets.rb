@@ -33,16 +33,21 @@ module FlightAsset
       def table_elements
         @table_elements ||= if opts.group
           ag = request_asset_groups_record_by_name(opts.group)
-          request_assets_records_by_asset_group(ag)
+          request_assets_records_by_asset_group(ag, **req_opts)
         else
-          request_assets_records
+          request_assets_records(**req_opts)
         end.sort_by(&:name)
+      end
+
+      def req_opts
+        { includes: ['asset_group'] }
       end
 
       def table_procs
         [
           ['Name', ->(a) { a.name }],
           ['Support Type', ->(a) { a.support_type }],
+          ['Asset Group', ->(a) { a.asset_group_or_missing&.name }],
           ['Decommissioned', ->(a) { a.decommissioned }]
         ]
       end
