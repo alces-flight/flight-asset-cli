@@ -46,6 +46,10 @@ module FlightAsset
         klass.descriptions[key] = value
       end
 
+      def default(value)
+        klass.defaults[key] = value
+      end
+
       def required
         klass.requires[key] = true
       end
@@ -60,20 +64,6 @@ module FlightAsset
 
       def sensitive
         klass.sensitives[key] = true
-      end
-    end
-
-    DefaultsDSL = Struct.new(:klass) do
-      def set(key, value, &_)
-        klass.defaults[key.to_sym] = value
-      end
-
-      def unset(key)
-        klass.defaults.delete(key.to_sym)
-      end
-
-      def unset_all
-        klass.defaults = {}
       end
     end
 
@@ -96,8 +86,6 @@ module FlightAsset
 
       def defaults(&block)
         @defaults ||= {}
-        DefaultsDSL.new(self).instance_exec(&block) if block
-        @defaults
       end
 
       def protects
@@ -171,8 +159,9 @@ module FlightAsset
                   'OPTIONAL'
                 end
           full_flag = "#{flags[key]} #{arg}"
-
           full_msg = summaries[key].dup
+
+          # Generate the "value" section
           if sensitives.key?(key)
             full_msg << "\nSENSITIVE"
           else
@@ -182,10 +171,18 @@ module FlightAsset
             elsif instance.__data__.key?(key)
               full_msg << "\nCURRENT: #{current}"
             end
-            if defaults.key?(key)
-              full_msg << "\nDEFAULT: #{defaults[key]}"
+          end
+
+          # Generate the "default" section
+          if defaults.key?(key)
+            full_msg << "\nDEFAULT"
+            if sensitives.key?(key)
+              full_msg << ' - OVERRIDDEN' if instance.__data__.key?(key)
+            else
+              full_msg << " #{defaults[key]}"
             end
           end
+
           full_msg << "\nVALUES: #{whitelists[key].join(',')}" if whitelists.key?(key)
           full_msg << "\nPROTECTED: #{protects[key]}" if protects.key?(key)
 

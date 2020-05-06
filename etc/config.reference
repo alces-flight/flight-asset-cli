@@ -27,15 +27,8 @@
 # https://github.com/alces-flight/alces-flight/flight-asset-cli
 #==============================================================================
 
-# Sets the global defaults
-# NOTE: They may be redefined by etc/config.defaults
-defaults do
-  set :create_dummy_group_name, 'ignore-me'
-  set :base_url,                'https://center.alces-flight.com/api'
-  set :api_prefix,              'v1'
-  set :log_level,               'error'
-  set :tmp_path,                '/tmp/flight-asset'
-end
+# NOTE: Any field in this document may be modified by:
+#       etc/config.overrides
 
 config :component_id do
   summary 'Numeric ID for the FC component'
@@ -69,6 +62,7 @@ dummy group. Then they are unassigned from the dummy group. The dummy group
 should be empty (your mileage my otherwise vary).
 DESC
   required
+  default 'ignore-me'
 end
 
 config :base_url do
@@ -80,6 +74,7 @@ should not be included in the URL
 DESC
   required
   protect 'do not send requests to an unknown location'
+  default 'https://center.alces-flight.com/api'
 end
 
 config :api_prefix do
@@ -89,6 +84,7 @@ Change the API version prefix. The prefix is normally static to the application
 version and should not need modifications.
 DESC
   protect 'check the target api for compatibility'
+  default 'v1'
 end
 
 config :log_path do
@@ -107,6 +103,7 @@ Set at which severity the application will log
 DESC
   required
   whitelist 'disabled', 'fatal', 'error', 'warn', 'info', 'debug'
+  default 'error'
 end
 
 config :tmp_path do
@@ -115,7 +112,8 @@ config :tmp_path do
 Set the base file name and path for temporary files
 DESC
   required
+  default '/tmp/flight-asset'
 end
 
-# Loads the alternative defaults
-load_reference File.expand_path('config.defaults', __dir__)
+# Loads the overrides
+load_reference File.expand_path('config.overrides', __dir__)
