@@ -131,7 +131,7 @@ module FlightAsset
       end
 
       def load_reference(path)
-        self.eval(File.read path) if File.exists?(path)
+        self.instance_eval(File.read(path), path, 0) if File.exists?(path)
       end
     end
 
@@ -273,7 +273,7 @@ module FlightAsset
         extend ClassMethods
         include InstanceMethods
 
-        self.class_eval(File.read reference_path)
+        self.load_reference(reference_path)
         self.class_exec(&b) if b
       end.tap do |klass|
         data = if File.exists?(config_path)

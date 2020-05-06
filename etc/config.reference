@@ -27,14 +27,6 @@
 # https://github.com/alces-flight/alces-flight/flight-asset-cli
 #==============================================================================
 
-#==============================================================================
-# This file is for references purposes only! It will not configure the
-# application. Editing this file will break the wizard
-#
-# The actual configuration file should be stored as:
-# etc/config.yaml
-#=============================================================================
-
 # Sets the global defaults
 defaults do
   set :create_dummy_group_name, 'ignore-me'
@@ -45,13 +37,7 @@ defaults do
 end
 
 # Loads the alternative defaults
-load_reference File.expand_path('etc/config.defaults', __dir__)
-
-#=============================================================================
-# API Request URLS
-# All API calls are made to the following URL:
-# <base_url>/<api_prefix>/...
-#=============================================================================
+load_reference File.expand_path('config.defaults', __dir__)
 
 config :component_id do
   summary 'Numeric ID for the FC component'
