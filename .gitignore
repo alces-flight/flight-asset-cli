@@ -1,5 +1,5 @@
-etc/config.yaml
-etc/config.defaults
+etc/config.*
+!etc/config.reference
 var
 .bundle/*
 vendor

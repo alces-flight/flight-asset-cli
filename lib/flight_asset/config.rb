@@ -120,7 +120,12 @@ module FlightAsset
 
       # TODO: Make this settable
       def conversions
-        Hash.new(:to_s)
+        @conversions ||= Hash.new(:to_s)
+      end
+
+      # TODO: Hook into the conversions hash
+      def nil_conversions
+        @nil_concersions ||= Hash.new(nil.to_s)
       end
 
       def config(key, &b)
@@ -129,7 +134,8 @@ module FlightAsset
         KeyDSL.new(self, sym).tap { |k| k.instance_exec(&b) } if b
         define_method(sym) { self[sym] }
         define_method(:"#{sym}!") do
-          self[sym].tap { |v| raise 'Unexpected Error' if v.nil? }
+          value = self[sym]
+          value.nil? ? nil_conversions[key] : value
         end
       end
 
@@ -297,7 +303,7 @@ module FlightAsset
   # Constructs the Config class and cache
   Config = ConfigDSL.build(REFERENCE_PATH, CONFIG_PATH) do
     def development?
-      log_level == 'development'
+      __data__[:development] ? true : false
     end
 
     def missing_keys
@@ -313,24 +319,6 @@ module FlightAsset
       missing_keys.empty?
     end
 
-    def log_level_const
-      case log_level
-      when 'disabled'
-        # The logger is disabled via /dev/null
-        Logger::FATAL
-      when 'fatal'
-        Logger::FATAL
-      when 'error'
-        Logger::ERROR
-      when 'warn'
-        Logger::WARN
-      when 'info'
-        Logger::INFO
-      when 'debug'
-        Logger::DEBUG
-      end
-    end
-
     def log_path_or_stderr
       if log_level == 'disabled'
         '/dev/null'
@@ -343,12 +331,30 @@ module FlightAsset
     end
 
     def logger
-      @logger ||= Logger.new(log_path_or_stderr).tap do |l|
-        if level = log_level_const
-          l.level = level
+      @logger ||= Logger.new(log_path_or_stderr).tap do |log|
+        next if log_level == 'disabled'
+
+        # Determine the level
+        level = case log_level
+        when 'fatal'
+          Logger::FATAL
+        when 'error'
+          Logger::ERROR
+        when 'warn'
+          Logger::WARN
+        when 'info'
+          Logger::INFO
+        when 'debug'
+          Logger::DEBUG
+        end
+
+        if level.nil?
+          # Log bad log levels
+          log.level = Logger::ERROR
+          log.error "Unrecognized log level: #{log_level}"
         else
-          $stderr.puts "Unrecognised log_level: #{log_level}"
-          exit 1
+          # Sets good log levels
+          log.level = level
         end
       end
     end

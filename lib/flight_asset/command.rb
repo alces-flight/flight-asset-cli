@@ -88,10 +88,10 @@ module FlightAsset
         default_headers = {
           'Accept' => 'application/vnd.api+json',
           'Content-Type' => 'application/json',
-          'Authorization' => "Bearer #{Config::CACHE.jwt}"
+          'Authorization' => "Bearer #{Config::CACHE.jwt!}"
         }
 
-        url = File.join(Config::CACHE.base_url!, Config::CACHE.api_prefix || '')
+        url = File.join(Config::CACHE.base_url!, Config::CACHE.api_prefix!)
         Faraday.new(url: url, headers: default_headers) do |c|
           c.use Faraday::Response::Logger, Config::CACHE.logger, { bodies: true } do |logger|
             logger.filter(/(Authorization:)(.*)/, '\1 [REDACTED]')
@@ -104,11 +104,11 @@ module FlightAsset
     end
 
     def build_components_record
-      ComponentsRecord.new(id: Config::CACHE.component_id, connection: nil)
+      ComponentsRecord.new(id: Config::CACHE.component_id!, connection: nil)
     end
 
     def request_assets_records(**opts)
-      url = "components/#{Config::CACHE.component_id}/assets"
+      url = "components/#{Config::CACHE.component_id!}/assets"
       AssetsRecord.index_enum(connection: connection, url: url, **opts)
     end
 
@@ -139,7 +139,7 @@ module FlightAsset
     def request_asset_groups_records
       AssetGroupsRecord.index_enum(
         connection: connection,
-        url: "components/#{Config::CACHE.component_id}/asset_groups",
+        url: "components/#{Config::CACHE.component_id!}/asset_groups",
         includes: ['assetGroupCategroy', 'asset_group_category']
       )
     end
