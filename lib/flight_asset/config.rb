@@ -175,15 +175,16 @@ module FlightAsset
           full_msg = summaries[key].dup
           if sensitives.key?(key)
             full_msg << "\nSENSITIVE"
-          elsif instance.__data__.key?(key)
+          else
             current = instance[key]
             if current.nil?
               full_msg << "\nBLANK"
-            else
+            elsif instance.__data__.key?(key)
               full_msg << "\nCURRENT: #{current}"
             end
-          elsif defaults.key?(key)
-            full_msg << "\nDEFAULT: #{defaults[key]}"
+            if defaults.key?(key)
+              full_msg << "\nDEFAULT: #{defaults[key]}"
+            end
           end
           full_msg << "\nVALUES: #{whitelists[key].join(',')}" if whitelists.key?(key)
           full_msg << "\nVOLATILE: #{volatiles[key]}" if volatiles.key?(key)
