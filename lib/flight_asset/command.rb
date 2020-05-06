@@ -61,6 +61,10 @@ module FlightAsset
     #
     def run!
       run_callbacks(:run) { run }
+    rescue => e
+      Config::CACHE.logger.fatal 'An error has occurred'
+      Config::CACHE.logger.debug e.full_message
+      raise e
     end
 
     ##

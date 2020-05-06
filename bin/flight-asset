@@ -68,5 +68,6 @@ end
 
 # Builds and runs the CLI
 require_relative '../lib/flight_asset/cli'
+FlightAsset::Config::CACHE.logger.info 'Running Command'
 FlightAsset::CLI.build(*parts).run!(*args)
 

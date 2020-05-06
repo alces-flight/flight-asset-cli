@@ -108,7 +108,7 @@ config :log_level do
 Set at which severity the application will log
 DESC
   required
-  whitelist 'disabled', 'fatal', 'error', 'warn', 'info', 'debug', 'development'
+  whitelist 'disabled', 'fatal', 'error', 'warn', 'info', 'debug'
 end
 
 config :tmp_path do
