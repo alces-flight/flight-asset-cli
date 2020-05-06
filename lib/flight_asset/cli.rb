@@ -133,18 +133,25 @@ ERROR
         c.option '--info-path PATH', 'Override --info with contents of a file'
       end
 
-      DECOMMISSION_FILTER = ->(c, type: 'records') do
+      DECOMMISSION_FILTER = ->(c, plurals: 'records') do
         c.option  '--include-decommissioned',
-                  "Include #{type} that have been decommissioned"
+                  "Include #{plurals} that have been decommissioned"
         c.option  '--only-decommissioned',
-                  "Only return #{type} that have been decommissioned"
+                  "Only return #{plurals} that have been decommissioned"
+      end
+
+      NAMED_FILTER = ->(c, single: 'RECORD', plurals: 'records') do
+        down = single.downcase
+        c.option "--#{down} #{single}", <<~MSG.chomp
+          Only return #{plurals} that are within #{single}
+          Specify the empty string ('') only return #{plurals} without a #{down}
+        MSG
       end
 
       create_command 'list-assets' do |c|
         c.summary = 'Return all the assets'
-        c.option '--group [GROUP]',
-                 'Filter the assets by GROUP (or no group if omitted)'
-        DECOMMISSION_FILTER.call(c, type: 'assets')
+        NAMED_FILTER.call(c, single: 'GROUP', plurals: 'assets')
+        DECOMMISSION_FILTER.call(c, plurals: 'assets')
       end
 
       create_command 'show-asset', 'ASSET' do |c|
@@ -187,9 +194,8 @@ DESC
 
       create_command 'list-groups' do |c|
         c.summary = 'Return all the groups'
-        c.option '--category [CATEGORY]',
-                 'Filter the groups be CATEGORY (or no category if omitted)'
-        DECOMMISSION_FILTER.call(c, type: 'groups')
+        NAMED_FILTER.call(c, single: 'CATEGORY', plurals: 'groups')
+        DECOMMISSION_FILTER.call(c, plurals: 'groups')
       end
 
       create_command 'show-group', 'ASSET_GROUP' do |c|
