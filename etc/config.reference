@@ -45,9 +45,7 @@ defaults do
 end
 
 # Loads the alternative defaults
-if File.exists?(path = File.expand_path('etc/config.defaults', __dir__))
-  load path
-end
+load_reference File.expand_path('etc/config.defaults', __dir__)
 
 #=============================================================================
 # API Request URLS

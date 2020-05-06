@@ -129,6 +129,10 @@ module FlightAsset
         KeyDSL.new(self, sym).tap { |k| k.instance_exec(&b) } if b
         define_method(sym) { self[sym] }
       end
+
+      def load_reference(path)
+        self.eval(File.read path) if File.exists?(path)
+      end
     end
 
     class MetaConfig < SimpleDelegator
