@@ -50,8 +50,8 @@ module FlightAsset
         klass.requires[key] = true
       end
 
-      def volatile(value)
-        klass.volatiles[key] = value
+      def protect(value)
+        klass.protects[key] = value
       end
 
       def whitelist(*args)
@@ -100,8 +100,8 @@ module FlightAsset
         @defaults
       end
 
-      def volatiles
-        @volatiles ||= {}
+      def protects
+        @protects ||= {}
       end
 
       def whitelists
@@ -187,7 +187,7 @@ module FlightAsset
             end
           end
           full_msg << "\nVALUES: #{whitelists[key].join(',')}" if whitelists.key?(key)
-          full_msg << "\nVOLATILE: #{volatiles[key]}" if volatiles.key?(key)
+          full_msg << "\nPROTECTED: #{protects[key]}" if protects.key?(key)
 
           cmd.option "#{full_flag}", "#{full_msg}".chomp
         end

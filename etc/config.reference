@@ -28,6 +28,7 @@
 #==============================================================================
 
 # Sets the global defaults
+# NOTE: They may be redefined by etc/config.defaults
 defaults do
   set :create_dummy_group_name, 'ignore-me'
   set :base_url,                'https://center.alces-flight.com/api'
@@ -35,9 +36,6 @@ defaults do
   set :log_level,               'error'
   set :tmp_path,                '/tmp/flight-asset'
 end
-
-# Loads the alternative defaults
-load_reference File.expand_path('config.defaults', __dir__)
 
 config :component_id do
   summary 'Numeric ID for the FC component'
@@ -81,7 +79,7 @@ prefix will be appended to the base url. The all most always means the version
 should not be included in the URL
 DESC
   required
-  volatile 'do not send requests to an unknown location'
+  protect 'do not send requests to an unknown location'
 end
 
 config :api_prefix do
@@ -90,7 +88,7 @@ config :api_prefix do
 Change the API version prefix. The prefix is normally static to the application
 version and should not need modifications.
 DESC
-  volatile 'check the target api for compatibility'
+  protect 'check the target api for compatibility'
 end
 
 config :log_path do
@@ -99,7 +97,7 @@ config :log_path do
 Specify the path to the log file. The application will log to standard error
 if left blank.
 DESC
-  volatile 'ensure logrotate has been setup'
+  protect 'ensure logrotate has been setup'
 end
 
 config :log_level do
@@ -118,3 +116,6 @@ Set the base file name and path for temporary files
 DESC
   required
 end
+
+# Loads the alternative defaults
+load_reference File.expand_path('config.defaults', __dir__)

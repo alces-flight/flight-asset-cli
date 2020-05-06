@@ -82,7 +82,7 @@ module FlightAsset
 
       create_command 'configure' do |c|
         c.option '--force', 'Ignore validation errors and save the config'
-        c.option '--volatile', 'Allow volatile configs to be updated'
+        c.option '--allow-protected', 'Allow protected configs to be updated'
         Config::CACHE.__meta__.commander_option_helper(c)
       end
     end

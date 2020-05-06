@@ -32,26 +32,26 @@ module FlightAsset
         # Extracts the existing config data
         old = cache.__data__
 
-        # Refuse to update volatile flags by default
+        # Refuse to update protect flags by default
         sym_opts = opts.keys.map(&:to_sym)
-        reset_volatiles = Config.volatiles.keys.map { |k| :"reset_#{k}" }
-        reset_vol_opts = sym_opts & reset_volatiles
-        vol_opts = sym_opts & Config.volatiles.keys
-        unless opts.volatile || [*reset_vol_opts, *vol_opts].empty?
+        reset_protects = Config.protects.keys.map { |k| :"reset_#{k}" }
+        reset_vol_opts = sym_opts & reset_protects
+        vol_opts = sym_opts & Config.protects.keys
+        unless opts.allow_protected || [*reset_vol_opts, *vol_opts].empty?
           msgs = []
           unless vol_opts.empty?
-            msgs << "The following flags are volatile, please ensure:"
+            msgs << "The following flags are protected, please ensure:"
             vol_opts.each do |key|
-              msgs << "#{Config.flags[key]}: #{Config.volatiles[key]}"
+              msgs << "#{Config.flags[key]}: #{Config.protects[key]}"
             end
             msgs << ''
           end
           unless reset_vol_opts.empty?
-            msgs << 'The following will reset a volatile flag:'
+            msgs << 'The following will reset a protect flag:'
             msgs << reset_vol_opts.map { |k| Config.flags[k] }.join(' ')
             msgs << ''
           end
-          msgs << 'Use the --volatile flag to proceed.'
+          msgs << 'Use the --allow-protected flag to proceed.'
           raise InternalError, msgs.join("\n")
         end
 
