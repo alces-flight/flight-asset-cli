@@ -1,4 +1,5 @@
 etc/config.yaml
+etc/config.defaults
 var
 .bundle/*
 vendor

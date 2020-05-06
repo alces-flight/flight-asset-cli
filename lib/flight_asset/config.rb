@@ -46,10 +46,6 @@ module FlightAsset
         klass.descriptions[key] = value
       end
 
-      def default(value)
-        klass.defaults[key] = value
-      end
-
       def required
         klass.requires[key] = true
       end
@@ -64,6 +60,20 @@ module FlightAsset
 
       def sensitive
         klass.sensitives[key] = true
+      end
+    end
+
+    DefaultsDSL = Struct.new(:klass) do
+      def set(key, value, &_)
+        klass.defaults[key.to_sym] = value
+      end
+
+      def unset(key)
+        klass.defaults.delete(key.to_sym)
+      end
+
+      def unset_all
+        klass.defaults = {}
       end
     end
 
@@ -84,8 +94,10 @@ module FlightAsset
         @descriptions ||= {}
       end
 
-      def defaults
+      def defaults(&block)
         @defaults ||= {}
+        DefaultsDSL.new(self).instance_exec(&block) if block
+        @defaults
       end
 
       def volatiles

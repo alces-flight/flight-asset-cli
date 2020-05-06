@@ -35,6 +35,20 @@
 # etc/config.yaml
 #=============================================================================
 
+# Sets the global defaults
+defaults do
+  set :create_dummy_group_name, 'ignore-me'
+  set :base_url,                'https://center.alces-flight.com/api'
+  set :api_prefix,              'v1'
+  set :log_level,               'error'
+  set :tmp_path,                '/tmp/flight-asset'
+end
+
+# Loads the alternative defaults
+if File.exists?(path = File.expand_path('etc/config.defaults', __dir__))
+  load path
+end
+
 #=============================================================================
 # API Request URLS
 # All API calls are made to the following URL:
@@ -73,7 +87,6 @@ dummy group. Then they are unassigned from the dummy group. The dummy group
 should be empty (your mileage my otherwise vary).
 DESC
   required
-  default 'ignore-me'
 end
 
 config :base_url do
@@ -84,7 +97,6 @@ prefix will be appended to the base url. The all most always means the version
 should not be included in the URL
 DESC
   required
-  default 'https://center.alces-flight.com/api'
   volatile 'do not send requests to an unknown location'
 end
 
@@ -94,7 +106,6 @@ config :api_prefix do
 Change the API version prefix. The prefix is normally static to the application
 version and should not need modifications.
 DESC
-  default 'v1'
   volatile 'check the target api for compatibility'
 end
 
@@ -113,7 +124,6 @@ config :log_level do
 Set at which severity the application will log
 DESC
   required
-  default 'error'
   whitelist 'disabled', 'fatal', 'error', 'warn', 'info', 'debug', 'development'
 end
 
@@ -123,5 +133,4 @@ config :tmp_path do
 Set the base file name and path for temporary files
 DESC
   required
-  default '/tmp/flight-asset'
 end
