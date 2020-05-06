@@ -33,12 +33,12 @@ module FlightAsset
       def table_elements
         @table_elements ||= begin
           assets = fetch_assets.sort_by(&:name)
-          if opts.decommissioned
+          if opts.only_decommissioned
             assets.select(&:decommissioned)
-          elsif opts.decommissioned == false
-            assets.reject(&:decommissioned)
-          else
+          elsif opts.include_decommissioned
             assets
+          else
+            assets.reject(&:decommissioned)
           end
         end
       end

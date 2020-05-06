@@ -134,11 +134,10 @@ ERROR
       end
 
       DECOMMISSION_FILTER = ->(c, type: 'records') do
-        c.option '--[no-]decommissioned', <<~DESC.chomp
-          Explicitly filter the #{type} by the decomissioned flag:
-            * --decommissioned    exclusively decommissioned
-            * --no-decommissioned exclusively (re)commissioned
-        DESC
+        c.option  '--include-decommissioned',
+                  "Include #{type} that have been decommissioned"
+        c.option  '--only-decommissioned',
+                  "Only return #{type} that have been decommissioned"
       end
 
       create_command 'list-assets' do |c|
