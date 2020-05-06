@@ -128,6 +128,9 @@ module FlightAsset
         self.keys << sym
         KeyDSL.new(self, sym).tap { |k| k.instance_exec(&b) } if b
         define_method(sym) { self[sym] }
+        define_method(:"#{sym}!") do
+          self[sym].tap { |v| raise 'Unexpected Error' if v.nil? }
+        end
       end
 
       def load_reference(path)
