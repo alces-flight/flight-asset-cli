@@ -74,8 +74,8 @@ module FlightAsset
         # Validates the new config
         errors = config.__meta__.generate_error_messages
         if opts.force
-          $stderr.puts <<~ERRORS
-            #{verb} the config with the following errors:
+          Config::CACHE.logger.error <<~ERRORS
+            Force-#{verb} the config with the following errors:
 
             #{errors.join("\n\n")}
           ERRORS

@@ -361,5 +361,9 @@ module FlightAsset
       end
     end
   end
+
+  Config::CACHE.logger.info "Loaded Config: #{CONFIG_PATH}"
+  data = File.read(CONFIG_PATH).gsub(/(?<=jwt)\s*:[^\n]*/, ': REDACTED')
+  Config::CACHE.logger.debug data
 end
 

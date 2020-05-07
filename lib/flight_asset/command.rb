@@ -60,10 +60,17 @@ module FlightAsset
     # Runs the man 'run' method with the callbacks
     #
     def run!
+      Config::CACHE.logger.info "Running: #{self.class}"
       run_callbacks(:run) { run }
+      Config::CACHE.logger.info 'Exited: 0'
     rescue => e
-      Config::CACHE.logger.fatal 'An error has occurred'
-      Config::CACHE.logger.debug e.full_message
+      if e.respond_to? :exit_code
+        Config::CACHE.logger.fatal "Exited: #{e.exit_code}"
+      else
+        Config::CACHE.logger.fatal 'Exited non-zero'
+      end
+      Config::CACHE.logger.debug e.backtrace.reverse.join("\n")
+      Config::CACHE.logger.error "(#{e.class}) #{e.message}"
       raise e
     end
 
