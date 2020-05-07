@@ -32,6 +32,10 @@ module FlightAsset
         # Extracts the existing config data
         old = cache.__data__
 
+        # Reject all false options
+        # NOTE: This is required due to the change from OptionParser to Slop
+        opts.select! { |_, o| o }
+
         # Refuse to update protect flags by default
         sym_opts = opts.keys.map(&:to_sym)
         reset_protects = Config.protects.keys.map { |k| :"reset_#{k}" }
