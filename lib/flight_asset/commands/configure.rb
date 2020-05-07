@@ -77,6 +77,29 @@ module FlightAsset
 
         # Validates the new config
         errors = config.__meta__.generate_error_messages
+
+        begin
+          config.logger.fatal 'If you can read this, logging is working'
+        rescue
+          errors << 'Failed to write to the log file'
+        end
+
+        begin
+          group = request_asset_groups_record_by_name(config.create_dummy_group_name!)
+          unless request_assets_records_by_asset_group(group).to_a.empty?
+            errors << <<~ERROR
+              The --create-dummy-group-name must specify an empty asset group
+            ERROR
+          end
+        rescue
+          errors << <<~ERROR
+            Could not request the group specified by --create_dummy_group_name
+
+            Either it doesn't exist, or there is an issue with the following:
+              --jwt --base-url --api-prefix
+          ERROR
+        end
+
         if opts.force
           Config::CACHE.logger.error <<~ERRORS
             Force-#{verb} the config with the following errors:
