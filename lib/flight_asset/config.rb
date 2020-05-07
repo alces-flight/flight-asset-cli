@@ -146,12 +146,14 @@ module FlightAsset
 
       def config(key, &b)
         sym = key.to_sym
-        self.keys << sym
         KeyDSL.new(self, sym).tap { |k| k.instance_exec(&b) } if b
-        define_method(sym) { self[sym] }
-        define_method(:"#{sym}!") do
-          value = self[sym]
-          value.nil? ? self.class.conversions[key].call(nil) : value
+        unless self.keys.include?(key)
+          self.keys << sym
+          define_method(sym) { self[sym] }
+          define_method(:"#{sym}!") do
+            value = self[sym]
+            value.nil? ? self.class.conversions[key].call(nil) : value
+          end
         end
       end
 
