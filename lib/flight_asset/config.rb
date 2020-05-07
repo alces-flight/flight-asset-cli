@@ -362,8 +362,12 @@ module FlightAsset
     end
   end
 
-  Config::CACHE.logger.info "Loaded Config: #{CONFIG_PATH}"
-  data = File.read(CONFIG_PATH).gsub(/(?<=jwt)\s*:[^\n]*/, ': REDACTED')
-  Config::CACHE.logger.debug data
+  if File.exists? CONFIG_PATH
+    Config::CACHE.logger.info "Loaded Config: #{CONFIG_PATH}"
+    data = File.read(CONFIG_PATH).gsub(/(?<=jwt)\s*:[^\n]*/, ': REDACTED')
+    Config::CACHE.logger.debug data
+  else
+    Config::CACHE.logger.info "Missing Config: #{CONFIG_PATH}"
+  end
 end
 
