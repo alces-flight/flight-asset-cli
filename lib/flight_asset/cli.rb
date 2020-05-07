@@ -63,7 +63,7 @@ module FlightAsset
 
         c.action do |args, opts|
           require_relative '../flight_asset'
-          Commands.build(name, *args, **opts.__hash__).run!
+          Commands.build(name, *args, **opts.to_h).run!
         end
 
         yield c if block_given?
@@ -103,7 +103,8 @@ DESC
 
       create_command '__missing__', '...' do |c|
         c.summary = 'Special internal missing helper'
-        c.hidden = true
+        c.skip_option_parsing
+        c.hidden
         c.action do |args, _|
           require_relative '../flight_asset/errors.rb'
 
@@ -236,14 +237,13 @@ DESC
         c.summary = 'Update the API access token'
       end
 
-      # NOTE: Disabled due to parsing bug
-      # alias_regex = /-assets?\Z/
-      # commands.keys
-      #         .select { |c| c.match?(alias_regex) }
-      #         .each { |c| alias_command c.sub(alias_regex, ''), c }
+      alias_regex = /-assets?\Z/
+      commands.keys
+              .select { |c| c.match?(alias_regex) }
+              .each { |c| alias_command c.sub(alias_regex, ''), c }
 
-      # alias_command 'edit',       'edit-asset-info'
-      # alias_command 'edit-asset', 'edit-asset-info'
+      alias_command 'edit',       'edit-asset-info'
+      alias_command 'edit-asset', 'edit-asset-info'
     end
 
     define(:development) do

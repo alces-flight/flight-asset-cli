@@ -42,9 +42,6 @@ if /.*-with-config\Z/.match? __FILE__
 end
 require_relative '../lib/flight_asset/config'
 
-# Display the help by default
-args << '--help' if args.empty?
-
 # Selects the CLI components
 parts = [:shared]
 if FlightAsset::Config::CACHE.__meta__.generate_error_messages.empty?
