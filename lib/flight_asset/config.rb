@@ -151,7 +151,7 @@ module FlightAsset
         define_method(sym) { self[sym] }
         define_method(:"#{sym}!") do
           value = self[sym]
-          value.nil? ? conversions[key].call(nil) : value
+          value.nil? ? self.class.conversions[key].call(nil) : value
         end
       end
 

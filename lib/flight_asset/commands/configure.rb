@@ -78,6 +78,9 @@ module FlightAsset
         # Validates the new config
         errors = config.__meta__.generate_error_messages
 
+        # Resets the 'connection' to use the new config
+        self.instance_variable_set(:@connection, connection_builder(config))
+
         begin
           config.logger.fatal 'If you can read this, logging is working'
         rescue
@@ -93,10 +96,9 @@ module FlightAsset
           end
         rescue
           errors << <<~ERROR
-            Could not request the group specified by --create_dummy_group_name
-
+            Could not request the group specified by: --create_dummy_group_name
             Either it doesn't exist, or there is an issue with the following:
-              --jwt --base-url --api-prefix
+            --jwt --base-url --api-prefix
           ERROR
         end
 

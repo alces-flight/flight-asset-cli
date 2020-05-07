@@ -91,22 +91,24 @@ module FlightAsset
     ##
     # Faraday Connection To the Remote service
     def connection
-      @connection ||= begin
-        default_headers = {
-          'Accept' => 'application/vnd.api+json',
-          'Content-Type' => 'application/json',
-          'Authorization' => "Bearer #{Config::CACHE.jwt!}"
-        }
+      @connection ||= connection_builder(Config::CACHE)
+    end
 
-        url = File.join(Config::CACHE.base_url!, Config::CACHE.api_prefix!)
-        Faraday.new(url: url, headers: default_headers) do |c|
-          c.use Faraday::Response::Logger, Config::CACHE.logger, { bodies: true } do |logger|
-            logger.filter(/(Authorization:)(.*)/, '\1 [REDACTED]')
-          end
-          c.request :json
-          c.response :json, :content_type => /\bjson$/
-          c.adapter :net_http
+    def connection_builder(config)
+      default_headers = {
+        'Accept' => 'application/vnd.api+json',
+        'Content-Type' => 'application/json',
+        'Authorization' => "Bearer #{config.jwt!}"
+      }
+
+      url = File.join(config.base_url!, config.api_prefix!)
+      Faraday.new(url: url, headers: default_headers) do |c|
+        c.use Faraday::Response::Logger, config.logger, { bodies: true } do |logger|
+          logger.filter(/(Authorization:)(.*)/, '\1 [REDACTED]')
         end
+        c.request :json
+        c.response :json, :content_type => /\bjson$/
+        c.adapter :net_http
       end
     end
 
