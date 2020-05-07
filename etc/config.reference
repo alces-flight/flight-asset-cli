@@ -27,8 +27,8 @@
 # https://github.com/alces-flight/alces-flight/flight-asset-cli
 #==============================================================================
 
-# NOTE: Any field in this document may be modified by:
-#       etc/config.overrides
+# NOTE: Any field in this document may be modified by any reference in:
+#       etc/config.overrides/*
 
 config :component_id do
   summary 'Numeric ID for the FC component'
@@ -115,5 +115,7 @@ DESC
   default '/tmp/flight-asset'
 end
 
-# Loads the overrides
-load_reference File.expand_path('config.overrides', __dir__)
+# Loads the overrides in alphanumeric order
+Dir.glob(File.join(__dir__, 'config.overrides/*')).sort.each do |ref|
+  load_reference ref
+end
