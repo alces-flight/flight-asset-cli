@@ -37,6 +37,23 @@ require 'delegate'
 
 module FlightAsset
   class ConfigDSL
+    def self.build(reference_path, config_path, &b)
+      Class.new do
+        extend ClassMethods
+        include InstanceMethods
+
+        self.load_reference(reference_path)
+        self.class_exec(&b) if b
+      end.tap do |klass|
+        data = if File.exists?(config_path)
+          YAML.load(File.read(config_path), symbolize_names: true)
+        else
+          {}
+        end
+        klass.const_set('CACHE', klass.new(**data))
+      end
+    end
+
     KeyDSL = Struct.new(:klass, :key) do
       def summary(value)
         klass.summaries[key] = value
@@ -46,8 +63,8 @@ module FlightAsset
         klass.descriptions[key] = value
       end
 
-      def default(value)
-        klass.defaults[key] = value
+      def default(value, &b)
+        klass.defaults[key] = value || b
       end
 
       def required
@@ -64,6 +81,10 @@ module FlightAsset
 
       def sensitive
         klass.sensitives[key] = true
+      end
+
+      def coerce(sym, &b)
+        klass.coerces[key] = sym || b
       end
     end
 
@@ -106,14 +127,21 @@ module FlightAsset
         end
       end
 
-      # TODO: Make this settable
-      def conversions
-        @conversions ||= Hash.new(:to_s)
+      def coerces
+        @coerces ||= Hash.new(:to_s)
       end
 
-      # TODO: Hook into the conversions hash
-      def nil_conversions
-        @nil_concersions ||= Hash.new(nil.to_s)
+      # Handy short-hand to coerces, the internal result is intentionally
+      # not being cached. This will be done on this instance
+      def conversions
+        @conversions ||= Hash.new do |_, key|
+          sym_or_proc = coerces[key]
+          if sym_or_proc.respond_to? :call
+            sym_or_proc
+          else
+            ->(v) { v.send(sym_or_proc) }
+          end
+        end
       end
 
       def config(key, &b)
@@ -123,7 +151,7 @@ module FlightAsset
         define_method(sym) { self[sym] }
         define_method(:"#{sym}!") do
           value = self[sym]
-          value.nil? ? nil_conversions[key] : value
+          value.nil? ? conversions[key].call(nil) : value
         end
       end
 
@@ -132,21 +160,41 @@ module FlightAsset
       end
     end
 
+    module InstanceMethods
+      attr_reader :__data__, :__meta__
+
+      def initialize(**data)
+        @__data__ = data.map { |k, v| [k.to_sym, v] }.to_h
+        @__meta__ = MetaConfig.new(self)
+      end
+
+      def [](raw_key)
+        __cache__[raw_key.to_sym]
+      end
+
+      def __cache__
+        @__cache__ ||= Hash.new do |hash, key|
+          is_current = __data__.key?(key)
+          value = if is_current
+            self.class.conversions[key].call(__data__[key])
+          else
+            default = self.class.defaults[key]
+            default.respond_to?(:call) ? default.call : default
+          end
+
+          # Force nil and empty string to be the same value
+          hash[key] = (value == '' ? nil : value)
+        end
+      end
+    end
+
+    # Consider refactoring into a Commander::ConfigureCommandHelper ?
     class MetaConfig < SimpleDelegator
       attr_reader :instance
 
       def initialize(instance)
         @instance = instance
         super(instance.class)
-      end
-
-      def full_flags
-        @full_flags ||= Hash.new do |_, flag|
-        end
-      end
-
-      def flag_helps
-        @flag_helps
       end
 
       def commander_option_helper(cmd)
@@ -245,50 +293,6 @@ module FlightAsset
             ERROR
           end
         end
-      end
-    end
-
-    module InstanceMethods
-      attr_reader :__data__, :__converted__, :__meta__
-
-      def initialize(**data)
-        @__data__ = data.map { |k, v| [k.to_sym, v] }.to_h
-        @__converted__ = {}
-        @__meta__ = MetaConfig.new(self)
-      end
-
-      def [](raw_key)
-        key = raw_key.to_sym
-        if __converted__.key?(key)
-          __converted__[key]
-        else
-          __converted__[key] = begin
-            if __data__.key?(key) && [nil, ''].include?(__data__[key])
-              nil
-            elsif __data__.key?(key)
-              __data__[key].send(self.class.conversions[key])
-            else
-              self.class.defaults[key]
-            end
-          end
-        end
-      end
-    end
-
-    def self.build(reference_path, config_path, &b)
-      Class.new do
-        extend ClassMethods
-        include InstanceMethods
-
-        self.load_reference(reference_path)
-        self.class_exec(&b) if b
-      end.tap do |klass|
-        data = if File.exists?(config_path)
-          YAML.load(File.read(config_path), symbolize_names: true)
-        else
-          {}
-        end
-        klass.const_set('CACHE', klass.new(**data))
       end
     end
   end
