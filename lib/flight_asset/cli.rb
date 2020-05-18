@@ -31,32 +31,9 @@ require_relative 'version'
 
 module FlightAsset
   class CLI
-    module Multipart
-      include Commander::CLI
+    extend Commander::CLI
 
-      module ClassMethods
-        def blocks
-          @blocks ||= {}
-        end
-
-        def define(name, &block)
-          blocks[name.to_sym] = block
-        end
-
-        def build(*parts)
-          parts.map { |k| blocks[k.to_sym] }
-               .each_with_object(self.new) { |b, cli| cli.instance_exec(&b) }
-        end
-      end
-
-      def self.included(base)
-        base.extend(ClassMethods)
-      end
-    end
-
-    include Multipart
-
-    def create_command(name, args_str = '')
+    def self.create_command(name, args_str = '')
       command(name) do |c|
         c.syntax = "#{program :name} #{name} #{args_str}"
         c.hidden = true if name.split.length > 1
@@ -70,184 +47,131 @@ module FlightAsset
       end
     end
 
-    define :shared do
-      def self.configure_command
-        commands['configure'].tap { |c| yield(c) if block_given? }
-      end
+    program :name, 'flight-asset'
+    program :version, "v#{FlightAsset::VERSION}"
+    program :description, 'Manage Alces Flight Center Assets'
+    program :help_paging, false
 
-      program :name, 'flight-asset'
-      program :version, "v#{FlightAsset::VERSION}"
-      program :description, 'Manage Alces Flight Center Assets'
-      program :help_paging, false
-
-      create_command 'configure' do |c|
-        c.option '--force', 'Ignore validation errors and save the config'
-        c.option '--allow-protected', 'Allow protected configs to be updated'
-        Config::CACHE.__meta__.commander_option_helper(c)
-      end
+    create_command 'configure' do |c|
+      c.summary = 'Configure the application'
     end
 
-    define :unconfigured do
-      def self.additional_help_text
-        @additional_help_text ||= Config::CACHE.__meta__.generate_error_messages.join("\n\n")
-      end
+    INFO_FLAGS = ->(c) do
+      c.option '--info INFO', 'Additional information about the asset'
+      c.option '--info-path PATH', 'Override --info with contents of a file'
+    end
 
-      configure_command do |c|
-        c.summary = 'Bootstrap the config generation and configuration'
-        c.description = <<~DESC.chomp
-The other commands have been disabled as the application has not been configured!
+    DECOMMISSION_FILTER = ->(c, plurals: 'records') do
+      c.option  '--include-decommissioned',
+                "Include #{plurals} that have been decommissioned"
+      c.option  '--only-decommissioned',
+                "Only return #{plurals} that have been decommissioned"
+    end
 
-#{additional_help_text}
+    NAMED_FILTER = ->(c, single: 'RECORD', plurals: 'records') do
+      down = single.downcase
+      c.option "--#{down} #{single}", <<~MSG.chomp
+        Only return #{plurals} that are within #{single}
+        Specify the empty string ('') only return #{plurals} without a #{down}
+      MSG
+    end
+
+    create_command 'list-assets' do |c|
+      c.summary = 'Return all the assets'
+      NAMED_FILTER.call(c, single: 'GROUP', plurals: 'assets')
+      DECOMMISSION_FILTER.call(c, plurals: 'assets')
+    end
+
+    create_command 'show-asset', 'ASSET' do |c|
+      c.summary = 'Return the detailed description of an asset'
+    end
+
+    create_command 'create-asset', 'ASSET' do |c|
+      c.summary = 'Define a new asset'
+      c.option '--group GROUP', 'Add the asset to an existing group'
+      c.option '--support-type SUPPORT_TYPE', 'Set the support type', default: 'advice'
+      INFO_FLAGS.call(c)
+    end
+
+    create_command 'decommission-asset', 'ASSET' do |c|
+      c.summary = 'Flag that an asset has been decommissioned'
+    end
+
+    create_command 'recommission-asset', 'ASSET' do |c|
+      c.summary = 'Unsets the decommissioned flag on an asset'
+    end
+
+    create_command 'edit-asset-info', 'Asset' do |c|
+      c.summary = "Update an asset's info field via the system editor"
+    end
+
+    create_command 'update-asset', 'ASSET' do |c|
+      c.summary = 'Modify the support type for an asset'
+      c.option '--support-type SUPPORT_TYPE', 'Update the support type'
+      INFO_FLAGS.call(c)
+    end
+
+    create_command 'move-asset', 'ASSET' do |c|
+      c.summary = 'Modify which group an asset belongs to'
+      c.description = <<~DESC.chomp
+By default this will unassign the asset from its group. The asset will be
+reassigned to a new group if the --group flag has been provided.
 DESC
-      end
-
-      create_command '__missing__', '...' do |c|
-        c.summary = 'Special internal missing helper'
-        c.skip_option_parsing
-        c.hidden
-        c.action do |args, _|
-          require_relative '../flight_asset/errors.rb'
-
-          raise InputError, <<~ERROR.chomp
-The following command can not be processed at this time:
-#{program(:name)} #{args.first}
-
-The application needs to be configured before any further commands
-are enabled. Please refer to the configuration help for futher details:
-#{program(:name)} configure --help
-
-#{additional_help_text}
-ERROR
-        end
-      end
-
-      default_command '__missing__'
+      c.option '--group GROUP', 'Reassign the asset to GROUP'
     end
 
-    define :main do
-      configure_command do |c|
-        c.summary = 'Reconfigure the application'
-      end
+    create_command 'list-groups' do |c|
+      c.summary = 'Return all the groups'
+      NAMED_FILTER.call(c, single: 'CATEGORY', plurals: 'groups')
+      DECOMMISSION_FILTER.call(c, plurals: 'groups')
+    end
 
-      INFO_FLAGS = ->(c) do
-        c.option '--info INFO', 'Additional information about the asset'
-        c.option '--info-path PATH', 'Override --info with contents of a file'
-      end
+    create_command 'show-group', 'ASSET_GROUP' do |c|
+      c.summary = 'Return the detailed description of a group'
+    end
 
-      DECOMMISSION_FILTER = ->(c, plurals: 'records') do
-        c.option  '--include-decommissioned',
-                  "Include #{plurals} that have been decommissioned"
-        c.option  '--only-decommissioned',
-                  "Only return #{plurals} that have been decommissioned"
-      end
+    create_command 'create-group', 'ASSET_GROUP' do |c|
+      c.summary = 'Define a new group'
+      c.option '--category CATEGORY', 'Add the group to an existing category'
+    end
 
-      NAMED_FILTER = ->(c, single: 'RECORD', plurals: 'records') do
-        down = single.downcase
-        c.option "--#{down} #{single}", <<~MSG.chomp
-          Only return #{plurals} that are within #{single}
-          Specify the empty string ('') only return #{plurals} without a #{down}
-        MSG
-      end
+    create_command 'decommission-group', 'ASSET_GROUP' do |c|
+      c.summary = 'Flag that a group has been decommissioned'
+    end
 
-      create_command 'list-assets' do |c|
-        c.summary = 'Return all the assets'
-        NAMED_FILTER.call(c, single: 'GROUP', plurals: 'assets')
-        DECOMMISSION_FILTER.call(c, plurals: 'assets')
-      end
+    create_command 'recommission-group', 'ASSET_GROUP' do |c|
+      c.summary = 'Unsets the decommissioned flag on a group'
+    end
 
-      create_command 'show-asset', 'ASSET' do |c|
-        c.summary = 'Return the detailed description of an asset'
-      end
-
-      create_command 'create-asset', 'ASSET' do |c|
-        c.summary = 'Define a new asset'
-        c.option '--group GROUP', 'Add the asset to an existing group'
-        c.option '--support-type SUPPORT_TYPE', 'Set the support type', default: 'advice'
-        INFO_FLAGS.call(c)
-      end
-
-      create_command 'decommission-asset', 'ASSET' do |c|
-        c.summary = 'Flag that an asset has been decommissioned'
-      end
-
-      create_command 'recommission-asset', 'ASSET' do |c|
-        c.summary = 'Unsets the decommissioned flag on an asset'
-      end
-
-      create_command 'edit-asset-info', 'Asset' do |c|
-        c.summary = "Update an asset's info field via the system editor"
-      end
-
-      create_command 'update-asset', 'ASSET' do |c|
-        c.summary = 'Modify the support type for an asset'
-        c.option '--support-type SUPPORT_TYPE', 'Update the support type'
-        INFO_FLAGS.call(c)
-      end
-
-      create_command 'move-asset', 'ASSET' do |c|
-        c.summary = 'Modify which group an asset belongs to'
-        c.description = <<~DESC.chomp
-  By default this will unassign the asset from its group. The asset will be
-  reassigned to a new group if the --group flag has been provided.
+    create_command 'move-group', 'ASSET_GROUP' do |c|
+      c.summary = 'Modify which category a group belongs to'
+      c.description = <<~DESC.chomp
+By default this will unassign the group from its category. The group will be
+reassigned to a new category if the --category flag has been provided.
 DESC
-        c.option '--group GROUP', 'Reassign the asset to GROUP'
-      end
-
-      create_command 'list-groups' do |c|
-        c.summary = 'Return all the groups'
-        NAMED_FILTER.call(c, single: 'CATEGORY', plurals: 'groups')
-        DECOMMISSION_FILTER.call(c, plurals: 'groups')
-      end
-
-      create_command 'show-group', 'ASSET_GROUP' do |c|
-        c.summary = 'Return the detailed description of a group'
-      end
-
-      create_command 'create-group', 'ASSET_GROUP' do |c|
-        c.summary = 'Define a new group'
-        c.option '--category CATEGORY', 'Add the group to an existing category'
-      end
-
-      create_command 'decommission-group', 'ASSET_GROUP' do |c|
-        c.summary = 'Flag that a group has been decommissioned'
-      end
-
-      create_command 'recommission-group', 'ASSET_GROUP' do |c|
-        c.summary = 'Unsets the decommissioned flag on a group'
-      end
-
-      create_command 'move-group', 'ASSET_GROUP' do |c|
-        c.summary = 'Modify which category a group belongs to'
-        c.description = <<~DESC.chomp
-  By default this will unassign the group from its category. The group will be
-  reassigned to a new category if the --category flag has been provided.
-DESC
-        c.option '--category CATEGORY', 'Reassign the group to CATEGORY'
-      end
-
-      create_command 'list-categories' do |c|
-        c.summary = 'Return all the categories'
-      end
-
-      create_command 'show-category', 'CATEGORY' do |c|
-        c.summary = 'Return the detailed description of a category'
-      end
-
-      create_command 'set-token', 'TOKEN' do |c|
-        c.summary = 'Update the API access token'
-      end
-
-      alias_regex = /-assets?\Z/
-      commands.keys
-              .select { |c| c.match?(alias_regex) }
-              .each { |c| alias_command c.sub(alias_regex, ''), c }
-
-      alias_command 'edit',       'edit-asset-info'
-      alias_command 'edit-asset', 'edit-asset-info'
+      c.option '--category CATEGORY', 'Reassign the group to CATEGORY'
     end
 
-    define(:development) do
-      create_command 'console'
+    create_command 'list-categories' do |c|
+      c.summary = 'Return all the categories'
     end
+
+    create_command 'show-category', 'CATEGORY' do |c|
+      c.summary = 'Return the detailed description of a category'
+    end
+
+    create_command 'set-token', 'TOKEN' do |c|
+      c.summary = 'Update the API access token'
+    end
+
+    alias_regex = /-assets?\Z/
+    commands.keys
+            .select { |c| c.match?(alias_regex) }
+            .each { |c| alias_command c.sub(alias_regex, ''), c }
+
+    alias_command 'edit',       'edit-asset-info'
+    alias_command 'edit-asset', 'edit-asset-info'
+
+    create_command 'console' if Config::CACHE.development?
   end
 end

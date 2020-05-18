@@ -42,21 +42,12 @@ if /.*-with-config\Z/.match? __FILE__
 end
 require_relative '../lib/flight_asset/config'
 
-# Selects the CLI components
-parts = [:shared]
-if FlightAsset::Config::CACHE.__meta__.generate_error_messages.empty?
-  parts << :main
-else
-  parts << :unconfigured
-end
-
 # Enables the development mode
 if FlightAsset::Config::CACHE.development?
   begin
       Bundler.setup(:default, :development)
       require 'pry'
       require 'pry-byebug'
-      parts << :development
   rescue StandardError, LoadError
     Bundler.setup(:default)
     $stderr.puts "An error occurred when enabling development mode!"
@@ -65,5 +56,5 @@ end
 
 # Builds and runs the CLI
 require_relative '../lib/flight_asset/cli'
-FlightAsset::CLI.build(*parts).run!(*args)
+FlightAsset::CLI.run!(*args)
 
