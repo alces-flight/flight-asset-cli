@@ -33,9 +33,10 @@ module FlightAsset
         prompt = TTY::Prompt.new
         old = Config::CACHE.load_credentials
         data = CredentialsConfig.new
-        data.asset_id = prompt.ask  'Specify the asset ID:',
-                                    default: old.asset_id
-        data.jwt = prompt.mask  'Specify the API access token:'
+        data.component_id = prompt.ask  'Asset Identifier:',
+                                        default: old.component_id
+        data.jwt = prompt.mask  'Flight Center API token:',
+                                default: old.jwt
         FileUtils.mkdir_p File.dirname(Config::CACHE.credentials_path)
         File.write  Config::CACHE.credentials_path,
                     YAML.dump(data.to_h)

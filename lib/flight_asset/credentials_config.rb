@@ -28,7 +28,7 @@
 
 module FlightAsset
   class CredentialsConfig < ConfigBase
-    config :asset_id
+    config :component_id
     config :jwt
 
     # Quick check that can be done on config load

@@ -109,15 +109,10 @@ module FlightAsset
       end
     end
 
-    {
-      jwt:  :jwt,
-      jwt!: :jwt!,
-      component_id:   :asset_id,
-      component_id!:  :asset_id!
-    }.each do |src, dst|
-      define_method(src) do
-        logger.warn "Deprecated: the Config##{src} method should not be used"
-        load_credentials.send(dst)
+    [:jwt, :jwt!, :component_id, :component_id!].each do |sym|
+      define_method(sym) do
+        logger.warn "Deprecated: the Config##{sym} method should not be used"
+        load_credentials.send(sym)
       end
     end
 
