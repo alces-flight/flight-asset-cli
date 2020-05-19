@@ -2,4 +2,3 @@ etc/config.*
 var
 .bundle/*
 vendor
-bin/*-with-config
