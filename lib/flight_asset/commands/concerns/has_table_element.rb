@@ -37,7 +37,10 @@ module FlightAsset
             table = table_procs.each_with_object(TTY::Table.new) do |(k, b), t|
               t << [k, b.call(element)]
             end
-            puts table.render(:unicode, multiline: table_multiline?, padding: [0, 1])
+            puts table.render(
+              :unicode, multiline: table_multiline?,
+              padding: [0, 1], alignments: :right
+            )
           end
 
           after(unless: :tty?) do
