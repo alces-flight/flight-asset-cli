@@ -62,7 +62,9 @@ module FlightAsset
         [
           ['Name', ->(a) { a.name }],
           ['Support Type', ->(a) { a.support_type }],
-          ['Asset Group', ->(a) { a.asset_group_or_missing&.name }],
+          ['Asset Group', ->(a) do
+            tty? ? a.asset_group_name_or_none : a.asset_group_name
+          end],
           ['Decommissioned', ->(a) { a.decommissioned }]
         ]
       end

@@ -42,7 +42,9 @@ module FlightAsset
             ['Support Type', ->(a) { a.support_type }],
             ['Decommissioned', ->(a) { a.decommissioned }],
             ['Component', ->(a) { a.component.name } ],
-            ['Asset Group', ->(a) { a.asset_group_or_missing&.name }],
+            ['Asset Group', ->(a) do
+              tty? ? a.asset_group_name_or_none : a.asset_group_name
+            end],
             ['Additional Information', ->(a) { a.info }]
           ]
         end
