@@ -160,10 +160,6 @@ DESC
       c.summary = 'Return the detailed description of a category'
     end
 
-    create_command 'set-token', 'TOKEN' do |c|
-      c.summary = 'Update the API access token'
-    end
-
     alias_regex = /-assets?\Z/
     commands.keys
             .select { |c| c.match?(alias_regex) }
