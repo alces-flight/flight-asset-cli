@@ -37,18 +37,9 @@ require 'hashie'
 require 'xdg'
 
 module FlightAsset
-  # Define the reference and config paths. The config_path if dynamic
-  # allowing it to be moved
-  REFERENCE_PATH = File.expand_path('../../etc/config.reference', __dir__)
-  CONFIG_PATH ||= File.expand_path('../../etc/config.yaml', __dir__)
-
-  class Config < Hashie::Trash
+  class ConfigBase < Hashie::Trash
     include Hashie::Extensions::IgnoreUndeclared
     include Hashie::Extensions::Dash::IndifferentAccess
-
-    def self.xdg
-      @xdg ||= XDG::Environment.new
-    end
 
     def self.config(sym, **input_opts)
       opts = input_opts.dup
@@ -79,13 +70,31 @@ module FlightAsset
       # Define the truthiness method
       define_method(:"#{sym}?") { send(sym) ? true : false }
     end
+  end
+end
+
+require_relative 'credentials_config.rb'
+
+module FlightAsset
+  # Define the reference and config paths. The config_path if dynamic
+  # allowing it to be moved
+  REFERENCE_PATH = File.expand_path('../../etc/config.reference', __dir__)
+  CONFIG_PATH ||= File.expand_path('../../etc/config.yaml', __dir__)
+  class Config < ConfigBase
+    config :create_dummy_group_name, default: 'ignore-me'
+    config :development
+
+    def self.xdg
+      @xdg ||= XDG::Environment.new
+    end
 
     def self.load_reference(path)
       self.instance_eval(File.read(path), path, 0) if File.exists?(path)
     end
 
-    config :create_dummy_group_name, default: 'ignore-me'
-    config :development
+    def load_credentials
+      CrendentialsConfig.new(load_credentials_path)
+    end
 
     def log_path_or_stderr
       if log_level == 'disabled'
