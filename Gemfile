@@ -36,6 +36,7 @@ gem 'hashie'
 gem 'simple_jsonapi_client'
 gem 'tty-editor'
 gem 'tty-table'
+gem 'xdg'
 
 group :development do
   gem 'pry'

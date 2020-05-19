@@ -34,6 +34,7 @@
 require 'yaml'
 require 'logger'
 require 'hashie'
+require 'xdg'
 
 module FlightAsset
   # Define the reference and config paths. The config_path if dynamic
@@ -44,6 +45,10 @@ module FlightAsset
   class Config < Hashie::Trash
     include Hashie::Extensions::IgnoreUndeclared
     include Hashie::Extensions::Dash::IndifferentAccess
+
+    def self.xdg
+      @xdg ||= XDG::Environment.new
+    end
 
     def self.config(sym, **input_opts)
       opts = input_opts.dup

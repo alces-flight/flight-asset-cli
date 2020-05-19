@@ -59,11 +59,18 @@ config :base_url, default: 'https://center.alces-flight.com/api'
 config :api_prefix, default: 'v1'
 
 # ==============================================================================
+# Data Path
+# A directory in which user specific data can be stored (e.g. access token)
+# ==============================================================================
+config :data_path, default: "#{xdg.data_home}/flight/asset-cli"
+
+# ==============================================================================
 # Log Path
 # The file the logger will write to. It will write to standard error when set to
 # empty string.
 # ==============================================================================
-config :log_path, default: '', required: false
+config :log_path, default: "#{xdg.cache_home}/flight/log/share/asset-cli.log",
+                  required: false
 
 # ==============================================================================
 # Log level
