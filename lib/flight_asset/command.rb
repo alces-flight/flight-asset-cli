@@ -89,6 +89,13 @@ module FlightAsset
     end
 
     ##
+    # Run in verbose mode when non-interactive or with --verbose
+    #
+    def verbose?
+      opts.verbose || !tty?
+    end
+
+    ##
     # Faraday Connection To the Remote service
     def connection
       @connection ||= connection_builder(Config::CACHE)

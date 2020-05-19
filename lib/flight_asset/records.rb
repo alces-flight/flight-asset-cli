@@ -195,6 +195,14 @@ module FlightAsset
       ERROR
       urls.first
     end
+
+    def category_name
+      category_or_missing&.name
+    end
+
+    def category_name_or_none
+      category_name || '(none)'
+    end
   end
 
   class CategoriesRecord < BaseRecord

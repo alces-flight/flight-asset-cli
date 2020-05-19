@@ -40,13 +40,14 @@ module FlightAsset
           [
             ['Name', ->(a) { a.name }],
             ['Support Type', ->(a) { a.support_type }],
-            ['Decommissioned', ->(a) { a.decommissioned }],
             ['Component', ->(a) { a.component.name } ],
             ['Asset Group', ->(a) do
               tty? ? a.asset_group_name_or_none : a.asset_group_name
-            end],
-            ['Additional Information', ->(a) { a.info }]
-          ]
+            end]
+          ].tap do |t|
+            t << ['Decommissioned', ->(a) { a.decommissioned }] if verbose?
+            t << ['Additional Information', ->(a) { a.info }]
+          end
         end
       end
     end

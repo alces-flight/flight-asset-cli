@@ -56,6 +56,11 @@ module FlightAsset
       c.summary = 'Configure the application'
     end
 
+    global_slop.bool '--verbose', <<~DESC.chomp
+      Display the full details when used in an interactive terminal.
+      Non-interactive terminals follow the same output layouts and are always verbose.
+    DESC
+
     INFO_FLAGS = ->(c) do
       c.option '--info INFO', 'Additional information about the asset'
       c.option '--info-path PATH', 'Override --info with contents of a file'

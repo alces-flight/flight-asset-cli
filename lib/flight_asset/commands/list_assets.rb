@@ -64,9 +64,10 @@ module FlightAsset
           ['Support Type', ->(a) { a.support_type }],
           ['Asset Group', ->(a) do
             tty? ? a.asset_group_name_or_none : a.asset_group_name
-          end],
-          ['Decommissioned', ->(a) { a.decommissioned }]
-        ]
+          end]
+        ].tap do |t|
+          t << ['Decommissioned', ->(a) { a.decommissioned }] if verbose?
+        end
       end
     end
   end

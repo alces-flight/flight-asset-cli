@@ -40,12 +40,11 @@ module FlightAsset
           [
             ['Name', ->(a) { a.name }],
             ['Category', ->(a) do
-              if a.send(:input_relationships)['assetGroupCategory']['data']
-                a.assetGroupCategory&.name
-              end
-            end],
-            ['Decommissioned', ->(a) { a.decommissioned }]
-          ]
+              tty? ? a.category_name_or_none : a.category_name
+            end]
+          ].tap do |t|
+            t << ['Decommissioned', ->(a) { a.decommissioned }] if verbose?
+          end
         end
       end
     end
