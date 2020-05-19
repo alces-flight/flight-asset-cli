@@ -92,8 +92,33 @@ module FlightAsset
       self.instance_eval(File.read(path), path, 0) if File.exists?(path)
     end
 
+    def credentials_path
+      File.join(data_path, 'credentials.yaml')
+    end
+
     def load_credentials
-      CrendentialsConfig.new(load_credentials_path)
+      if File.exists? credentials_path
+        data = YAML.load File.read(credentials_path), symbolize_names: true
+        CredentialsConfig.new data
+      else
+        logger.error <<~ERROR
+          Could not locate: #{credentials_path}
+          Using a blank config instead
+        ERROR
+        CredentialsConfig.new
+      end
+    end
+
+    {
+      jwt:  :jwt,
+      jwt!: :jwt!,
+      component_id:   :asset_id,
+      component_id!:  :asset_id!
+    }.each do |src, dst|
+      define_method(src) do
+        logger.warn "Deprecated: the Config##{src} method should not be used"
+        load_credentials.send(dst)
+      end
     end
 
     def log_path_or_stderr

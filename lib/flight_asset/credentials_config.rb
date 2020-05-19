@@ -28,10 +28,6 @@
 
 module FlightAsset
   class CredentialsConfig < ConfigBase
-    def load(path)
-      new(YAMl.load(File.read(path), symbolize_names: true))
-    end
-
     config :asset_id
     config :jwt
 

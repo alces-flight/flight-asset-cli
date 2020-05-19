@@ -28,21 +28,6 @@
 #==============================================================================
 
 # ==============================================================================
-# Asset ID
-# Specify the ID to the component the API will be tied to. Currently the
-# application can only function on a per component basis. The ID must be the
-# numeric value and not obfuscated.
-# ==============================================================================
-config :component_id
-
-# ==============================================================================
-# Authorization Token
-# The API token generated through the Alces Flight Center management portal.
-# Please contact your support team on how to generate this token.
-# ==============================================================================
-config :jwt
-
-# ==============================================================================
 # Asset API Base URL
 # Specify the location where the API server is being hosted. The API version
 # prefix will be appended to the base url. The all most always means the version
