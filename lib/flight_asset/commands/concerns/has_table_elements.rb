@@ -41,7 +41,7 @@ module FlightAsset
             table_elements.each do |element|
               table << procs.map { |p| p.call(element) }
             end
-            puts table.render(:ascii, multiline: table_multiline?)
+            puts table.render(:unicode, multiline: table_multiline?, padding: [0,1])
           end
 
           after(unless: :tty?) do
