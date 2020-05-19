@@ -49,6 +49,16 @@ module FlightAsset
               puts table_procs.map { |_, p| p.call(element) }.join("\t")
             end
           end
+
+          # NOTE: The regular printing methods will always print a new line
+          #       The stack is LIFO, this must be last
+          after(if: :empty?) do
+            $stderr.print 'No results!'
+          end
+        end
+
+        def empty?
+          table_elements.empty?
         end
 
         def table_multiline?
