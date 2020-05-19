@@ -34,6 +34,7 @@ require 'cgi'
 require 'tempfile'
 require 'tty-editor'
 require 'tty-table'
+require 'tty-prompt'
 
 require 'active_support/callbacks'
 require 'active_support/concern'

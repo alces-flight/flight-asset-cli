@@ -87,6 +87,7 @@ DEPENDENCIES
   pry-byebug
   simple_jsonapi_client
   tty-editor
+  tty-prompt
   tty-table
   xdg
 

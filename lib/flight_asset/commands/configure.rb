@@ -26,21 +26,20 @@
 # https://github.com/alces-flight/alces-flight/flight-asset-cli
 #==============================================================================
 
-source "https://rubygems.org"
-
-git_source(:github) { |repo_name| "https://github.com/#{repo_name}" }
-
-gem 'activesupport'
-gem 'commander-openflighthpc', '> 2'
-gem 'hashie'
-gem 'simple_jsonapi_client'
-gem 'tty-editor'
-gem 'tty-table'
-gem 'tty-prompt'
-gem 'xdg'
-
-group :development do
-  gem 'pry'
-  gem 'pry-byebug'
+module FlightAsset
+  module Commands
+    class Configure < Command
+      def run
+        prompt = TTY::Prompt.new
+        old = Config::CACHE.load_credentials
+        data = CredentialsConfig.new
+        data.asset_id = prompt.ask  'Specify the asset ID:',
+                                    default: old.asset_id
+        data.jwt = prompt.mask  'Specify the API access token:'
+        FileUtils.mkdir_p File.dirname(Config::CACHE.credentials_path)
+        File.write  Config::CACHE.credentials_path,
+                    YAML.dump(data.to_h)
+      end
+    end
+  end
 end
-
