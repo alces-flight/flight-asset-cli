@@ -33,6 +33,20 @@ module FlightAsset
         include HasTableElement
         include HasDecommissionedField
 
+        # Overrides the runner to force print info at the end
+        def run!
+          super
+          if tty?
+            info = assets_record.info.to_s
+            if info.empty?
+              puts 'No Additional Information'
+            else
+              puts 'Additional Information:'
+              puts info
+            end
+          end
+        end
+
         def table_element
           assets_record
         end
@@ -48,12 +62,9 @@ module FlightAsset
           ].tap do |t|
             append_decommissioned(t)
 
-            # Always display the info last as it's free form
-            # text and may contain tabs
-            t << ['Additional Information', ->(a) do
-              info = a.info.to_s # Guarantee it's a string
-              info.empty? ? tty_none_or_nil : info
-            end]
+            # Only append info for non-interactive sessions
+            # Interactive are handled separately
+            t << ['Additional Information', ->(a) { a.info }] unless tty?
           end
         end
       end
