@@ -35,7 +35,28 @@ module FlightAsset
       before(unless: :tty?) { raise InteractiveOnly }
 
       def run
-        assets_record.update(info: updated)
+        with_temp_file do |file|
+          # Writes the original copy to the file
+          file.write original
+          file.rewind
+
+          # Opens the file in an editor for the user
+          TTY::Editor.open(file.path)
+
+          # Computes the digests
+          old_digest = Digest::SHA256.digest original
+          new_digest = Digest::SHA256.file(file.path).digest
+
+          if old_digest == new_digest
+            # Logs the content has not changed
+            Config::CACHE.logger.warn <<~WARN.chomp
+              Skipping the edit as the information has not changed!
+            WARN
+          else
+            # Updates the record if the digests match
+            assets_record.update(info: file.read)
+          end
+        end
       end
 
       def assets_record
@@ -43,25 +64,18 @@ module FlightAsset
       end
 
       def original
-        assets_record.info
+        assets_record.info || ''
       end
 
-      def updated
-        @updated ||= with_editor(original)
-      end
-
-      def with_editor(data)
+      def with_temp_file
         file = Tempfile.new(
           File.basename(Config::CACHE.tmp_path),
           File.dirname(Config::CACHE.tmp_path)
         )
-        file.write(data || '')
-        file.rewind
-        TTY::Editor.open(file.path)
-        file.read
+        yield file
       ensure
-        file.close
-        file.unlink
+        file&.close
+        file&.unlink
       end
     end
   end
