@@ -58,24 +58,24 @@ The commonly used commands have been aliased:
 
 ### Outputting Modes
 
-This application will report back results in one of the following modes:
-* Simplified
-* Verbose
-* Machine (Verbose)
+This application will report back results in one following modes:
+(1)  Simplified
+(2a) Verbose
+(2b) Machine
 
-*Simplified*
+*1. Simplified*
 This mode runs by default in an interactive session. It is primarily intended for humans to read/digest and will make various simplifications.
 
 There maybe minor changes in the output between minor releases.
 
-*Verbose*
+*2a. Verbose*
 This mode runs in an interactive session with the `--verbose` flag. It is guaranteed to display the full output available for a particular resource(s).
 
 The output field order is guaranteed between minor releases\*. 
 
 (\*) The `Additional Information` returned by `show-asset` (and others) will always be the last field. Because the information is free form text, it can not be easily parsed in the `machine` output below. Therefore the information's field index is not guaranteed between minor releases.
 
-*Machine*
+*2b. Machine*
 The `machine` output is returned in all non-interactive terminals. It is designed to be parsed by a machine is delimited by tab: `\t`.
 
 The field order is guaranteed to match the `verbose` output above. However the "header fields" are not included.

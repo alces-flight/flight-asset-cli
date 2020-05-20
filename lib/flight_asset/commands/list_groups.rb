@@ -57,9 +57,10 @@ module FlightAsset
       def table_procs
         [
           ['Name', ->(a) { a.name }],
-          ['Category', ->(a) { a.category_or_missing&.name }],
-          ['Decommissioned', ->(a) { a.decommissioned }]
-        ]
+          ['Category', ->(a) { a.category_or_missing&.name }]
+        ].tap do |t|
+          t << ['Decommissioned', ->(a) { a.decommissioned }] if verbose?
+        end
       end
     end
   end
