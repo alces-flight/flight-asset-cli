@@ -106,7 +106,7 @@ module FlightAsset
       c.summary = 'Unsets the decommissioned flag on an asset'
     end
 
-    create_command 'edit-asset-info', 'ASSET' do |c|
+    create_command 'edit-asset', 'ASSET' do |c|
       c.summary = "Update an asset's info field via the system editor"
     end
 
@@ -165,9 +165,6 @@ DESC
     commands.keys
             .select { |c| c.match?(alias_regex) }
             .each { |c| alias_command c.sub(alias_regex, ''), c }
-
-    alias_command 'edit',       'edit-asset-info'
-    alias_command 'edit-asset', 'edit-asset-info'
 
     create_command 'console' if Config::CACHE.development?
   end
