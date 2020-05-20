@@ -61,9 +61,9 @@ module FlightAsset
       Non-interactive terminals follow the same output layouts and are always verbose.
     DESC
 
-    INFO_FLAGS = ->(c) do
-      c.option '--info INFO', 'Additional information about the asset'
-      c.option '--info-path PATH', 'Override --info with contents of a file'
+    INFO_FLAG = ->(c) do
+      c.slop.string '--info',
+        'Update the information. Prefix with "@" to specify a file path'
     end
 
     DECOMMISSION_FILTER = ->(c, plurals: 'records') do
@@ -100,7 +100,7 @@ module FlightAsset
         Select a support type: #{types_str}
       DESC
 
-      INFO_FLAGS.call(c)
+      INFO_FLAG.call(c)
     end
 
     create_command 'decommission-asset', 'ASSET' do |c|
@@ -118,7 +118,7 @@ module FlightAsset
     create_command 'update-asset', 'ASSET' do |c|
       c.summary = 'Modify the type and info for an asset'
       c.option '--support-type TYPE', 'Update the support type'
-      INFO_FLAGS.call(c)
+      INFO_FLAG.call(c)
     end
 
     create_command 'move-asset', 'ASSET' do |c|

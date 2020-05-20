@@ -31,25 +31,18 @@ module FlightAsset
       module HasInfo
         extend ActiveSupport::Concern
 
-        included do
-          # Errors out of the command if the flags are invalid
-          before if: -> { opts.info && opts.info_path },
-                 do: -> do
-            raise InputError, <<~ERROR.chomp
-              --info and --info-path can not be used together
-            ERROR
-          end
-
-          before if: -> { opts.info_path && !File.exists?(opts.info_path) },
-                 do: -> do
-            raise InputError, <<~ERROR.chomp
-              Could not locate: #{opts.info_path}
-            ERROR
-          end
-        end
-
         def info
-          (p = opts.info_path) ? File.read(p) : opts.info
+          # Filter out inputs which are not paths
+          str = opts.info
+          return if str.nil?
+          return str unless str[0] == '@'
+
+          path = str[1..]
+          if File.exists?(path)
+            File.read(path)
+          else
+            raise InputError, "Could not locate: #{path}"
+          end
         end
       end
     end
