@@ -81,7 +81,6 @@ module FlightAsset
   REFERENCE_PATH = File.expand_path('../../etc/config.reference', __dir__)
   CONFIG_PATH ||= File.expand_path('../../etc/config.yaml', __dir__)
   class Config < ConfigBase
-    config :create_dummy_group_name, default: 'ignore-me'
     config :development
 
     def self.xdg

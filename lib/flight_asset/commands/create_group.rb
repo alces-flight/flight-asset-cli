@@ -48,10 +48,6 @@ module FlightAsset
         end
       end
 
-      def group_name
-        opts.group || Config::CACHE.create_dummy_group_name
-      end
-
       def create_record
         AssetGroupsRecord.create(
           connection: connection,

@@ -34,15 +34,6 @@ module FlightAsset
       define_args :name
       attr_accessor :assets_record
 
-      before do
-        dummy = Config::CACHE.create_dummy_group_name
-        if opts.group == dummy
-          raise InputError, <<~ERROR.chomp
-            Cowardly refusing to create an asset in: #{dummy}
-          ERROR
-        end
-      end
-
       def run
         existing = request_assets_record_by_name(name, error: false)
         raise InputError, <<~ERROR.chomp if existing
@@ -50,30 +41,25 @@ module FlightAsset
         ERROR
 
         self.assets_record = create_record
-
-        # Removes the asset from the dummy group (if required)
-        unless opts.group
-          self.assets_record = \
-            request_assets_record_move_asset_group(self.assets_record)
-        end
       end
 
       def asset_groups_record
-        @asset_groups_record ||= request_asset_groups_record_by_name(group_name)
-      end
-
-      def group_name
-        opts.group || Config::CACHE.create_dummy_group_name
+        @asset_groups_record ||= request_asset_groups_record_by_name(opts.group)
       end
 
       def create_record
+        relationships = {
+          component: build_components_record
+        }.tap do |r|
+          if opts.group
+            r[:assetGroup] = asset_groups_record,
+            r[:asset_group] = asset_groups_record
+          end
+        end
+
         AssetsRecord.create(
           connection: connection,
-          relationships: {
-            component: build_components_record,
-            assetGroup: asset_groups_record,
-            asset_group: asset_groups_record
-          },
+          relationships: relationships,
           attributes: {
             name: name,
             info: info || '',
