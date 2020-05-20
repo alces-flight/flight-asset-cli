@@ -161,10 +161,6 @@ DESC
       c.summary = 'Return all the categories'
     end
 
-    create_command 'show-category', 'CATEGORY' do |c|
-      c.summary = 'Return the detailed description of a category'
-    end
-
     alias_regex = /-assets?\Z/
     commands.keys
             .select { |c| c.match?(alias_regex) }
