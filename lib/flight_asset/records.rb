@@ -161,10 +161,6 @@ module FlightAsset
     def asset_group_name
       asset_group_or_missing&.name
     end
-
-    def asset_group_name_or_none
-      asset_group_name || '(none)'
-    end
   end
 
   class AssetGroupsRecord < AutoRecord
@@ -198,10 +194,6 @@ module FlightAsset
 
     def category_name
       category_or_missing&.name
-    end
-
-    def category_name_or_none
-      category_name || '(none)'
     end
   end
 

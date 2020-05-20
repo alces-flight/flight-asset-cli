@@ -43,7 +43,7 @@ module FlightAsset
             ['Support Type', ->(a) { a.support_type }],
             ['Component', ->(a) { a.component.name } ],
             ['Asset Group', ->(a) do
-              tty? ? a.asset_group_name_or_none : a.asset_group_name
+              a.asset_group_name || tty_none_or_nil
             end]
           ].tap do |t|
             append_decommissioned(t)

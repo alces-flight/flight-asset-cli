@@ -58,7 +58,9 @@ module FlightAsset
       def table_procs
         [
           ['Name', ->(a) { a.name }],
-          ['Category', ->(a) { a.category_or_missing&.name }]
+          ['Category', ->(a) do
+            a.category_name || tty_none_or_nil
+          end],
         ].tap { |t| append_decommissioned(t) }
       end
     end

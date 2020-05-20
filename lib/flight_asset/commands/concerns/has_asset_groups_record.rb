@@ -41,7 +41,7 @@ module FlightAsset
           [
             ['Name', ->(a) { a.name }],
             ['Category', ->(a) do
-              tty? ? a.category_name_or_none : a.category_name
+              a.category_name || tty_none_or_nil
             end]
           ].tap { |t| append_decommissioned(t) }
         end

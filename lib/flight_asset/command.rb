@@ -89,6 +89,13 @@ module FlightAsset
     end
 
     ##
+    # Method that returns '(none)' instead of nil when connect
+    # to as tty. This is used extensively when printing
+    def tty_none_or_nil
+      tty? ? '(none)' : nil
+    end
+
+    ##
     # Run in verbose mode when non-interactive or with --verbose
     #
     def verbose?
