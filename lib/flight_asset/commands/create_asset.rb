@@ -47,6 +47,10 @@ module FlightAsset
         @asset_groups_record ||= request_asset_groups_record_by_name(opts.group)
       end
 
+      def support_type
+        opts.support_type || Config::CACHE.create_support_type
+      end
+
       def create_record
         relationships = {
           component: build_components_record
@@ -63,8 +67,8 @@ module FlightAsset
           attributes: {
             name: name,
             info: info || '',
-            support_type: opts.support_type,
-            supportType: opts.support_type
+            support_type: support_type,
+            supportType: support_type
           }
         )
       end

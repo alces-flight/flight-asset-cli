@@ -44,6 +44,15 @@ config :base_url, default: 'https://center.alces-flight.com/api'
 config :api_prefix, default: 'v1'
 
 # ==============================================================================
+# Create Support Type
+# The support type all new assets are created as. This type can be overridden on
+# the command line. The valid options are: inherit, managed, and advice
+#
+# WARNING: This field is not type checked!
+# ==============================================================================
+config :create_support_type, default: 'inherit'
+
+# ==============================================================================
 # Data Path
 # A directory in which user specific data can be stored (e.g. access token)
 # ==============================================================================
