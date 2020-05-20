@@ -50,7 +50,10 @@ module FlightAsset
 
             # Always display the info last as it's free form
             # text and may contain tabs
-            t << ['Additional Information', ->(a) { a.info }]
+            t << ['Additional Information', ->(a) do
+              info = a.info.to_s # Guarantee it's a string
+              info.empty? ? tty_none_or_nil : info
+            end]
           end
         end
       end
