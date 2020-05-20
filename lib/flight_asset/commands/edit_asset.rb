@@ -34,11 +34,20 @@ module FlightAsset
 
       before(unless: :tty?) { raise InteractiveOnly }
 
+      def run
+        assets_record.update(info: updated)
+      end
+
       def assets_record
-        @assets_record ||= begin
-          a = request_assets_record_by_name(name)
-          a.update(info: with_editor(a.info))
-        end
+        @assets_record ||= request_assets_record_by_name(name)
+      end
+
+      def original
+        assets_record.info
+      end
+
+      def updated
+        @updated ||= with_editor(original)
       end
 
       def with_editor(data)
