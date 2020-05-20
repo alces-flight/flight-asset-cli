@@ -46,6 +46,9 @@ module FlightAsset
             end]
           ].tap do |t|
             t << ['Decommissioned', ->(a) { a.decommissioned }] if verbose?
+
+            # Always display the info last as it's free form
+            # text and may contain tabs
             t << ['Additional Information', ->(a) { a.info }]
           end
         end

@@ -26,35 +26,26 @@ bundle install --with default --without development --path vendor
 
 ## Configuration
 
-By default this application will look for `etc/config.yaml` as its configuration file. This config can be easily created using the `wizard` utility. It is not possible to exit the wizard until all the `REQUIRED` flags have been provided (see `wizard --help` for details). The `--finished` flag will exit the wizard after all the required flags have been provided.
+WIP
+
+### Advanced: Change the Config Path
+
+The application ships with the following two `bin` files:
 
 ```
-# The the list of required configuration flags
-bin/flight-asset wizard --help
-
-# Example command setting configs
-# NOTE: The --finished flag is required to exit the wizard
-bin/flight-asset wizard --jwt foo --component-id bar --finished
+bin/asset ...                     # Run with the default config
+bin/asset-with-config CONFIG ...  # Run with a custom config
 ```
+The first argument to `bin/asset-with-config` MUST be a config path. The application will use the its inbuilt defaults if the config is missing.
 
-### Advanced: Change the config path
-
-It is possible to move the config file by renaming the executable to `flight-asset-with-config`. This makes the first argument to the script the config path. The config path must be provided with every execution of this script.
-
-```
-# Create the executable
-ln -s bin/flight-asset bin/flight-asset-with-config
-
-# Execute the CLI with a different config
-bin/flight-asset-with-config /tmp/other.yaml
-```
+This feature is primarily intended for integration purposes and is not intended for general users.
 
 ## Operation
 
 See the help text for the main commands list:
 
 ```
-bin/flight-asset --help
+bin/asset --help
 ```
 
 The commonly used commands have been aliased:
@@ -64,6 +55,30 @@ The commonly used commands have been aliased:
 * `decommission`  => `decommission-asset`
 * `update`        => `update-asset`
 * `move`          => `move-asset`
+
+### Outputting Modes
+
+This application will report back results in one of the following modes:
+* Simplified
+* Verbose
+* Machine (Verbose)
+
+*Simplified*
+This mode runs by default in an interactive session. It is primarily intended for humans to read/digest and will make various simplifications.
+
+There maybe minor changes in the output between minor releases.
+
+*Verbose*
+This mode runs in an interactive session with the `--verbose` flag. It is guaranteed to display the full output available for a particular resource(s).
+
+The output field order is guaranteed between minor releases\*. 
+
+(\*) The `Additional Information` returned by `show-asset` (and others) will always be the last field. Because the information is free form text, it can not be easily parsed in the `machine` output below. Therefore the information's field index is not guaranteed between minor releases.
+
+*Machine*
+The `machine` output is returned in all non-interactive terminals. It is designed to be parsed by a machine is delimited by tab: `\t`.
+
+The field order is guaranteed to match the `verbose` output above. However the "header fields" are not included.
 
 # Known Issues
 
