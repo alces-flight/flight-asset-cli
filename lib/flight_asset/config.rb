@@ -91,6 +91,10 @@ module FlightAsset
       self.instance_eval(File.read(path), path, 0) if File.exists?(path)
     end
 
+    def support_types
+      ['inherit', 'managed', 'advice']
+    end
+
     def credentials_path
       File.join(data_path, 'credentials.yaml')
     end

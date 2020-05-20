@@ -92,9 +92,14 @@ module FlightAsset
     end
 
     create_command 'create-asset', 'ASSET' do |c|
+      types_str = Config::CACHE.support_types.join(',')
+
       c.summary = 'Define a new asset'
-      c.option '--group GROUP', 'Add the asset to an existing group'
-      c.option '--support-type TYPE', 'Set the support type', default: 'advice'
+      c.slop.bool '--group', 'Add the asset to an existing group'
+      c.slop.string '--support-type', <<~DESC.chomp, meta: 'TYPE'
+        Select a support type: #{types_str}
+      DESC
+
       INFO_FLAGS.call(c)
     end
 

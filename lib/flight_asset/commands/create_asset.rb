@@ -34,6 +34,14 @@ module FlightAsset
       define_args :name
       attr_accessor :assets_record
 
+      before do
+        unless Config::CACHE.support_types.include? support_type
+          raise InputError, <<~ERROR.chomp
+            Unrecognized support type: #{support_type}
+          ERROR
+        end
+      end
+
       def run
         existing = request_assets_record_by_name(name, error: false)
         raise InputError, <<~ERROR.chomp if existing
