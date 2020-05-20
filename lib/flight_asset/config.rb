@@ -92,7 +92,7 @@ module FlightAsset
     end
 
     def support_types
-      ['inherit', 'managed', 'advice']
+      ['managed', 'advice', 'collaborative', 'inherit']
     end
 
     def credentials_path
