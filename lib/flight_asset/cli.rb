@@ -94,7 +94,7 @@ module FlightAsset
     create_command 'create-asset', 'ASSET' do |c|
       c.summary = 'Define a new asset'
       c.option '--group GROUP', 'Add the asset to an existing group'
-      c.option '--support-type SUPPORT_TYPE', 'Set the support type', default: 'advice'
+      c.option '--support-type TYPE', 'Set the support type', default: 'advice'
       INFO_FLAGS.call(c)
     end
 
@@ -106,13 +106,13 @@ module FlightAsset
       c.summary = 'Unsets the decommissioned flag on an asset'
     end
 
-    create_command 'edit-asset-info', 'Asset' do |c|
+    create_command 'edit-asset-info', 'ASSET' do |c|
       c.summary = "Update an asset's info field via the system editor"
     end
 
     create_command 'update-asset', 'ASSET' do |c|
-      c.summary = 'Modify the support type for an asset'
-      c.option '--support-type SUPPORT_TYPE', 'Update the support type'
+      c.summary = 'Modify the type and info for an asset'
+      c.option '--support-type TYPE', 'Update the support type'
       INFO_FLAGS.call(c)
     end
 
@@ -131,24 +131,24 @@ DESC
       DECOMMISSION_FILTER.call(c, plurals: 'groups')
     end
 
-    create_command 'show-group', 'ASSET_GROUP' do |c|
+    create_command 'show-group', 'GROUP' do |c|
       c.summary = 'Return the detailed description of a group'
     end
 
-    create_command 'create-group', 'ASSET_GROUP' do |c|
+    create_command 'create-group', 'GROUP' do |c|
       c.summary = 'Define a new group'
       c.option '--category CATEGORY', 'Add the group to an existing category'
     end
 
-    create_command 'decommission-group', 'ASSET_GROUP' do |c|
+    create_command 'decommission-group', 'GROUP' do |c|
       c.summary = 'Flag that a group has been decommissioned'
     end
 
-    create_command 'recommission-group', 'ASSET_GROUP' do |c|
+    create_command 'recommission-group', 'GROUP' do |c|
       c.summary = 'Unsets the decommissioned flag on a group'
     end
 
-    create_command 'move-group', 'ASSET_GROUP' do |c|
+    create_command 'move-group', 'GROUP' do |c|
       c.summary = 'Modify which category a group belongs to'
       c.description = <<~DESC.chomp
 By default this will unassign the group from its category. The group will be
