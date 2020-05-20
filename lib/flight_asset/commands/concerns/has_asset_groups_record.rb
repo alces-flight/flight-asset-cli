@@ -31,6 +31,7 @@ module FlightAsset
       module HasAssetGroupsRecord
         extend ActiveSupport::Concern
         include HasTableElement
+        include HasDecommissionedField
 
         def table_element
           asset_groups_record
@@ -42,9 +43,7 @@ module FlightAsset
             ['Category', ->(a) do
               tty? ? a.category_name_or_none : a.category_name
             end]
-          ].tap do |t|
-            t << ['Decommissioned', ->(a) { a.decommissioned }] if verbose?
-          end
+          ].tap { |t| append_decommissioned(t) }
         end
       end
     end

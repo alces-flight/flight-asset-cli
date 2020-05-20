@@ -51,6 +51,8 @@ require_relative 'flight_asset/commands'
 require_relative 'flight_asset/commands/concerns/has_table_element'
 require_relative 'flight_asset/commands/concerns/has_table_elements'
 
+# Application Specific Concerns
+require_relative 'flight_asset/commands/concerns/has_decommissioned_field'
 Dir.glob(File.join(__dir__, 'flight_asset/commands/concerns', '*.rb')).each do |f|
   require_relative f
 end

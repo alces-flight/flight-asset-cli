@@ -29,6 +29,7 @@ module FlightAsset
   module Commands
     class ListAssets < FlightAsset::Command
       include Concerns::HasTableElements
+      include Concerns::HasDecommissionedField
 
       def table_elements
         @table_elements ||= begin
@@ -65,9 +66,7 @@ module FlightAsset
           ['Asset Group', ->(a) do
             tty? ? a.asset_group_name_or_none : a.asset_group_name
           end]
-        ].tap do |t|
-          t << ['Decommissioned', ->(a) { a.decommissioned }] if verbose?
-        end
+        ].tap { |t| append_decommissioned(t) }
       end
     end
   end

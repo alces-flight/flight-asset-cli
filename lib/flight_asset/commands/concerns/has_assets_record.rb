@@ -31,6 +31,7 @@ module FlightAsset
       module HasAssetsRecord
         extend ActiveSupport::Concern
         include HasTableElement
+        include HasDecommissionedField
 
         def table_element
           assets_record
@@ -45,7 +46,7 @@ module FlightAsset
               tty? ? a.asset_group_name_or_none : a.asset_group_name
             end]
           ].tap do |t|
-            t << ['Decommissioned', ->(a) { a.decommissioned }] if verbose?
+            append_decommissioned(t)
 
             # Always display the info last as it's free form
             # text and may contain tabs

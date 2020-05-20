@@ -1,5 +1,5 @@
 #==============================================================================
-# Copyright (C) 2019-present Alces Flight Ltd.
+# Copyright (C) 2020-present Alces Flight Ltd.
 #
 # This file is part of Flight Asset.
 #
@@ -27,39 +27,23 @@
 
 module FlightAsset
   module Commands
-    class ListGroups < FlightAsset::Command
-      include Concerns::HasTableElements
-      include Concerns::HasDecommissionedField
+    module Concerns
+      module HasDecommissionedField
+        extend ActiveSupport::Concern
 
-      def table_elements
-        @table_elements ||= begin
-          groups = fetch_groups.sort_by(&:name)
-          if opts.only_decommissioned
-            groups.select(&:decommissioned)
-          elsif opts.include_decommissioned
-            groups
-          else
-            groups.reject(&:decommissioned)
+        ##
+        # NOTE: Application Specific Logic, do not extract
+        def append_decommissioned(array)
+          if verbose? || mixed_decommissioned?
+            array << ['Decommissioned', ->(a) do
+              a.decommissioned ? 'yes' : 'no'
+            end]
           end
         end
-      end
 
-      def fetch_groups
-        if ['', true].include?(opts.category)
-          request_asset_groups_records.reject(&:category_or_missing)
-        elsif opts.category
-          cat = request_categories_record_by_name(opts.category)
-          request_asset_groups_records_by_category(cat)
-        else
-          request_asset_groups_records
+        def mixed_decommissioned?
+          opts.include_decommissioned && !opts.only_decommissioned
         end
-      end
-
-      def table_procs
-        [
-          ['Name', ->(a) { a.name }],
-          ['Category', ->(a) { a.category_or_missing&.name }]
-        ].tap { |t| append_decommissioned(t) }
       end
     end
   end
