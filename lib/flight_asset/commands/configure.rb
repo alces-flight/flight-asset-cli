@@ -30,7 +30,6 @@ module FlightAsset
   module Commands
     class Configure < Command
       def run
-        prompt = TTY::Prompt.new
         old = Config::CACHE.load_credentials
         data = CredentialsConfig.new
         data.component_id = prompt.ask  'Asset Identifier:',

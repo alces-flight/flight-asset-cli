@@ -53,6 +53,15 @@ config :api_prefix, default: 'v1'
 config :create_support_type, default: 'inherit'
 
 # ==============================================================================
+# Maximum file size
+# The is the maximum sized file that can be uploaded. Supports multiple unit
+# types including: unitary (e.g. 10), binary (e.g. 100 KiB) and SI (e.g. 1 MB)
+# ==============================================================================
+config :file_size, default: '32 KiB', transform_with: ->(v) do
+  Filesize.from(v.to_s || '').to_i
+end
+
+# ==============================================================================
 # Data Path
 # A directory in which user specific data can be stored (e.g. access token)
 # ==============================================================================

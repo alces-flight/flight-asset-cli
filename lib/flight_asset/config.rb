@@ -35,6 +35,7 @@ require 'yaml'
 require 'logger'
 require 'hashie'
 require 'xdg'
+require 'filesize'
 
 module FlightAsset
   class ConfigBase < Hashie::Trash

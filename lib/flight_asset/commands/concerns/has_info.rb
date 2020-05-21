@@ -35,13 +35,23 @@ module FlightAsset
           # Filter out inputs which are not paths
           str = opts.info
           return if str.nil?
-          return str unless str[0] == '@'
 
-          path = str[1..]
-          if File.exists?(path)
-            File.read(path)
+          # Extracts the value
+          value = if str[0] == '@'
+            path = str[1..]
+            if File.exists? path
+              File.read path
+            else
+              raise InputError, "Could not locate: #{path}"
+            end
           else
-            raise InputError, "Could not locate: #{path}"
+            str
+          end
+
+          # Enforce the maximum size constraint
+          value.tap do |v|
+            error = FileSizeError.new(v.length, Config::CACHE.file_size!)
+            raise error if error.oversized?
           end
         end
       end

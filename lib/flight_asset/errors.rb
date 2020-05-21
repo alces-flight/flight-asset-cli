@@ -56,6 +56,31 @@ module FlightAsset
     end
   end
 
+  class FileSizeError < InputError
+    attr_reader :cur, :max, :cur_pretty, :max_pretty
+
+    def initialize(cur, max)
+      @cur = cur
+      @max = max
+      @cur_pretty = Filesize.from(cur.to_s).pretty
+      @max_pretty = Filesize.from(max.to_s).pretty
+      super <<~MSG.chomp
+        The new file size (#{cur_pretty}) exceeds the maximum size (#{max_pretty}).
+      MSG
+    end
+
+    def oversized?
+      cur > max
+    end
+
+    def warning_msg
+      <<~MSG.chomp
+        The current file size (#{cur_pretty}) exceeds the maximum (#{max_pretty})!
+        You will not be able to edit the file unless the file size is reduced.
+      MSG
+    end
+  end
+
   DuplicateError = GeneralError.define_class(4)
 
   MissingError = GeneralError.define_class(20)

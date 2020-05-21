@@ -82,6 +82,12 @@ module FlightAsset
     end
 
     ##
+    # Creates a prompt object for interactive commands
+    def prompt
+      @prompt ||= TTY::Prompt.new
+    end
+
+    ##
     # Checks if standard out is going to a TTY
     #
     def tty?
