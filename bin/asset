@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env ruby
 #==============================================================================
 # Copyright (C) 2019-present Alces Flight Ltd.
 #
@@ -26,6 +26,8 @@
 # https://github.com/alces-flight/alces-flight/flight-asset-cli
 #==============================================================================
 
-ETC="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../etc" >/dev/null 2>&1 && pwd )"
-exec $0-with-config $ETC/config.yaml $@
+# Adds the config onto the front of ARGV
+ARGV.unshift File.expand_path('../etc/config.yaml', __dir__)
+
+load File.join(__dir__, 'asset-with-config')
 
