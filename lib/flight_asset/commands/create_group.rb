@@ -29,6 +29,7 @@ module FlightAsset
   module Commands
     class CreateGroup < FlightAsset::Command
       include Concerns::HasAssetGroupsRecord
+      include Concerns::HasCategoryInput
 
       define_args :name
       attr_accessor :asset_groups_record
@@ -43,9 +44,7 @@ module FlightAsset
       end
 
       def categories_record
-        @categories_record ||= if cat_name = opts.category
-          request_categories_record_by_name(cat_name)
-        end
+        @categories_record ||= request_input_categories_record_or_nil
       end
 
       def create_record
@@ -60,9 +59,9 @@ module FlightAsset
 
       def relationships
         { component: build_components_record }.tap do |rels|
-          if cat = categories_record
-            rels[:assetGroupCategory] = cat
-            rels[:asset_group_category] = cat
+          if categories_record
+            rels[:assetGroupCategory] = categories_record
+            rels[:asset_group_category] = categories_record
           end
         end
       end

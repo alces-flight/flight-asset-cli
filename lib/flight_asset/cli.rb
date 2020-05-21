@@ -134,9 +134,8 @@ module FlightAsset
       c.summary = 'Return the detailed description of a group'
     end
 
-    create_command 'create-group', 'GROUP' do |c|
+    create_command 'create-group', 'GROUP [CATEGORY]' do |c|
       c.summary = 'Define a new group'
-      c.option '--category CATEGORY', 'Add the group to an existing category'
     end
 
     create_command 'decommission-group', 'GROUP' do |c|
