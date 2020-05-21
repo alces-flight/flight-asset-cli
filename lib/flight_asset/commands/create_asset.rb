@@ -30,6 +30,7 @@ module FlightAsset
     class CreateAsset < FlightAsset::Command
       include Concerns::HasInfo
       include Concerns::HasAssetsRecord
+      include Concerns::HasAssetGroupInput
 
       define_args :name
       attr_accessor :assets_record
@@ -52,7 +53,7 @@ module FlightAsset
       end
 
       def asset_groups_record
-        @asset_groups_record ||= request_asset_groups_record_by_name(opts.group)
+        @asset_groups_record ||= request_input_asset_groups_record_or_nil
       end
 
       def support_type
@@ -63,7 +64,7 @@ module FlightAsset
         relationships = {
           component: build_components_record
         }.tap do |r|
-          if opts.group
+          if asset_groups_record
             r[:assetGroup] = asset_groups_record,
             r[:asset_group] = asset_groups_record
           end
