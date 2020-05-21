@@ -41,7 +41,7 @@ module FlightAsset
             table_elements.each do |element|
               table << procs.map { |p| p.call(element) }
             end
-            puts table.render(:unicode, multiline: table_multiline?, padding: [0,1])
+            puts table.render(:unicode, padding: [0,1])
           end
 
           after(unless: :tty?) do
@@ -59,10 +59,6 @@ module FlightAsset
 
         def empty?
           table_elements.empty?
-        end
-
-        def table_multiline?
-          false
         end
 
         def table_procs

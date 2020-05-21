@@ -58,10 +58,6 @@ module FlightAsset
           end
         end
 
-        def table_multiline?
-          true
-        end
-
         def table_procs
           raise NotImplementedError
         end
