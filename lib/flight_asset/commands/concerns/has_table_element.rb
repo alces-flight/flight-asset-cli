@@ -54,7 +54,7 @@ module FlightAsset
 
           after(unless: :tty?) do
             element = table_element
-            puts table_procs.map { |_, p| p.call(element) }.join("\n")
+            puts table_procs.map { |_, p| p.call(element) }.join("\t")
           end
         end
 
