@@ -149,13 +149,6 @@ module FlightAsset
 
     create_command 'move-group', 'GROUP [CATEGORY]' do |c|
       c.summary = 'Modify which category a group belongs to'
-      c.description = <<~DESC.chomp
-Modifies the GROUP so it belongs to a new CATEGORY. The GROUP and CATEGORY
-should already exist otherwise this command will error.
-
-The group-category relationship will be unassigned if CATEGORY is omitted
-or a "blank value". Blank string values include empty ('') and spaces ('\\s+')
-DESC
     end
 
     create_command 'list-categories' do |c|
