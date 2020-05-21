@@ -121,13 +121,8 @@ module FlightAsset
       INFO_FLAG.call(c)
     end
 
-    create_command 'move-asset', 'ASSET' do |c|
+    create_command 'move-asset', 'ASSET [GROUP]' do |c|
       c.summary = 'Modify which group an asset belongs to'
-      c.description = <<~DESC.chomp
-By default this will unassign the asset from its group. The asset will be
-reassigned to a new group if the --group flag has been provided.
-DESC
-      c.option '--group GROUP', 'Reassign the asset to GROUP'
     end
 
     create_command 'list-groups' do |c|
