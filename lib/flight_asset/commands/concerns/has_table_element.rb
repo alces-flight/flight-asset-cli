@@ -34,13 +34,11 @@ module FlightAsset
         included do
           after(if: :tty?) do
             element = table_element
-            table = table_procs.each_with_object(TTY::Table.new) do |(k, b), t|
-              t << [k, b.call(element)]
+            table_procs.each do |key, proc|
+              header = Paint[key + ':', '#2794d8']
+              value = Paint[proc.call(element), :green]
+              puts "#{header} #{value}"
             end
-            puts table.render(
-              :unicode, multiline: table_multiline?,
-              padding: [0, 1], alignments: :right
-            )
           end
 
           after(unless: :tty?) do
