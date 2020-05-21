@@ -35,13 +35,21 @@ module FlightAsset
 
       def run
         initial = request_asset_groups_record_by_name(name)
-        cat = if opts.category
-          request_categories_record_by_name(opts.category)
-        else
+        self.asset_groups_record = request_asset_groups_record_move_category(
+          initial, category_or_nil
+        )
+      end
+
+      def category_name
+        args.length < 2 ? '' : args[1].strip
+      end
+
+      def category_or_nil
+        if category_name.empty?
           nil
+        else
+          request_categories_record_by_name(category_name)
         end
-        self.asset_groups_record = \
-          request_asset_groups_record_move_category(initial, cat)
       end
     end
   end

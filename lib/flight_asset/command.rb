@@ -204,7 +204,7 @@ module FlightAsset
     def request_categories_record_by_name(name, error: true)
       categories = request_categories_records.select { |c| c.name == name }
       if error && categories.empty?
-        raise CategoriesMissing, <<~ERROR.chomp
+        raise CategoryMissing, <<~ERROR.chomp
           Could not locate category: #{name}
         ERROR
       elsif categories.length > 1
