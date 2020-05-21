@@ -1,5 +1,5 @@
 #==============================================================================
-# Copyright (C) 2019-present Alces Flight Ltd.
+# Copyright (C) 2020-present Alces Flight Ltd.
 #
 # This file is part of Flight Asset.
 #
@@ -27,18 +27,21 @@
 
 module FlightAsset
   module Commands
-    class MoveAsset < FlightAsset::Command
-      include Concerns::HasAssetsRecord
-      include Concerns::HasAssetGroupInput
+    module Concerns
+      module HasAssetGroupInput
+        extend ActiveSupport::Concern
 
-      define_args :name
-      attr_accessor :assets_record
+        def asset_group_input
+          args.length < 2 ? '' : args[1].strip
+        end
 
-      def run
-        initial = request_assets_record_by_name(name)
-        self.assets_record = request_assets_record_move_asset_group(
-          initial, request_input_asset_groups_record_or_nil
-        )
+        def request_input_asset_groups_record_or_nil
+          if asset_group_input.empty?
+            nil
+          else
+            request_asset_groups_record_by_name(asset_group_input)
+          end
+        end
       end
     end
   end

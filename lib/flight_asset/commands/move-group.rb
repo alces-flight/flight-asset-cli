@@ -29,6 +29,7 @@ module FlightAsset
   module Commands
     class MoveGroup < FlightAsset::Command
       include Concerns::HasAssetGroupsRecord
+      include Concerns::HasCategoryInput
 
       define_args :name
       attr_accessor :asset_groups_record
@@ -36,20 +37,8 @@ module FlightAsset
       def run
         initial = request_asset_groups_record_by_name(name)
         self.asset_groups_record = request_asset_groups_record_move_category(
-          initial, categories_record_or_nil
+          initial, request_input_categories_record_or_nil
         )
-      end
-
-      def category_name
-        args.length < 2 ? '' : args[1].strip
-      end
-
-      def categories_record_or_nil
-        if category_name.empty?
-          nil
-        else
-          request_categories_record_by_name(category_name)
-        end
       end
     end
   end
