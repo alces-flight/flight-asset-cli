@@ -28,6 +28,12 @@
 #==============================================================================
 
 # ==============================================================================
+# Application Name
+# The name of the application to use in the help text
+# ==============================================================================
+config :app_name, default: 'flight-asset'
+
+# ==============================================================================
 # Asset API Base URL
 # Specify the location where the API server is being hosted. The API version
 # prefix will be appended to the base url. The all most always means the version

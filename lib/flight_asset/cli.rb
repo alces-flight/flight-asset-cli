@@ -47,7 +47,7 @@ module FlightAsset
       end
     end
 
-    program :name, 'flight-asset'
+    program :name, Config::CACHE.app_name!
     program :version, "v#{FlightAsset::VERSION}"
     program :description, 'Manage Alces Flight Center Assets'
     program :help_paging, false
