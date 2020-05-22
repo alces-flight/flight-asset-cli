@@ -116,7 +116,7 @@ module FlightAsset
 
     create_command 'update-asset', 'ASSET' do |c|
       c.summary = 'Modify the type and info for an asset'
-      c.option '--support-type TYPE', 'Update the support type'
+      c.slop.string '--support-type', 'Update the support type', meta: 'TYPE'
       INFO_FLAG.call(c)
     end
 
