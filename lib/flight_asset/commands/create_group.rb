@@ -30,6 +30,7 @@ module FlightAsset
     class CreateGroup < FlightAsset::Command
       include Concerns::HasAssetGroupsRecord
       include Concerns::HasCategoryInput
+      include Concerns::BeforeConfiguredCheck
 
       define_args :name
       attr_accessor :asset_groups_record

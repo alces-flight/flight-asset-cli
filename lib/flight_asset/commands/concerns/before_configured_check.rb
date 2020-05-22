@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 #==============================================================================
 # Copyright (C) 2019-present Alces Flight Ltd.
 #
@@ -27,17 +28,21 @@
 
 module FlightAsset
   module Commands
-    class RecommissionGroup < FlightAsset::Command
-      include Concerns::HasAssetGroupsRecord
-      include Concerns::BeforeConfiguredCheck
+    module Concerns
+      module BeforeConfiguredCheck
+        extend ActiveSupport::Concern
 
-      define_args :name
-      attr_reader :asset_groups_record
+        included do
+          before(unless: :valid_credentials?) do
+            raise CredentialsError, <<~ERROR.chomp
+              The application does not appear to be configured!
+              Please see: '#{program(:name)} configure --help'
+            ERROR
+          end
+        end
 
-      def run
-        @asset_groups_record ||= begin
-          a = request_asset_groups_record_by_name(name)
-          a.update(decommissioned: false)
+        def valid_credentials?
+          credentials.valid?
         end
       end
     end

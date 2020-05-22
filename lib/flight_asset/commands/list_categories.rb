@@ -29,6 +29,7 @@ module FlightAsset
   module Commands
     class ListCategories < FlightAsset::Command
       include Concerns::HasTableElements
+      include Concerns::BeforeConfiguredCheck
 
       def table_elements
         @table_elements ||= request_categories_records.sort_by(&:name)

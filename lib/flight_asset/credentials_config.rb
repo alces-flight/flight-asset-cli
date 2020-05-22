@@ -43,7 +43,11 @@ module FlightAsset
     end
 
     def valid?
-      @validate ? true : false
+      if @validate.nil?
+        validate
+      else
+        @validate ? true : false
+      end
     end
 
     def headers

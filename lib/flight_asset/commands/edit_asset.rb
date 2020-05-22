@@ -29,6 +29,7 @@ module FlightAsset
   module Commands
     class EditAsset < FlightAsset::Command
       include Concerns::HasAssetsRecord
+      include Concerns::BeforeConfiguredCheck
 
       define_args :name
 

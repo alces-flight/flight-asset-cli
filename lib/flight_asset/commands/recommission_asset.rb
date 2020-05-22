@@ -29,6 +29,7 @@ module FlightAsset
   module Commands
     class RecommissionAsset < FlightAsset::Command
       include Concerns::HasAssetsRecord
+      include Concerns::BeforeConfiguredCheck
 
       define_args :name
       attr_reader :assets_record

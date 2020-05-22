@@ -31,6 +31,7 @@ module FlightAsset
       include Concerns::HasInfo
       include Concerns::HasAssetsRecord
       include Concerns::HasAssetGroupInput
+      include Concerns::BeforeConfiguredCheck
 
       define_args :name
       attr_accessor :assets_record

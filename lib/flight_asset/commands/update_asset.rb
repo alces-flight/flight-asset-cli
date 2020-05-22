@@ -30,6 +30,7 @@ module FlightAsset
     class UpdateAsset < FlightAsset::Command
       include Concerns::HasInfo
       include Concerns::HasAssetsRecord
+      include Concerns::BeforeConfiguredCheck
 
       define_args :name
       attr_reader :assets_record

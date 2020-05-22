@@ -29,6 +29,7 @@ module FlightAsset
   module Commands
     class ShowGroup  < FlightAsset::Command
       include Concerns::HasAssetGroupsRecord
+      include Concerns::BeforeConfiguredCheck
 
       define_args :name
       attr_reader :asset_groups_record

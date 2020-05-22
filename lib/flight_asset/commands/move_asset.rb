@@ -30,6 +30,7 @@ module FlightAsset
     class MoveAsset < FlightAsset::Command
       include Concerns::HasAssetsRecord
       include Concerns::HasAssetGroupInput
+      include Concerns::BeforeConfiguredCheck
 
       define_args :name
       attr_accessor :assets_record

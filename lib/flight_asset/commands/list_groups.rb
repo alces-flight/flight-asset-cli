@@ -30,6 +30,7 @@ module FlightAsset
     class ListGroups < FlightAsset::Command
       include Concerns::HasTableElements
       include Concerns::HasDecommissionedField
+      include Concerns::BeforeConfiguredCheck
 
       def table_elements
         @table_elements ||= begin
