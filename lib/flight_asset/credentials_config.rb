@@ -33,7 +33,7 @@ module FlightAsset
 
     # Quick check that can be done on config load
     def validate
-      @validate = asset_id? && jwt?
+      @validate = component_id? && jwt?
     end
 
     ##
