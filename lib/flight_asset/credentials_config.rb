@@ -45,6 +45,29 @@ module FlightAsset
     def valid?
       @validate ? true : false
     end
+
+    def headers
+      {
+        'Accept' => 'application/vnd.api+json',
+        'Content-Type' => 'application/json',
+        'Authorization' => "Bearer #{jwt!}"
+      }
+    end
+
+    def url
+      File.join(Config::CACHE.base_url!, Config::CACHE.api_prefix!)
+    end
+
+    def connection
+      @connection ||= Faraday.new(url: url, headers: headers) do |c|
+        c.use Faraday::Response::Logger, Config::CACHE.logger, { bodies: true } do |l|
+          l.filter(/(Authorization:)(.*)/, '\1 [REDACTED]')
+        end
+        c.request :json
+        c.response :json, :content_type => /\bjson$/
+        c.adapter :net_http
+      end
+    end
   end
 end
 

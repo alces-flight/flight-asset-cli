@@ -109,27 +109,15 @@ module FlightAsset
     end
 
     ##
-    # Faraday Connection To the Remote service
-    def connection
-      @connection ||= connection_builder(Config::CACHE)
+    # Caches the credentials object
+    def credentials
+      @credentials ||= Config::CACHE.load_credentials
     end
 
-    def connection_builder(config)
-      default_headers = {
-        'Accept' => 'application/vnd.api+json',
-        'Content-Type' => 'application/json',
-        'Authorization' => "Bearer #{config.jwt!}"
-      }
-
-      url = File.join(config.base_url!, config.api_prefix!)
-      Faraday.new(url: url, headers: default_headers) do |c|
-        c.use Faraday::Response::Logger, config.logger, { bodies: true } do |logger|
-          logger.filter(/(Authorization:)(.*)/, '\1 [REDACTED]')
-        end
-        c.request :json
-        c.response :json, :content_type => /\bjson$/
-        c.adapter :net_http
-      end
+    ##
+    # Faraday Connection To the remote service
+    def connection
+      credentials.connection
     end
 
     def build_components_record
