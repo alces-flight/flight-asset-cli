@@ -68,6 +68,14 @@ module FlightAsset
             a.asset_group_name || tty_none_or_nil
           end]
         ].tap { |t| append_decommissioned(t) }
+          .tap { |t| append_group_unix_name(t) }
+      end
+
+      def append_group_unix_name(array)
+        return if tty?
+        array << ['Group Unix Name', ->(a) do
+          a.assetGroup.unix_name
+        end]
       end
     end
   end
