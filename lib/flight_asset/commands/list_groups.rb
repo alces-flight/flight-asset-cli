@@ -63,6 +63,13 @@ module FlightAsset
             a.category_name || tty_none_or_nil
           end],
         ].tap { |t| append_decommissioned(t) }
+          .tap { |t| append_group_unix_name(t) }
+      end
+
+      def append_group_unix_name(array)
+        array << ['Genders Name', ->(a) do
+          a.unix_name || tty_none_or_nil
+        end]
       end
     end
   end
