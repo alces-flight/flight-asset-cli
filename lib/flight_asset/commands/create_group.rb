@@ -38,7 +38,7 @@ module FlightAsset
       def run
         existing = request_asset_groups_record_by_name(name, error: false)
         raise InputError, <<~ERROR.chomp if existing
-          Can not create group '#{name}' as it already exists!
+          Cannot create group '#{name}' as it already exists!
         ERROR
 
         self.asset_groups_record = create_record
@@ -53,7 +53,8 @@ module FlightAsset
           connection: connection,
           relationships: relationships,
           attributes: {
-            name: name
+            name: name,
+            unix_name: genders_name_option,
           }
         )
       end

@@ -136,6 +136,12 @@ module FlightAsset
 
     create_command 'create-group', 'GROUP [CATEGORY]' do |c|
       c.summary = 'Define a new group'
+      c.slop.string '--genders-name', 'Set the genders name', meta: 'NAME'
+    end
+
+    create_command 'update-group', 'GROUP [CATEGORY]' do |c|
+      c.summary = 'Modify the unix name for a group'
+      c.slop.string '--genders-name', 'Update the genders name', meta: 'NAME'
     end
 
     create_command 'decommission-group', 'GROUP' do |c|

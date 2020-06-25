@@ -27,39 +27,22 @@
 
 module FlightAsset
   module Commands
-    module Concerns
-      module HasAssetGroupsRecord
-        extend ActiveSupport::Concern
-        include HasTableElement
-        include HasDecommissionedField
+    class UpdateGroup < FlightAsset::Command
+      include Concerns::HasAssetGroupsRecord
+      include Concerns::BeforeConfiguredCheck
 
-        def table_element
-          asset_groups_record
-        end
+      define_args :name
+      attr_reader :asset_groups_record
 
-        def table_procs
-          [
-            ['Name', ->(a) { a.name }],
-            ['Category', ->(a) do
-              a.category_name || tty_none_or_nil
-            end]
-          ].tap { |t| append_decommissioned(t) }
-            .tap { |t| append_group_unix_name(t) }
-        end
-
-        def append_group_unix_name(array)
-          array << ['Genders Name', ->(a) do
-            a.unix_name || tty_none_or_nil
-          end]
-        end
-
-        def genders_name_option
-          case opts.genders_name.strip
-          when nil, ''
-            nil
-          else
-            opts.genders_name.strip
+      def run
+        @asset_groups_record ||= begin
+          g = request_asset_groups_record_by_name(name)
+          updates = {}
+          if opts.genders_name
+            updates[:unix_name] = genders_name_option
+            updates[:unixName] = genders_name_option
           end
+          g.update(**updates)
         end
       end
     end
