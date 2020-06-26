@@ -51,7 +51,8 @@ module FlightAsset
           new_opts = ['size', 'number'].map do |key|
             [key, nxt_params.fetch("page[#{key}]", []).first]
           end.reject { |_, v| v.nil? }.to_h
-          opts = base_opts.merge(page_opts: new_opts)
+          page_opts = ( base_opts[:page_opts] || {} ).merge(new_opts)
+          opts = base_opts.merge(page_opts: page_opts)
 
           # Makes the next request
           res = operation(:fetch_all_request, :plural, **opts)
