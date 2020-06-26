@@ -58,6 +58,9 @@ module FlightAsset
 
       def req_opts
         {
+          field_opts: {
+            assets: ['name', 'support_type', 'decommissioned', 'asset_group'].join(','),
+          },
           includes: ['asset_group'],
           page_opts: { 'size' => 5000 },
         }

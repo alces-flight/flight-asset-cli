@@ -74,6 +74,21 @@ module FlightAsset
       end
     end
 
+    def self.fetch_all_request(connection:,
+                               url_opts: {},
+                               url: self::COLLECTION_URL % url_opts,
+                               filter_opts: {},
+                               field_opts: [],
+                               page_opts: {},
+                               includes: [])
+      params = {}
+      params[:include] = includes.join(',') unless includes.empty?
+      params[:filter] = filter_opts unless filter_opts.empty?
+      params[:page] = page_opts unless page_opts.empty?
+      params[:fields] = field_opts unless field_opts.empty?
+      connection.get(url, params)
+    end
+
     def meta
       @meta ||= loaded_record.has_meta? ? loaded_record.meta : {}
     end
