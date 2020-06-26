@@ -69,9 +69,16 @@ end
 
 # ==============================================================================
 # Data Path
-# A directory in which user specific data can be stored (e.g. access token)
+# A directory in which user specific data can be stored.
 # ==============================================================================
 config :data_path, default: "#{xdg.data_home}/flight/asset-cli"
+
+# ==============================================================================
+# Config Path
+# A directory in which user specific configuration can be stored (e.g. access
+# token).
+# ==============================================================================
+config :config_path, default: "#{xdg.config_home}/flight/asset-cli"
 
 # ==============================================================================
 # Log Path

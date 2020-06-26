@@ -97,10 +97,11 @@ module FlightAsset
     end
 
     def credentials_path
-      File.join(data_path, 'credentials.yaml')
+      File.join(config_path, 'credentials.yaml')
     end
 
     def load_credentials
+      migrate_credentials_file
       if File.exists? credentials_path
         data = YAML.load File.read(credentials_path), symbolize_names: true
         CredentialsConfig.new data
@@ -157,6 +158,19 @@ module FlightAsset
           # Sets good log levels
           log.level = level
         end
+      end
+    end
+
+    private
+
+    def migrate_credentials_file
+      return if File.exists?(credentials_path)
+
+      old_path = File.join(data_path, 'credentials.yaml')
+      if File.exists?(old_path)
+        credentials_dir = Pathname.new(credentials_path).dirname
+        FileUtils.mkdir_p(credentials_dir)
+        FileUtils.mv(old_path, credentials_path)
       end
     end
   end
