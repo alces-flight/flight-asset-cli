@@ -135,7 +135,10 @@ module FlightAsset
     end
 
     def request_assets_record_by_name(name, error: true)
-      assets = request_assets_records.select { |a| a.name == name }
+      assets = AssetsRecord.fetch_all(
+        connection: connection,
+        filter_opts: { name: name, component_id: Config::CACHE.component_id },
+      )
       if error && assets.empty?
         raise AssetMissing, <<~ERROR.chomp
           Could not locate asset: #{name}
