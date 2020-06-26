@@ -32,7 +32,7 @@ module FlightAsset
       def run
         old = Config::CACHE.load_credentials
         data = CredentialsConfig.new
-        data.component_id = prompt.ask  'Asset Identifier:',
+        data.component_id = prompt.ask  'Component Identifier:',
                                         default: old.component_id
         data.jwt = prompt.mask  'Flight Center API token:',
                                 default: old.jwt
