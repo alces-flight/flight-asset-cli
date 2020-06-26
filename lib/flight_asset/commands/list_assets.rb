@@ -57,7 +57,10 @@ module FlightAsset
       end
 
       def req_opts
-        { includes: ['asset_group'] }
+        {
+          includes: ['asset_group'],
+          page_opts: { 'size' => 5000 },
+        }
       end
 
       def table_procs
