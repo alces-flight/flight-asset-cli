@@ -40,7 +40,13 @@ module FlightAsset
         def table_procs
           [
             ['Name', ->(a) { a.name }],
-            ['Support Type', ->(a) { a.support_type }],
+            ['Support Type', ->(a) do
+              a.support_type.tap do |s|
+                if a.support_type_inheritted && tty?
+                  s << " (inherited)"
+                end
+              end
+            end],
             ['Component', ->(a) { a.component.name } ],
             ['Asset Group', ->(a) do
               a.asset_group_name || tty_none_or_nil

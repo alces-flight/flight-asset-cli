@@ -72,6 +72,14 @@ module FlightAsset
         end
       end
     end
+
+    def meta
+      @meta ||= loaded_record.has_meta? ? loaded_record.meta : {}
+    end
+
+    def has_meta?
+      !@meta.nil?
+    end
   end
 
   class AutoRecord < BaseRecord
@@ -124,6 +132,37 @@ module FlightAsset
         _attributes[camal] = true
       end
     end
+
+    ##
+    # Defines attribute getters and setters that work with both snake_case
+    # and camalCase. This is to allow the API to change without affecting
+    # the client
+    #
+    def self.fallback_meta(*attrs)
+      attrs.each do |snake|
+        camal = snake_to_camal(snake)
+        snake = snake.to_sym
+
+        # Define the fallback getter
+        define_method(snake) do
+          camal_attr = meta[camal]
+          snake_attr = meta[snake]
+          if camal_attr == snake_attr
+            snake_attr
+          elsif camal_attr.nil? || snake_attr.nil?
+            snake_attr.nil? ? camal_attr : snake_attr
+          else
+            raise InternalError, 'Invalid API response!'
+          end
+        end
+
+        # Define the fallback setter
+        define_method("#{snake}=") do |value|
+          meta[snake] = value
+          meta[camal] = value
+        end
+      end
+    end
   end
 
   class ComponentsRecord < AutoRecord
@@ -135,6 +174,8 @@ module FlightAsset
   class AssetsRecord < AutoRecord
     fallback_attributes :name, :support_type, :info, :created_at, :updated_at,
                         :decommissioned
+
+    fallback_meta :support_type_inheritted
 
     has_one :component, class_name: 'FlightAsset::ComponentsRecord'
     has_one :asset_group, class_name: 'FlightAsset::AssetGroupsRecord'
