@@ -157,7 +157,8 @@ module FlightAsset
       AssetGroupsRecord.index_enum(
         connection: connection,
         url: "components/#{Config::CACHE.component_id!}/asset_groups",
-        includes: ['assetGroupCategroy', 'asset_group_category']
+        includes: ['assetGroupCategroy', 'asset_group_category'],
+        page_opts: { 'size' => 100 },
       )
     end
 
@@ -189,8 +190,12 @@ module FlightAsset
       CategoriesRecord.index_enum(connection: connection)
     end
 
-    def request_categories_record_by_name(name, error: true)
-      categories = request_categories_records.select { |c| c.name == name }
+    def request_categories_record_by_name(name, error: true, **opts)
+      categories = CategoriesRecord.fetch_all(
+        connection: connection,
+        filter_opts: { name: name },
+        **opts
+      )
       if error && categories.empty?
         raise CategoryMissing, <<~ERROR.chomp
           Could not locate category: #{name}
