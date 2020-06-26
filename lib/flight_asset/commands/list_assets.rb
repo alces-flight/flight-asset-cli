@@ -73,7 +73,7 @@ module FlightAsset
 
       def append_group_unix_name(array)
         array << ['Group Genders Name', ->(a) do
-          a.assetGroup.unix_name || tty_none_or_nil
+          a.asset_group_or_missing&.unix_name || tty_none_or_nil
         end]
       end
     end
