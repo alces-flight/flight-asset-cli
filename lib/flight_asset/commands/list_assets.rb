@@ -65,7 +65,7 @@ module FlightAsset
           ['Name', ->(a) { a.name }],
           ['Support Type', ->(a) {
             a.support_type.tap do |s|
-              if a.support_type_inheritted && tty?
+              if a.support_type_inherited && tty?
                 s << " (inherited)"
               end
             end

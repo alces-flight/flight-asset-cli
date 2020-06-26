@@ -175,7 +175,7 @@ module FlightAsset
     fallback_attributes :name, :support_type, :info, :created_at, :updated_at,
                         :decommissioned
 
-    fallback_meta :support_type_inheritted
+    fallback_meta :support_type_inherited
 
     has_one :component, class_name: 'FlightAsset::ComponentsRecord'
     has_one :asset_group, class_name: 'FlightAsset::AssetGroupsRecord'
