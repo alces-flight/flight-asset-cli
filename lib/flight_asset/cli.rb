@@ -139,8 +139,8 @@ module FlightAsset
       c.slop.string '--genders-name', 'Set the genders name', meta: 'NAME'
     end
 
-    create_command 'update-group', 'GROUP [CATEGORY]' do |c|
-      c.summary = 'Modify the unix name for a group'
+    create_command 'update-group', 'GROUP' do |c|
+      c.summary = 'Modify the genders name for a group'
       c.slop.string '--genders-name', 'Update the genders name', meta: 'NAME'
     end
 
