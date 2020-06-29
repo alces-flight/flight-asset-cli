@@ -36,6 +36,12 @@ module FlightAsset
 
       def run
         @assets_record ||= request_assets_record_by_name(name)
+        # XXX If the asset is decommissioned we should probably show it here.
+        # The current mechanism for displaying assets kind of makes this
+        # really awkward.
+        #
+        # record ||= request_assets_record_by_name(name)
+        # AssetOutput.new(record, detailed: true, **opts).output
       end
     end
   end

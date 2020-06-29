@@ -37,6 +37,11 @@ module FlightAsset
       def run
         @asset_groups_record ||= request_asset_groups_record_by_name(name)
       end
+
+      def run
+        group = request_asset_groups_record_by_name(name)
+        AssetGroupOutput.new(group, **opts).output
+      end
     end
   end
 end

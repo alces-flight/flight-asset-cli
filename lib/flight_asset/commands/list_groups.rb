@@ -28,13 +28,11 @@
 module FlightAsset
   module Commands
     class ListGroups < FlightAsset::Command
-      include Concerns::HasTableElements
-      include Concerns::HasDecommissionedField
       include Concerns::BeforeConfiguredCheck
 
-      def table_elements
-        @table_elements ||= begin
-          groups = fetch_groups.sort_by(&:name)
+      def run
+        groups = fetch_groups.sort_by(&:name)
+        groups =
           if opts.only_decommissioned
             groups.select(&:decommissioned)
           elsif opts.include_decommissioned
@@ -42,7 +40,7 @@ module FlightAsset
           else
             groups.reject(&:decommissioned)
           end
-        end
+        AssetGroupOutput.new(groups, **opts).output
       end
 
       def fetch_groups
@@ -57,29 +55,6 @@ module FlightAsset
         else
           request_asset_groups_records
         end
-      end
-
-      def table_procs
-        [
-          ['Name', ->(a) { a.name }],
-          ['Category', ->(a) do
-            a.category_name || tty_none_or_nil
-          end],
-        ].tap do |t|
-            if tty?
-              append_group_unix_name(t)
-              append_decommissioned(t)
-            else
-              append_decommissioned(t)
-              append_group_unix_name(t)
-            end
-          end
-      end
-
-      def append_group_unix_name(array)
-        array << ['Genders Name', ->(a) do
-          a.unix_name || tty_none_or_nil
-        end]
       end
     end
   end
