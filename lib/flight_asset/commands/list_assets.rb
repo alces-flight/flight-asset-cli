@@ -57,7 +57,13 @@ module FlightAsset
       end
 
       def req_opts
-        { includes: ['asset_group'] }
+        {
+          field_opts: {
+            assets: ['name', 'support_type', 'decommissioned', 'asset_group'].join(','),
+          },
+          includes: ['asset_group'],
+          page_opts: { 'size' => Config::CACHE.page_size },
+        }
       end
 
       def table_procs
@@ -65,7 +71,9 @@ module FlightAsset
           ['Name', ->(a) { a.name }],
           ['Support Type', ->(a) {
             a.support_type.tap do |s|
-              if a.support_type_inherited && tty?
+              distinguish = Config::CACHE.distinguish_inherited_support_type? &&
+                tty?
+              if distinguish && a.support_type_inherited
                 s << " (inherited)"
               end
             end

@@ -49,8 +49,11 @@ module FlightAsset
         if ['', true].include?(opts.category)
           request_asset_groups_records.reject(&:category_or_missing)
         elsif opts.category
-          cat = request_categories_record_by_name(opts.category)
-          request_asset_groups_records_by_category(cat)
+          cat = request_categories_record_by_name(
+            opts.category,
+            includes: ['assetGroups', 'asset_groups']
+          )
+          cat.assetGroups.select { |g| g.component.id == Config::CACHE.component_id }
         else
           request_asset_groups_records
         end
