@@ -53,7 +53,7 @@ module FlightAsset
             opts.category,
             includes: ['assetGroups', 'asset_groups']
           )
-          cat.assetGroups
+          cat.assetGroups.select { |g| g.component.id == Config::CACHE.component_id }
         else
           request_asset_groups_records
         end
