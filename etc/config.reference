@@ -100,3 +100,12 @@ config :log_level, default: 'error'
 # A directory to write temporary files in
 # ==============================================================================
 config :tmp_path, default: '/tmp/flight-asset'
+
+# ==============================================================================
+# Distinguish Inherited Support Type
+# Should inherited support types by distinguished from non-inherited support
+# types.  Distinguishing inherited support types can have performance
+# implications in certain situations.  This option can be used to prevent
+# those performance issues.
+# ==============================================================================
+config :distinguish_inherited_support_type, default: true

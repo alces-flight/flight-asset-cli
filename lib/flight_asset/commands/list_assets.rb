@@ -71,7 +71,9 @@ module FlightAsset
           ['Name', ->(a) { a.name }],
           ['Support Type', ->(a) {
             a.support_type.tap do |s|
-              if a.support_type_inherited && tty?
+              distinguish = Config::CACHE.distinguish_inherited_support_type? &&
+                tty?
+              if distinguish && a.support_type_inherited
                 s << " (inherited)"
               end
             end
