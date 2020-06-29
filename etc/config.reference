@@ -109,3 +109,9 @@ config :tmp_path, default: '/tmp/flight-asset'
 # those performance issues.
 # ==============================================================================
 config :distinguish_inherited_support_type, default: true
+
+# ==============================================================================
+# Page Size
+# The page size to use when listing assets, groups, etc..
+# ==============================================================================
+config :page_size, default: 100

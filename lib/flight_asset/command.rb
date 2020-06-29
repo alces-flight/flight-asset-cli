@@ -161,7 +161,7 @@ module FlightAsset
         connection: connection,
         url: "components/#{Config::CACHE.component_id!}/asset_groups",
         includes: ['assetGroupCategroy', 'asset_group_category'],
-        page_opts: { 'size' => 100 },
+        page_opts: { 'size' => Config::CACHE.page_size },
       )
     end
 

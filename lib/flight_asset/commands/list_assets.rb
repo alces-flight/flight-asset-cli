@@ -62,7 +62,7 @@ module FlightAsset
             assets: ['name', 'support_type', 'decommissioned', 'asset_group'].join(','),
           },
           includes: ['asset_group'],
-          page_opts: { 'size' => 1000 },
+          page_opts: { 'size' => Config::CACHE.page_size },
         }
       end
 
