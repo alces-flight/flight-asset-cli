@@ -34,11 +34,23 @@ module FlightAsset
         data = CredentialsConfig.new
         data.component_id = prompt.ask  'Component Identifier:',
                                         default: old.component_id
-        data.jwt = prompt.mask  'Flight Center API token:',
-                                default: old.jwt
+        jwt = prompt.ask  'Flight Center API token:',
+                          default: masked_jwt(old.jwt)
+        if jwt == masked_jwt(old.jwt)
+           data.jwt = old.jwt
+        else
+           data.jwt = jwt
+        end
         FileUtils.mkdir_p File.dirname(Config::CACHE.credentials_path)
         File.write  Config::CACHE.credentials_path,
                     YAML.dump(data.to_h)
+      end
+
+
+      def masked_jwt(jwt)
+        return nil if jwt.nil?
+        return ('*' * jwt.length) if jwt[-8..-1].nil?
+        ('*' * 24) + jwt[-8..-1]
       end
     end
   end
