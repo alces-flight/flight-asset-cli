@@ -38,7 +38,9 @@ module FlightAsset
       def table_procs
         [
           ['Name', ->(a) { a.name }]
-        ]
+        ].tap do |t|
+            t << ['ID', ->(g) { g.id }] if verbose?
+          end
       end
     end
   end
