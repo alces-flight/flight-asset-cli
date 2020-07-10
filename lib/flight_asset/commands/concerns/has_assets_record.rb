@@ -56,6 +56,8 @@ module FlightAsset
           ].tap do |t|
             append_decommissioned(t)
 
+            t << ['ID', ->(a) { a.id }] if verbose?
+
             t << ['Additional Information', ->(a) do
               if tty? && a.info.to_s.length > 0
                 "\n" + a.info

@@ -89,6 +89,7 @@ module FlightAsset
             append_decommissioned(t)
             append_group_unix_name(t)
           end
+          t << ['ID', ->(a) { a.id }] if verbose?
         end
       end
 
