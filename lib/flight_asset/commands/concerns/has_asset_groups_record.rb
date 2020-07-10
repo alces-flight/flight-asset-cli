@@ -43,8 +43,11 @@ module FlightAsset
             ['Category', ->(a) do
               a.category_name || tty_none_or_nil
             end]
-          ].tap { |t| append_decommissioned(t) }
-            .tap { |t| append_group_unix_name(t) }
+          ].tap do |t|
+              append_decommissioned(t)
+              append_group_unix_name(t)
+              t << ['ID', ->(g) { g.id }] if verbose?
+            end
         end
 
         def append_group_unix_name(array)
