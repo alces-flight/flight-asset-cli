@@ -57,8 +57,8 @@ module FlightAsset
         end
 
         def genders_name_option
-          case opts.genders_name.strip
-          when nil, ''
+          case opts.genders_name
+          when nil, /^\s*$/
             nil
           else
             opts.genders_name.strip
