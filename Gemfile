@@ -38,6 +38,8 @@ gem 'simple_jsonapi_client'
 gem 'tty-editor'
 gem 'tty-table'
 gem 'tty-prompt'
+gem 'jwt'
+gem 'paint'
 gem 'xdg'
 
 group :development do
