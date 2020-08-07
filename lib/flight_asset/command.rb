@@ -71,7 +71,15 @@ module FlightAsset
       end
       Config::CACHE.logger.debug e.backtrace.reverse.join("\n")
       Config::CACHE.logger.error "(#{e.class}) #{e.message}"
-      raise e
+      case e
+      when SimpleJSONAPIClient::Errors::APIError
+        raise InternalError, <<~ERROR.chomp
+          The API responded with an unexpected error, see logs for details:
+          #{Paint[Config::CACHE.log_path_or_stderr, :yellow]}
+        ERROR
+      else
+        raise e
+      end
     end
 
     ##
