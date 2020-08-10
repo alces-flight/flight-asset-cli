@@ -72,9 +72,14 @@ module FlightAsset
       Config::CACHE.logger.debug e.backtrace.reverse.join("\n")
       Config::CACHE.logger.error "(#{e.class}) #{e.message}"
       case e
-      when SimpleJSONAPIClient::Errors::APIError, Faraday::Error
+      when SimpleJSONAPIClient::Errors::APIError
         raise InternalError, <<~ERROR.chomp
           The API responded with an unexpected error, see logs for details:
+          #{Paint[Config::CACHE.log_path_or_stderr, :yellow]}
+        ERROR
+      when Faraday::Error
+        raise InternalError, <<~ERROR.chomp
+          Unable to connect to the API server, see logs for details:
           #{Paint[Config::CACHE.log_path_or_stderr, :yellow]}
         ERROR
       else
