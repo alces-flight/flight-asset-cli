@@ -34,7 +34,7 @@ module FlightAsset
         data = CredentialsConfig.new
         data.component_id = prompt.ask  'Component Identifier:',
                                         default: old.component_id
-        jwt = prompt.ask  'Flight Center API token:',
+        jwt = prompt.ask  'Alces Flight Center API token:',
                           default: masked_jwt(old.jwt)
         if jwt == masked_jwt(old.jwt)
            data.jwt = old.jwt
