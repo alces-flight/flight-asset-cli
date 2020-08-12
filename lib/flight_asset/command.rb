@@ -229,6 +229,8 @@ module FlightAsset
       end
     end
 
+    ##
+    # DEPRECATED: This method will be removed in version 2
     def request_assets_record_move_asset_group(assets_record, asset_groups_record = nil)
       rel_url = assets_record.asset_group_relationship_url
       data = asset_groups_record&.to_relationship
@@ -238,6 +240,8 @@ module FlightAsset
       )
     end
 
+    ##
+    # DEPRECATED: This method will be removed in version 2
     def request_asset_groups_record_move_category(asset_groups_record, category_record = nil)
       rel_url = asset_groups_record.category_relationship_url
       data = category_record&.to_relationship

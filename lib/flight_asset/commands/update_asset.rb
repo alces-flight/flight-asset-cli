@@ -55,7 +55,8 @@ module FlightAsset
       end
 
       def opts_asset_groups_record
-        return if opts.group == '' || !opts.group
+        return unless opts.group
+        return NilRecord if opts.group == ''
         request_asset_groups_record_by_name(opts.group)
       end
     end
