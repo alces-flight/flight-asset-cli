@@ -35,6 +35,17 @@ module FlightAsset
       define_args :name
       attr_accessor :assets_record
 
+      before do
+        group_name = args.length < 2 ? '' : args[1]
+        msg = <<~WARN.chomp
+          This command has been deprecated and will cease to function as expected in the
+          next major release. Please use the following:
+          #{Paint["#{Config::CACHE.app_name} update-asset '#{name}' --group '#{group_name}'", :yellow]}
+        WARN
+        Config::CACHE.logger.warn msg
+        $stderr.puts msg
+      end
+
       def run
         initial = request_assets_record_by_name(name)
         self.assets_record = request_assets_record_move_asset_group(
