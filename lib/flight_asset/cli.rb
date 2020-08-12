@@ -99,7 +99,6 @@ module FlightAsset
       c.slop.string '--support-type', <<~DESC.chomp, meta: 'TYPE'
         Select a support type: #{types_str}
       DESC
-
       INFO_FLAG.call(c)
     end
 
@@ -118,6 +117,10 @@ module FlightAsset
     create_command 'update-asset', 'ASSET' do |c|
       c.summary = 'Modify the type and info for an asset'
       c.slop.string '--support-type', 'Update the support type', meta: 'TYPE'
+      c.slop.string '--group', <<~DESC.chomp
+        Assign the asset to a different group. Empty string will unassign the group
+      DESC
+
       INFO_FLAG.call(c)
     end
 
