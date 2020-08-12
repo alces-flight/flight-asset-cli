@@ -146,6 +146,9 @@ module FlightAsset
     create_command 'update-group', 'GROUP' do |c|
       c.summary = 'Modify the genders name for a group'
       c.slop.string '--genders-name', 'Update the genders name', meta: 'NAME'
+      c.slop.string '--category', <<~DESC.chomp
+        Assign the group to a different category. Empty string will unassign the category
+      DESC
     end
 
     create_command 'decommission-group', 'GROUP' do |c|

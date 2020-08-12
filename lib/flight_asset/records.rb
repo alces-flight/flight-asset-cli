@@ -234,6 +234,7 @@ module FlightAsset
 
     has_one :component, class_name: 'FlightAsset::ComponentsRecord'
     has_many :assets, class_name: 'FlightAsset::AssetsRecord'
+    has_one :asset_group_category, class_name: 'FlightAsset::CategoriesRecord'
     has_one :assetGroupCategory, class_name: 'FlightAsset::CategoriesRecord'
 
     def assets_relationship_url

@@ -42,8 +42,18 @@ module FlightAsset
             updates[:unix_name] = genders_name_option
             updates[:unixName] = genders_name_option
           end
+          if category = opts_categories_record
+            updates[:asset_group_category] = category
+            updates[:assetGroupCategory] = category
+          end
           g.update(**updates)
         end
+      end
+
+      def opts_categories_record
+        return unless opts.category
+        return NilRecord if opts.category == ''
+        request_categories_record_by_name(opts.category)
       end
     end
   end
