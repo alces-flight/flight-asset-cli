@@ -125,7 +125,14 @@ module FlightAsset
     end
 
     create_command 'move-asset', 'ASSET [GROUP]' do |c|
-      c.summary = 'Modify which group an asset belongs to'
+      c.summary = "Legacy command to modify an asset's group"
+      c.description = <<~DESC.chomp
+        This command has been deprecated and will be repurposed in the next major release.
+
+        Please use the following:
+        #{Config::CACHE.app_name} update-asset ASSET --group GROUP
+      DESC
+      c.hidden
     end
 
     create_command 'list-groups' do |c|
@@ -160,7 +167,14 @@ module FlightAsset
     end
 
     create_command 'move-group', 'GROUP [CATEGORY]' do |c|
-      c.summary = 'Modify which category a group belongs to'
+      c.summary = "Legacy command to modify a group's category"
+      c.description = <<~DESC.chomp
+        This command has been deprecated and will be repurposed in the next major release.
+
+        Please use the following:
+        #{Config::CACHE.app_name} update-group GROUP --category CATEGORY
+      DESC
+      c.hidden
     end
 
     create_command 'list-categories' do |c|
