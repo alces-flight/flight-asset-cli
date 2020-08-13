@@ -37,6 +37,7 @@ module FlightAsset
 
       def table_procs
         [
+          *(verbose? ? [['ID', ->(a) { a.id }]] : []),
           ['Name', ->(a) { a.name }],
           ['X Capacity', ->(a) { a.xCapacity }],
           ['Y Capacity', ->(a) { a.yCapacity }]

@@ -1,5 +1,5 @@
 #==============================================================================
-# Copyright (C) 2019-present Alces Flight Ltd.
+# Copyright (C) 2020-present Alces Flight Ltd.
 #
 # This file is part of Flight Asset.
 #
@@ -286,7 +286,7 @@ module FlightAsset
   end
 
   class AssetContainersRecord < AutoRecord
-    attributes :name, :xCapacity, :yCapacity
+    attributes :name, :xCapacity, :yCapacity, :containerType
   end
 end
 

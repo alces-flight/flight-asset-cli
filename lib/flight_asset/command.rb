@@ -122,6 +122,29 @@ module FlightAsset
     end
 
     ##
+    # Renders an element against a set of transform functions and
+    # generates the formatted output
+    def render_element(element, transforms)
+      # Converts procs to prettified data
+      data = transforms.map do |key, proc|
+        header = Paint[key + ':', '#2794d8']
+        value = Paint[proc.call(element), :green]
+        [header, value]
+      end
+
+      # Determines the maximum width header for padding
+      max = data.max { |h, v| h.length }[0].length
+
+      # Renders the data into a padded string
+      combined = data.reduce('') do |memo, (header, value)|
+        memo << "#{' ' * (max - header.length)}#{header} #{value}\n"
+      end
+
+      # Removes the trailing endline charcter
+      combined[0..-2]
+    end
+
+    ##
     # Caches the credentials object
     def credentials
       @credentials ||= Config::CACHE.load_credentials
@@ -231,6 +254,28 @@ module FlightAsset
 
     def request_asset_containers_records
       AssetContainersRecord.index_enum(connection: connection)
+    end
+
+    def request_asset_containers_record_by_name(name, error: true)
+      containers = request_asset_containers_records.select { |a| a.name == name }
+      if error && containers.empty?
+        raise GroupMissing, <<~ERROR.chomp
+          Could not locate container: #{name}
+        ERROR
+      elsif containers.length > 1
+        # NOTE: This error is unrecoverable and can not be skipped
+        raise DuplicateError, <<~ERROR.chomp
+          Found multiple copies of container: #{name}
+          Contact your system administrator for further assistance
+        ERROR
+      elsif containers.length == 1
+        id = containers.first.id
+        AssetContainersRecord.fetch(connection: connection,
+                                    url_opts: { id: id },
+                                    includes: ['assets', 'parent', 'child_containers'])
+      else
+        nil
+      end
     end
 
     ##

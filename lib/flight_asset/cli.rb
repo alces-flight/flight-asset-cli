@@ -160,11 +160,11 @@ module FlightAsset
     end
 
     create_command 'list-containers' do |c|
-      c.summary = 'Return all the component containers'
-      c.description = <<~DESC.chomp
-        Returns a list off all the asset contianers which are directly associated
-        with the component
-      DESC
+      c.summary = 'Return all the containers'
+    end
+
+    create_command 'show-container', 'CONTAINER' do |c|
+      c.summary = 'Return the detailed description of a container'
     end
 
     alias_regex = /-assets?\Z/

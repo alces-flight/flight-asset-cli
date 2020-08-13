@@ -1,5 +1,5 @@
 #==============================================================================
-# Copyright (C) 2019-present Alces Flight Ltd.
+# Copyright (C) 2020-present Alces Flight Ltd.
 #
 # This file is part of Flight Asset.
 #
@@ -28,27 +28,24 @@
 module FlightAsset
   module Commands
     module Concerns
-      module HasTableElement
+      module HasAssetContainersRecord
         extend ActiveSupport::Concern
 
         included do
           after(if: :tty?) do
-            # Local caches the element so it can be reused
-            puts render_element(table_element, table_procs)
+            puts render_element(asset_containers_record, container_procs)
           end
 
           after(unless: :tty?) do
-            element = table_element
-            puts table_procs.map { |_, p| p.call(element) }.join("\t")
+            raise NotImplementedError
           end
         end
 
-        def table_procs
-          raise NotImplementedError
-        end
-
-        def table_element
-          raise NotImplementedError
+        def container_procs
+          [
+            ['Name', ->(a) { a.name }],
+            ['Type', ->(a) { a.containerType }]
+          ]
         end
       end
     end
