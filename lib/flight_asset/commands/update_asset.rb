@@ -46,8 +46,18 @@ module FlightAsset
           if i = info
             updates[:info] = i
           end
+          if group = opts_asset_groups_record
+            updates[:asset_group] = group
+            updates[:assetGroup] = group
+          end
           a.update(**updates)
         end
+      end
+
+      def opts_asset_groups_record
+        return unless opts.group
+        return NilRecord if opts.group == ''
+        request_asset_groups_record_by_name(opts.group)
       end
     end
   end

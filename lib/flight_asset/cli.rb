@@ -99,7 +99,6 @@ module FlightAsset
       c.slop.string '--support-type', <<~DESC.chomp, meta: 'TYPE'
         Select a support type: #{types_str}
       DESC
-
       INFO_FLAG.call(c)
     end
 
@@ -118,11 +117,22 @@ module FlightAsset
     create_command 'update-asset', 'ASSET' do |c|
       c.summary = 'Modify the type and info for an asset'
       c.slop.string '--support-type', 'Update the support type', meta: 'TYPE'
+      c.slop.string '--group', <<~DESC.chomp
+        Assign the asset to a different group. Empty string will unassign the group
+      DESC
+
       INFO_FLAG.call(c)
     end
 
     create_command 'move-asset', 'ASSET [GROUP]' do |c|
-      c.summary = 'Modify which group an asset belongs to'
+      c.summary = "Legacy command to modify an asset's group"
+      c.description = <<~DESC.chomp
+        This command has been deprecated and will be repurposed in the next major release.
+
+        Please use the following:
+        #{Config::CACHE.app_name} update-asset ASSET --group GROUP
+      DESC
+      c.hidden
     end
 
     create_command 'list-groups' do |c|
@@ -143,6 +153,9 @@ module FlightAsset
     create_command 'update-group', 'GROUP' do |c|
       c.summary = 'Modify the genders name for a group'
       c.slop.string '--genders-name', 'Update the genders name', meta: 'NAME'
+      c.slop.string '--category', <<~DESC.chomp
+        Assign the group to a different category. Empty string will unassign the category
+      DESC
     end
 
     create_command 'decommission-group', 'GROUP' do |c|
@@ -154,7 +167,14 @@ module FlightAsset
     end
 
     create_command 'move-group', 'GROUP [CATEGORY]' do |c|
-      c.summary = 'Modify which category a group belongs to'
+      c.summary = "Legacy command to modify a group's category"
+      c.description = <<~DESC.chomp
+        This command has been deprecated and will be repurposed in the next major release.
+
+        Please use the following:
+        #{Config::CACHE.app_name} update-group GROUP --category CATEGORY
+      DESC
+      c.hidden
     end
 
     create_command 'list-categories' do |c|

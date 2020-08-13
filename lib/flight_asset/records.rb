@@ -26,6 +26,15 @@
 #==============================================================================
 
 module FlightAsset
+  ##
+  # A dummy record use to represent a relationship to nothing (aka nil)
+  # The key difference being it is "truthy". This tricks SimpleJSONAPIClient
+  # into rendering a nil/none as a relationship link instead of skipping it
+  NilRecord = SimpleDelegator.new(nil)
+  NilRecord.instance_exec do
+    define_singleton_method(:to_relationship) { self }
+  end
+
   class BaseRecord < SimpleJSONAPIClient::Base
     # Defines a method to index a particular URL, very few protections are in
     # place. However it should page responses correctly
@@ -225,6 +234,7 @@ module FlightAsset
 
     has_one :component, class_name: 'FlightAsset::ComponentsRecord'
     has_many :assets, class_name: 'FlightAsset::AssetsRecord'
+    has_one :asset_group_category, class_name: 'FlightAsset::CategoriesRecord'
     has_one :assetGroupCategory, class_name: 'FlightAsset::CategoriesRecord'
 
     def assets_relationship_url
