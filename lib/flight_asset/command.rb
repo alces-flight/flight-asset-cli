@@ -229,6 +229,10 @@ module FlightAsset
       end
     end
 
+    def request_asset_containers_records
+      AssetContainersRecord.index_enum(connection: connection)
+    end
+
     ##
     # DEPRECATED: This method will be removed in version 2
     def request_assets_record_move_asset_group(assets_record, asset_groups_record = nil)

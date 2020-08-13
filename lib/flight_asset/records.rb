@@ -284,5 +284,9 @@ module FlightAsset
       urls.first
     end
   end
+
+  class AssetContainersRecord < AutoRecord
+    attributes :name, :xCapacity, :yCapacity
+  end
 end
 

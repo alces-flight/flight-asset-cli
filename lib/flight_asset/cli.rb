@@ -159,6 +159,14 @@ module FlightAsset
       c.summary = 'Return all the categories'
     end
 
+    create_command 'list-containers' do |c|
+      c.summary = 'Return all the component containers'
+      c.description = <<~DESC.chomp
+        Returns a list off all the asset contianers which are directly associated
+        with the component
+      DESC
+    end
+
     alias_regex = /-assets?\Z/
     commands.keys
             .select { |c| c.match?(alias_regex) }
