@@ -124,17 +124,6 @@ module FlightAsset
       INFO_FLAG.call(c)
     end
 
-    create_command 'move-asset', 'ASSET [GROUP]' do |c|
-      c.summary = "Legacy command to modify an asset's group"
-      c.description = <<~DESC.chomp
-        This command has been deprecated and will be repurposed in the next major release.
-
-        Please use the following:
-        #{Config::CACHE.app_name} update-asset ASSET --group GROUP
-      DESC
-      c.hidden
-    end
-
     create_command 'list-groups' do |c|
       c.summary = 'Return all the groups'
       NAMED_FILTER.call(c, single: 'CATEGORY', plurals: 'groups')
@@ -164,17 +153,6 @@ module FlightAsset
 
     create_command 'recommission-group', 'GROUP' do |c|
       c.summary = 'Unsets the decommissioned flag on a group'
-    end
-
-    create_command 'move-group', 'GROUP [CATEGORY]' do |c|
-      c.summary = "Legacy command to modify a group's category"
-      c.description = <<~DESC.chomp
-        This command has been deprecated and will be repurposed in the next major release.
-
-        Please use the following:
-        #{Config::CACHE.app_name} update-group GROUP --category CATEGORY
-      DESC
-      c.hidden
     end
 
     create_command 'list-categories' do |c|
