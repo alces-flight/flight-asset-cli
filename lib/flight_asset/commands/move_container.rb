@@ -36,8 +36,11 @@ module FlightAsset
 
       # Error if their are missing coordinates
       before(unless: :valid_method_signature?) do
+        metas = ['X_START',  'X_END', 'Y_START', 'Y_END']
+        (args.length - 2).times { metas.shift }
         raise InputError, <<~ERROR
-          
+          Insufficient inputs to move the container! Please try again with all the cooridinates set:
+          #{Paint["#{Config::CACHE.app_name} #{args.join(' ')} #{metas.join(' ')}", :yellow]}
         ERROR
       end
 
