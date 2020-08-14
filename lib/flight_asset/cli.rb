@@ -167,6 +167,13 @@ module FlightAsset
       c.summary = 'Return the detailed description of a container'
     end
 
+    create_command 'create-container', 'CONTAINER' do |c|
+      c.summary = 'Define a new container'
+      c.slop.string '--type', 'Select the type of the container'
+      c.slop.integer '--x-capacity', 'Define the width', meta: 'WIDTH'
+      c.slop.integer '--y-capacity', 'Define the hieght', meta: 'HEIGHT'
+    end
+
     alias_regex = /-assets?\Z/
     commands.keys
             .select { |c| c.match?(alias_regex) }
