@@ -286,7 +286,6 @@ module FlightAsset
   end
 
   class AssetContainersRecord < AutoRecord
-    attributes :name, :xCapacity, :yCapacity, :containerType
+    attributes :name, :xCapacity, :yCapacity, :containerType, :x_capacity, :y_capacity
   end
 end
-

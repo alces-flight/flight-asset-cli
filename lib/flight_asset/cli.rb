@@ -140,7 +140,7 @@ module FlightAsset
     end
 
     create_command 'update-group', 'GROUP' do |c|
-      c.summary = 'Modify the genders name for a group'
+      c.summary = 'Modify an existing group'
       c.slop.string '--genders-name', 'Update the genders name', meta: 'NAME'
       c.slop.string '--category', <<~DESC.chomp
         Assign the group to a different category. Empty string will unassign the category
@@ -169,6 +169,13 @@ module FlightAsset
 
     create_command 'create-container', 'CONTAINER' do |c|
       c.summary = 'Define a new container'
+      c.slop.string '--type', 'Select a different container type'
+      c.slop.integer '--x-capacity', 'Specify a new width', meta: 'WIDTH'
+      c.slop.integer '--y-capacity', 'Specify a new hieght', meta: 'HEIGHT'
+    end
+
+    create_command 'update-container', 'CONTAINER' do |c|
+      c.summary = 'Modify an existing container'
       c.slop.string '--type', 'Select the type of the container'
       c.slop.integer '--x-capacity', 'Define the width', meta: 'WIDTH'
       c.slop.integer '--y-capacity', 'Define the hieght', meta: 'HEIGHT'

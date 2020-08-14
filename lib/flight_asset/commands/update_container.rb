@@ -1,5 +1,5 @@
 #==============================================================================
-# Copyright (C) 2020-present Alces Flight Ltd.
+# Copyright (C) 2019-present Alces Flight Ltd.
 #
 # This file is part of Flight Asset.
 #
@@ -27,27 +27,30 @@
 
 module FlightAsset
   module Commands
-    module Concerns
-      module HasAssetContainersRecord
-        extend ActiveSupport::Concern
+    class UpdateContainer < FlightAsset::Command
+      include Concerns::HasAssetContainersRecord
+      include Concerns::BeforeConfiguredCheck
 
-        included do
-          after(if: :tty?) do
-            puts render_element(asset_containers_record, container_procs)
+      define_args :name
+      attr_reader :asset_containers_record
+
+      def run
+        @asset_containers_record ||= begin
+          g = request_asset_containers_record_by_name(name)
+          updates = {}
+          if opts.type
+            updates[:containerType] = opts.type
+            updates[:container_type] = opts.type
           end
-
-          after(unless: :tty?) do
-            raise NotImplementedError
+          if opts.x_capacity
+            updates[:xCapacity] = opts.x_capacity
+            updates[:x_capacity] = opts.x_capacity
           end
-        end
-
-        def container_procs
-          [
-            ['Name', ->(a) { a.name }],
-            ['Type', ->(a) { a.containerType }],
-            ['X Capacity', ->(a) { a.xCapacity }],
-            ['Y Capacity', ->(a) { a.yCapacity }]
-          ]
+          if opts.y_capacity
+            updates[:yCapacity] = opts.y_capacity
+            updates[:y_capacity] = opts.y_capacity
+          end
+          g.update(**updates)
         end
       end
     end
