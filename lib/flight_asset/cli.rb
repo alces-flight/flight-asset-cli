@@ -103,6 +103,10 @@ module FlightAsset
       INFO_FLAG.call(c)
     end
 
+    create_command 'move-asset', 'ASSET [PARENT_CONTAINER] [X_START] [X_END] [Y_START] [Y_END]' do |c|
+      c.summary = 'Reposition (or ophan) an asset within a container'
+    end
+
     create_command 'decommission-asset', 'ASSET' do |c|
       c.summary = 'Flag that an asset has been decommissioned'
     end

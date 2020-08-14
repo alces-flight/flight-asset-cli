@@ -27,12 +27,12 @@
 
 module FlightAsset
   module Commands
-    class MoveContainer < FlightAsset::Command
-      include Concerns::HasAssetContainersRecord
+    class MoveAsset < FlightAsset::Command
+      include Concerns::HasAssetsRecord
       include Concerns::BeforeConfiguredCheck
 
       define_args :name
-      attr_reader :asset_containers_record
+      attr_reader :assets_record
 
       # Error if their are missing coordinates
       before(unless: :valid_method_signature?) do
@@ -64,8 +64,8 @@ module FlightAsset
       end
 
       def run
-        @asset_containers_record ||= begin
-          g = request_asset_containers_record_by_name(name)
+        @assets_record ||= begin
+          g = request_assets_record_by_name(name)
           updates = {}
           if parent_name
             updates[:x_start_position] = updates[:xStartPosition] = args[2]

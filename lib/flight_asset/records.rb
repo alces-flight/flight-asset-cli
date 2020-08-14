@@ -202,9 +202,14 @@ module FlightAsset
 
     fallback_meta :support_type_inherited
 
+    attributes :x_start_position, :xStartPosition, :x_end_position, :xEndPosition,
+               :y_start_position, :yStartPosition, :y_end_position, :yEndPosition
+
     has_one :component, class_name: 'FlightAsset::ComponentsRecord'
     has_one :asset_group, class_name: 'FlightAsset::AssetGroupsRecord'
     has_one :assetGroup, class_name: 'FlightAsset::AssetGroupsRecord'
+    has_one :parentContainer, class: 'FlightAsset::AssetContainersRecord'
+    has_one :parent_container, class: 'FlightAsset::AssetContainersRecord'
 
     def asset_group_or_missing
       key = ['asset_group', 'assetGroup'].find do |key|

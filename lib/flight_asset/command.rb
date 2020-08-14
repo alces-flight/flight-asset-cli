@@ -259,7 +259,7 @@ module FlightAsset
     def request_asset_containers_record_by_name(name, error: true)
       containers = request_asset_containers_records.select { |a| a.name == name }
       if error && containers.empty?
-        raise GroupMissing, <<~ERROR.chomp
+        raise ContainerMissing, <<~ERROR.chomp
           Could not locate container: #{name}
         ERROR
       elsif containers.length > 1

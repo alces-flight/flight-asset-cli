@@ -88,4 +88,5 @@ module FlightAsset
   AssetMissing = MissingError.define_class(21)
   CategoryMissing = MissingError.define_class(22)
   GroupMissing = MissingError.define_class(23)
+  ContainerMissing = MissingError.define_class(24)
 end
