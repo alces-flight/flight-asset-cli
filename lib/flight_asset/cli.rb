@@ -28,6 +28,7 @@
 require 'commander'
 
 require_relative 'version'
+require_relative 'errors'
 
 module FlightAsset
   class CLI
@@ -179,6 +180,12 @@ module FlightAsset
       c.slop.string '--type', 'Select the type of the container'
       c.slop.integer '--x-capacity', 'Define the width', meta: 'WIDTH'
       c.slop.integer '--y-capacity', 'Define the hieght', meta: 'HEIGHT'
+    end
+
+    create_command 'remove-container', 'CONTAINER' do |c|
+      c.summary = 'Permanently destroy a container'
+      c.hidden
+      c.action { raise InternalError, 'Currently not supoorted!' }
     end
 
     alias_regex = /-assets?\Z/
