@@ -294,6 +294,9 @@ module FlightAsset
     has_one :parentContainer, class: self.to_s
     has_one :parent_container, class: self.to_s
 
+    has_many :childContainers, class:  self.to_s
+    has_many :assets, class: 'FlightAsset::AssetsRecord'
+
     attributes :name, :xCapacity, :yCapacity, :containerType, :x_capacity, :y_capacity,
       :x_start_position, :xStartPosition, :x_end_position, :xEndPosition,
       :y_start_position, :yStartPosition, :y_end_position, :yEndPosition

@@ -1,5 +1,5 @@
 #==============================================================================
-# Copyright (C) 2020-present Alces Flight Ltd.
+# Copyright (C) 2019-present Alces Flight Ltd.
 #
 # This file is part of Flight Asset.
 #
@@ -25,18 +25,19 @@
 # https://github.com/alces-flight/alces-flight/flight-asset-cli
 #==============================================================================
 
-module FlightAsset
-  module Commands
-    class ShowContainer < FlightAsset::Command
-      include Concerns::HasAssetContainersRecord
-      include Concerns::BeforeConfiguredCheck
+# Bug Fix to SimpleJSONAPIClient where it does not handle optional has-one
+# relationships. The request MAY still return 200 even if the resource doesn't
+# exist. This is because *technically* the "relationship resource" exists even
+# if it doesn't have a target.
+# See: https://jsonapi.org/format/#fetching-relationships-responses-404
 
-      define_args :name
-      attr_reader :asset_containers_record
-
-      def run
-        @asset_containers_record ||= request_asset_containers_record_by_name(name, verbose: true)
-      end
-    end
+module SimpleJSONAPIClientPatch
+  def interpret_singular_response(response, connection)
+    return nil if response.body.nil?
+    super
   end
+end
+
+class << SimpleJSONAPIClient::Base
+  self.prepend SimpleJSONAPIClientPatch
 end

@@ -256,7 +256,7 @@ module FlightAsset
       AssetContainersRecord.index_enum(connection: connection)
     end
 
-    def request_asset_containers_record_by_name(name, error: true)
+    def request_asset_containers_record_by_name(name, error: true, verbose: false)
       containers = request_asset_containers_records.select { |a| a.name == name }
       if error && containers.empty?
         raise ContainerMissing, <<~ERROR.chomp
@@ -270,9 +270,13 @@ module FlightAsset
         ERROR
       elsif containers.length == 1
         id = containers.first.id
-        AssetContainersRecord.fetch(connection: connection,
-                                    url_opts: { id: id },
-                                    includes: ['assets', 'parent', 'child_containers'])
+        if verbose
+          AssetContainersRecord.fetch(connection: connection,
+                                      url_opts: { id: id },
+                                      includes: ['assets', 'parent', 'child_containers'])
+        else
+          AssetContainersRecord.fetch(connection: connection, url_opts: { id: id })
+        end
       else
         nil
       end

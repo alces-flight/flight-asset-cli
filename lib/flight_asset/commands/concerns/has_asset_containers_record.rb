@@ -34,10 +34,19 @@ module FlightAsset
         included do
           after(if: :tty?) do
             puts render_element(asset_containers_record, container_procs)
+            unless asset_containers_record.parentContainer.nil?
+              puts
+              puts render_element(asset_containers_record, tty_parent_container_procs)
+            end
           end
 
           after(unless: :tty?) do
-            raise NotImplementedError
+            puts container_procs.map { |p| p[1].call(asset_containers_record) }.join("\t")
+            if asset_containers_record.parentContainer.nil?
+              puts
+            else
+              puts non_tty_parent_container_procs.map { |p| p[1].call(asset_containers_record) }.join("\t")
+            end
           end
         end
 
@@ -47,6 +56,31 @@ module FlightAsset
             ['Type', ->(a) { a.containerType }],
             ['X Capacity', ->(a) { a.xCapacity }],
             ['Y Capacity', ->(a) { a.yCapacity }]
+          ]
+        end
+
+        ##
+        # These procs take the original container as their input as this is
+        # where the start/stop positions are stored
+        def tty_parent_container_procs
+          [
+            ['Location', ->(a) { "#{a.parentContainer.containerType} - #{a.parentContainer.name}" }],
+            ['X Position', ->(a) { "#{a.xStartPosition} - #{a.xEndPosition}" }],
+            ['Y Position', ->(a) { "#{a.yStartPosition} - #{a.yEndPosition}" }]
+          ]
+        end
+
+        ##
+        # These procs take the original container as their input as this is
+        # where the start/stop positions are stored
+        def non_tty_parent_container_procs
+          [
+            [nil, ->(a) { a.parentContainer.name }],
+            [nil, ->(a) { a.parentContainer.containerType }],
+            [nil, ->(a) { a.xStartPosition }],
+            [nil, ->(a) { a.xEndPosition }],
+            [nil, ->(a) { a.yStartPosition }],
+            [nil, ->(a) { a.yEndPosition }]
           ]
         end
       end
