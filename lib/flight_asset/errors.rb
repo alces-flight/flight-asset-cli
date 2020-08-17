@@ -83,6 +83,7 @@ module FlightAsset
 
   DuplicateError = GeneralError.define_class(4)
   CredentialsError = GeneralError.define_class(5)
+  ClientError = GeneralError.define_class(6)
 
   MissingError = GeneralError.define_class(20)
   AssetMissing = MissingError.define_class(21)

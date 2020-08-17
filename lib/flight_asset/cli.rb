@@ -175,8 +175,11 @@ module FlightAsset
     create_command 'create-container', 'CONTAINER' do |c|
       c.summary = 'Define a new container'
       c.slop.string '--type', 'Specify the container type', meta: Config::CACHE.container_types_metachar
-      c.slop.integer '--x-capacity', 'Specify a new width', meta: 'WIDTH'
-      c.slop.integer '--y-capacity', 'Specify a new hieght', meta: 'HEIGHT'
+      # Commander has a bug (feature?) where it strips non-integers from c.slop.integer flags
+      # This is likely a integration issue between Commander and Slop
+      # Regardless it leads to funky error handling
+      c.slop.string '--x-capacity', 'Specify a new width', meta: 'WIDTH'
+      c.slop.string '--y-capacity', 'Specify a new hieght', meta: 'HEIGHT'
     end
 
     create_command 'update-container', 'CONTAINER' do |c|
