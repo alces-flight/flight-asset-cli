@@ -104,7 +104,7 @@ module FlightAsset
     end
 
     create_command 'move-asset', 'ASSET [PARENT_CONTAINER] [X_START] [X_END] [Y_START] [Y_END]' do |c|
-      c.summary = 'Reposition (or ophan) an asset within a container'
+      c.summary = 'Reposition (or orphan) an asset within a container'
     end
 
     create_command 'decommission-asset', 'ASSET' do |c|
@@ -187,7 +187,7 @@ module FlightAsset
     end
 
     create_command 'move-container', 'CONTAINER [PARENT] [X_START] [X_END] [Y_START] [Y_END]' do |c|
-      c.summary = 'Reposition (or ophan) a container within another'
+      c.summary = 'Reposition (or orphan) a container within another'
     end
 
     create_command 'remove-container', 'CONTAINER' do |c|
