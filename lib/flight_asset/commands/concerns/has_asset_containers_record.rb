@@ -42,6 +42,10 @@ module FlightAsset
               puts
               puts render_element(child, tty_child_container_procs)
             end
+            asset_containers_record.assets.each do |asset|
+              puts
+              puts render_element(asset, tty_asset_procs)
+            end
           end
 
           after(unless: :tty?) do
@@ -53,6 +57,9 @@ module FlightAsset
             end
             asset_containers_record.childContainers.each do |child|
               puts non_tty_child_container_procs.map { |p| p[1].call(child) }.join("\t")
+            end
+            asset_containers_record.assets.each do |asset|
+              puts non_tty_asset_procs.map { |p| p[1].call(asset) }.join("\t")
             end
           end
         end
@@ -107,6 +114,29 @@ module FlightAsset
           [
             [nil, ->(a) { a.name }],
             [nil, ->(a) { a.containerType }],
+            [nil, ->(a) { a.xStartPosition }],
+            [nil, ->(a) { a.xEndPosition }],
+            [nil, ->(a) { a.yStartPosition }],
+            [nil, ->(a) { a.yEndPosition }]
+          ]
+        end
+
+        ##
+        # These procs take the asset record directly
+        def tty_asset_procs
+          [
+            ['Location', ->(a) { "asset - #{a.name}" }],
+            ['X Position', ->(a) { "#{a.xStartPosition} - #{a.xEndPosition}" }],
+            ['Y Position', ->(a) { "#{a.yStartPosition} - #{a.yEndPosition}" }]
+          ]
+        end
+
+        ##
+        # These procs take the asset record directly
+        def non_tty_asset_procs
+          [
+            [nil, ->(a) { a.name }],
+            [nil, ->(_) { 'asset' }],
             [nil, ->(a) { a.xStartPosition }],
             [nil, ->(a) { a.xEndPosition }],
             [nil, ->(a) { a.yStartPosition }],
