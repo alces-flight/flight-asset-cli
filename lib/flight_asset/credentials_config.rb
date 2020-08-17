@@ -80,9 +80,15 @@ module FlightAsset
         end
 
         if xy_end_position
-          raise ClientError, <<~ERROR.chomp
-            The #{xy_end_position} end position must be greater than the #{xy_end_position} start position
-          ERROR
+          if code == 'greater_than'
+            raise ClientError, <<~ERROR.chomp
+              The #{xy_end_position} end position must be greater than the #{xy_end_position} start position
+            ERROR
+          elsif code == 'less_than_or_equal_to'
+            raise ClientError, <<~ERROR.chomp
+              The #{xy_end_position} end position exceeds the maximum size of the parent
+            ERROR
+          end
         end
       end
 
