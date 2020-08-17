@@ -69,6 +69,15 @@ module FlightAsset
             ERROR
           end
         end
+
+        # Errors if their is an issue with the parent
+        if parent_container? && code == 'position range overlaps with another item in the parent container'
+          raise ClientError, <<~ERROR.chomp
+            Another container or asset is already using the specified range.
+            Run the following for more details:
+            #{Paint["#{Config::CACHE.app_name} show-container PARENT_CONTAINER", :yellow]}
+          ERROR
+        end
       end
 
       ##
@@ -85,6 +94,12 @@ module FlightAsset
         else
           nil
         end
+      end
+
+      ##
+      # Returns true if the error was due to the parent container
+      def parent_container?
+        pointer == '/data/relationships/parentContainer/data'
       end
 
       def pointer
