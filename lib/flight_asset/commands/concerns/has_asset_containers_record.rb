@@ -38,6 +38,10 @@ module FlightAsset
               puts
               puts render_element(asset_containers_record, tty_parent_container_procs)
             end
+            asset_containers_record.childContainers.each do |child|
+              puts
+              puts render_element(child, tty_child_container_procs)
+            end
           end
 
           after(unless: :tty?) do
@@ -46,6 +50,9 @@ module FlightAsset
               puts
             else
               puts non_tty_parent_container_procs.map { |p| p[1].call(asset_containers_record) }.join("\t")
+            end
+            asset_containers_record.childContainers.each do |child|
+              puts non_tty_child_container_procs.map { |p| p[1].call(child) }.join("\t")
             end
           end
         end
@@ -77,6 +84,29 @@ module FlightAsset
           [
             [nil, ->(a) { a.parentContainer.name }],
             [nil, ->(a) { a.parentContainer.containerType }],
+            [nil, ->(a) { a.xStartPosition }],
+            [nil, ->(a) { a.xEndPosition }],
+            [nil, ->(a) { a.yStartPosition }],
+            [nil, ->(a) { a.yEndPosition }]
+          ]
+        end
+
+        ##
+        # These procs take the child container record directly
+        def tty_child_container_procs
+          [
+            ['Location', ->(a) { "#{a.containerType} - #{a.name}" }],
+            ['X Position', ->(a) { "#{a.xStartPosition} - #{a.xEndPosition}" }],
+            ['Y Position', ->(a) { "#{a.yStartPosition} - #{a.yEndPosition}" }]
+          ]
+        end
+
+        ##
+        # These procs take the child container record directly
+        def non_tty_child_container_procs
+          [
+            [nil, ->(a) { a.name }],
+            [nil, ->(a) { a.containerType }],
             [nil, ->(a) { a.xStartPosition }],
             [nil, ->(a) { a.xEndPosition }],
             [nil, ->(a) { a.yStartPosition }],
