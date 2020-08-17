@@ -50,7 +50,7 @@ module FlightAsset
       def run
         existing = request_asset_containers_record_by_name(name, error: false)
         raise InputError, <<~ERROR.chomp if existing
-          Cannot create group '#{name}' as it already exists!
+          Cannot create container '#{name}' as it already exists!
         ERROR
 
         self.asset_containers_record = create_record

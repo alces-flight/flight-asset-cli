@@ -174,7 +174,7 @@ module FlightAsset
 
     create_command 'create-container', 'CONTAINER' do |c|
       c.summary = 'Define a new container'
-      c.slop.string '--type', 'Select a different container type'
+      c.slop.string '--type', 'Specify the container type', meta: Config::CACHE.container_types_metachar
       c.slop.integer '--x-capacity', 'Specify a new width', meta: 'WIDTH'
       c.slop.integer '--y-capacity', 'Specify a new hieght', meta: 'HEIGHT'
     end
