@@ -30,6 +30,16 @@ module FlightAsset
     module Concerns
       module HasAssetContainersRecord
         extend ActiveSupport::Concern
+        XY_COORDINATE_PROCS = [
+          ['X Position', ->(a) { "#{a.xStartPosition} - #{a.xEndPosition}" }],
+          ['Y Position', ->(a) { "#{a.yStartPosition} - #{a.yEndPosition}" }]
+        ]
+        VERBOSE_XY_COORDINATE_PROCS = [
+          [nil, ->(a) { a.xStartPosition }],
+          [nil, ->(a) { a.xEndPosition }],
+          [nil, ->(a) { a.yStartPosition }],
+          [nil, ->(a) { a.yEndPosition }]
+        ]
 
         included do
           after(if: :tty?) do
@@ -79,8 +89,7 @@ module FlightAsset
         def tty_parent_container_procs
           [
             ['Location', ->(a) { "#{a.parentContainer.containerType} - #{a.parentContainer.name}" }],
-            ['X Position', ->(a) { "#{a.xStartPosition} - #{a.xEndPosition}" }],
-            ['Y Position', ->(a) { "#{a.yStartPosition} - #{a.yEndPosition}" }]
+            *XY_COORDINATE_PROCS
           ]
         end
 
@@ -91,10 +100,7 @@ module FlightAsset
           [
             [nil, ->(a) { a.parentContainer.name }],
             [nil, ->(a) { a.parentContainer.containerType }],
-            [nil, ->(a) { a.xStartPosition }],
-            [nil, ->(a) { a.xEndPosition }],
-            [nil, ->(a) { a.yStartPosition }],
-            [nil, ->(a) { a.yEndPosition }]
+            *VERBOSE_XY_COORDINATE_PROCS
           ]
         end
 
@@ -103,8 +109,7 @@ module FlightAsset
         def tty_child_container_procs
           [
             ['Location', ->(a) { "#{a.containerType} - #{a.name}" }],
-            ['X Position', ->(a) { "#{a.xStartPosition} - #{a.xEndPosition}" }],
-            ['Y Position', ->(a) { "#{a.yStartPosition} - #{a.yEndPosition}" }]
+            *XY_COORDINATE_PROCS
           ]
         end
 
@@ -114,10 +119,7 @@ module FlightAsset
           [
             [nil, ->(a) { a.name }],
             [nil, ->(a) { a.containerType }],
-            [nil, ->(a) { a.xStartPosition }],
-            [nil, ->(a) { a.xEndPosition }],
-            [nil, ->(a) { a.yStartPosition }],
-            [nil, ->(a) { a.yEndPosition }]
+            *VERBOSE_XY_COORDINATE_PROCS
           ]
         end
 
@@ -126,8 +128,7 @@ module FlightAsset
         def tty_asset_procs
           [
             ['Location', ->(a) { "asset - #{a.name}" }],
-            ['X Position', ->(a) { "#{a.xStartPosition} - #{a.xEndPosition}" }],
-            ['Y Position', ->(a) { "#{a.yStartPosition} - #{a.yEndPosition}" }]
+            *XY_COORDINATE_PROCS
           ]
         end
 
@@ -137,10 +138,7 @@ module FlightAsset
           [
             [nil, ->(a) { a.name }],
             [nil, ->(_) { 'asset' }],
-            [nil, ->(a) { a.xStartPosition }],
-            [nil, ->(a) { a.xEndPosition }],
-            [nil, ->(a) { a.yStartPosition }],
-            [nil, ->(a) { a.yEndPosition }]
+            *VERBOSE_XY_COORDINATE_PROCS
           ]
         end
       end
