@@ -78,6 +78,12 @@ module FlightAsset
             #{Paint["#{Config::CACHE.app_name} show-container PARENT_CONTAINER", :yellow]}
           ERROR
         end
+
+        if xy_end_position
+          raise ClientError, <<~ERROR.chomp
+            The #{xy_end_position} end position must be greater than the #{xy_end_position} start position
+          ERROR
+        end
       end
 
       ##
@@ -91,6 +97,20 @@ module FlightAsset
           'x capacity'
         when '/data/relationships/yCapacity/data'
           'y capacity'
+        else
+          nil
+        end
+      end
+
+      ##
+      # @returns [String] if the error was due to the xEndPosition or yEndPosition
+      # @returns [Nil] if the error was not due to the xEndPosition or yEndPosition
+      def xy_end_position
+        case pointer
+        when "/data/relationships/xEndPosition/data"
+          'x'
+        when "/data/relationships/yEndPosition/data"
+          'y'
         else
           nil
         end
