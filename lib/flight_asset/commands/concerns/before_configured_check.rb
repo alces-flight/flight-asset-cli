@@ -35,8 +35,8 @@ module FlightAsset
         included do
           before(unless: :valid_credentials?) do
             raise CredentialsError, <<~ERROR.chomp
-              The application does not appear to be configured!
-              Please see: '#{CLI.program(:name)} configure --help'
+              The application does not appear to be configured, please run:
+              #{Paint["#{Config::CACHE.app_name} configure", :yellow]}
             ERROR
           end
         end
