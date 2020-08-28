@@ -50,12 +50,14 @@ config :base_url, default: 'https://center.alces-flight.com/api'
 config :api_prefix, default: 'v1'
 
 # ==============================================================================
-# Container Types Metachar
-# The list of containers which will appear in the help text. The type is not
-# validated before making the request. This allows new types to be used without
-# updating the CLI.
+# Container Types
+# The valid container types displayed in the CLI and error messages. Note they
+# are not validated pre-request. This allows the server to add additional types
+# without updating this list.
+#
+# The first type is doubles as the default to the create command.
 # ==============================================================================
-config :container_types_metachar, default: 'rack|room|chassis|generic'
+config :container_types, default: ['generic', 'rack', 'room', 'chassis']
 
 # ==============================================================================
 # Create Support Type

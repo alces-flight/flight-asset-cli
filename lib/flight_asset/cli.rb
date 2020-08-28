@@ -1,4 +1,4 @@
-#==============================================================================
+#==============================================================================]
 # Copyright (C) 2019-present Alces Flight Ltd.
 #
 # This file is part of Flight Asset.
@@ -174,7 +174,9 @@ module FlightAsset
 
     create_command 'create-container', 'CONTAINER' do |c|
       c.summary = 'Define a new container'
-      c.slop.string '--type', 'Specify the container type', meta: Config::CACHE.container_types_metachar
+      c.slop.string '--type', 'Specify the container type',
+                    meta: Config::CACHE.container_types.join('|'),
+                    default: Config::CACHE.container_types.first
       # Commander has a bug (feature?) where it strips non-integers from c.slop.integer flags
       # This is likely a integration issue between Commander and Slop
       # Regardless it leads to funky error handling
