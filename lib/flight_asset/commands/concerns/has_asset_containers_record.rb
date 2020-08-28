@@ -36,23 +36,30 @@ module FlightAsset
             puts render_element(asset_containers_record, procs)
 
             child_procs = (verbose? ? verbose_child_procs : simplified_child_procs)
-            asset_containers_record.childContainers.each do |child|
+            children.each do |child|
               puts
               puts render_element(child, child_procs)
-            end
-            asset_containers_record.assets.each do |asset|
-              puts
-              puts render_element(asset, child_procs)
             end
           end
 
           after(unless: :tty?) do
             puts verbose_container_procs.map { |p| p[1].call(asset_containers_record) }.join("\t")
-            asset_containers_record.childContainers.each do |child|
+            children.each do |child|
               puts verbose_child_procs.map { |p| p[1].call(child) }.join("\t")
             end
-            asset_containers_record.assets.each do |asset|
-              puts verbose_child_procs.map { |p| p[1].call(asset) }.join("\t")
+          end
+        end
+
+        def children
+          [
+            *asset_containers_record.childContainers.to_a,
+            *asset_containers_record.assets.to_a
+          ].sort do |first, second|
+            y_comp = (first.yStartPosition <=> second.yStartPosition)
+            if y_comp == 0
+              first.xStartPosition <=> second.xStartPosition
+            else
+              y_comp
             end
           end
         end
