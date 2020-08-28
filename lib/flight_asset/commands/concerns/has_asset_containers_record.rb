@@ -32,28 +32,27 @@ module FlightAsset
         extend ActiveSupport::Concern
         included do
           after(if: :tty?) do
-            if verbose?
-              puts render_element(asset_containers_record, verbose_container_procs)
-            else
-              puts render_element(asset_containers_record, simplified_container_procs)
-            end
+            procs = (verbose? ? verbose_container_procs : simplified_container_procs)
+            puts render_element(asset_containers_record, procs)
+
+            child_procs = (verbose? ? verbose_child_procs : simplified_child_procs)
             asset_containers_record.childContainers.each do |child|
               puts
-              puts render_element(child, tty_child_container_procs)
+              puts render_element(child, child_procs)
             end
             asset_containers_record.assets.each do |asset|
               puts
-              puts render_element(asset, tty_asset_procs)
+              puts render_element(asset, child_procs)
             end
           end
 
           after(unless: :tty?) do
             puts verbose_container_procs.map { |p| p[1].call(asset_containers_record) }.join("\t")
             asset_containers_record.childContainers.each do |child|
-              puts non_tty_child_container_procs.map { |p| p[1].call(child) }.join("\t")
+              puts verbose_child_procs.map { |p| p[1].call(child) }.join("\t")
             end
             asset_containers_record.assets.each do |asset|
-              puts non_tty_asset_procs.map { |p| p[1].call(asset) }.join("\t")
+              puts verbose_child_procs.map { |p| p[1].call(asset) }.join("\t")
             end
           end
         end
@@ -88,20 +87,30 @@ module FlightAsset
         end
 
         ##
-        # These procs take the child container record directly
-        def tty_child_container_procs
+        # These procs are rendered for each child of the container. A child could be another container
+        # or an asset
+        def base_child_procs
           [
             ['Location', ->(a) { a.name }],
-            *xy_coordinate_procs
+            ['Type', ->(a) { a.is_a?(AssetsRecord) ? 'asset' : 'container' }]
           ]
         end
 
         ##
-        # These procs take the child container record directly
-        def non_tty_child_container_procs
+        # These procs render the verbose child outputs
+        def verbose_child_procs
           [
-            [nil, ->(a) { a.name }],
+            *base_child_procs,
             *verbose_xy_coordinate_procs
+          ]
+        end
+
+        ##
+        # These proocs render the simplified child output
+        def simplified_child_procs
+          [
+            *base_child_procs,
+            *xy_coordinate_procs
           ]
         end
 
@@ -124,25 +133,6 @@ module FlightAsset
             ['X End Position', ->(a) { a.xEndPosition || tty_none_or_nil }],
             ['Y Start Position', ->(a) { a.yStartPosition || tty_none_or_nil }],
             ['Y End Position', ->(a) { a.yEndPosition || tty_none_or_nil }]
-          ]
-        end
-
-        ##
-        # These procs take the asset record directly
-        def tty_asset_procs
-          [
-            ['Location', ->(a) { "asset - #{a.name}" }],
-            *xy_coordinate_procs
-          ]
-        end
-
-        ##
-        # These procs take the asset record directly
-        def non_tty_asset_procs
-          [
-            [nil, ->(a) { a.name }],
-            [nil, ->(_) { 'asset' }],
-            *verbose_xy_coordinate_procs
           ]
         end
       end
