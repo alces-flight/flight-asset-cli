@@ -94,20 +94,13 @@ module FlightAsset
         end
 
         ##
-        # These procs are rendered for each child of the container. A child could be another container
-        # or an asset
-        def base_child_procs
-          [
-            ['Location', ->(a) { a.name }],
-            ['Type', ->(a) { a.is_a?(AssetsRecord) ? 'asset' : 'container' }]
-          ]
-        end
-
-        ##
         # These procs render the verbose child outputs
         def verbose_child_procs
           [
-            *base_child_procs,
+            ['Location', ->(a) { a.name }],
+            ['(placeholder)', ->(_) { '' }],
+            ['(placeholder)', ->(_) { '' }],
+            ['Type', ->(a) { a.is_a?(AssetsRecord) ? 'asset' : 'container' }],
             *verbose_xy_coordinate_procs
           ]
         end
@@ -116,7 +109,8 @@ module FlightAsset
         # These proocs render the simplified child output
         def simplified_child_procs
           [
-            *base_child_procs,
+            ['Location', ->(a) { a.name }],
+            ['Type', ->(a) { a.is_a?(AssetsRecord) ? 'asset' : 'container' }],
             *xy_coordinate_procs
           ]
         end
