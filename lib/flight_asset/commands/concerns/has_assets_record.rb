@@ -82,7 +82,7 @@ module FlightAsset
                 if a.parentContainer.nil?
                   tty_none_or_nil
                 else
-                  "#{a.parentContainer.containerType} - #{a.parentContainer.name}"
+                  a.parentContainer.name
                 end
               end]
               t << ['X Position', ->(a) do
