@@ -37,7 +37,6 @@ module FlightAsset
       # Ensures the "option flags" are specified
       before do
         missing = [].tap do |a|
-          a << '--type TYPE'          unless opts.type
           a << '--x-capacity WIDTH'   unless opts.x_capacity
           a << '--y-capacity HEIGHT'  unless opts.y_capacity
         end.join(' ')
@@ -79,6 +78,15 @@ module FlightAsset
             end
           end
         )
+      rescue SimpleJSONAPIClient::Errors::APIError => e
+        # Checks if the error was likely due to an unrecognised type
+        if e.status == 500 && !Config::CACHE.container_types.include?(opts.type)
+          raise InputError, <<~ERROR.chomp
+            Unrecognized container type: #{opts.type}
+          ERROR
+        else
+          raise e
+        end
       end
     end
   end
