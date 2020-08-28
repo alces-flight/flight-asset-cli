@@ -78,7 +78,7 @@ module FlightAsset
                 a.yEndPosition || tty_none_or_nil
               end]
             else
-              t << ['ParentContainer', ->(a) do
+              t << ['Parent Container', ->(a) do
                 if a.parentContainer.nil?
                   tty_none_or_nil
                 else

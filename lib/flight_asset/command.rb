@@ -133,7 +133,7 @@ module FlightAsset
       end
 
       # Determines the maximum width header for padding
-      max = data.max { |h, v| h.length }[0].length
+      max = data.max { |(h1, _v1), (h2, _v2)| h1.length <=> h2.length }[0].length
 
       # Renders the data into a padded string
       combined = data.reduce('') do |memo, (header, value)|

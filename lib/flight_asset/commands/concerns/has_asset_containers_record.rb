@@ -30,23 +30,12 @@ module FlightAsset
     module Concerns
       module HasAssetContainersRecord
         extend ActiveSupport::Concern
-        XY_COORDINATE_PROCS = [
-          ['X Position', ->(a) { "#{a.xStartPosition} - #{a.xEndPosition}" }],
-          ['Y Position', ->(a) { "#{a.yStartPosition} - #{a.yEndPosition}" }]
-        ]
-        VERBOSE_XY_COORDINATE_PROCS = [
-          [nil, ->(a) { a.xStartPosition }],
-          [nil, ->(a) { a.xEndPosition }],
-          [nil, ->(a) { a.yStartPosition }],
-          [nil, ->(a) { a.yEndPosition }]
-        ]
-
         included do
           after(if: :tty?) do
-            puts render_element(asset_containers_record, container_procs)
-            unless asset_containers_record.parentContainer.nil?
-              puts
-              puts render_element(asset_containers_record, tty_parent_container_procs)
+            if verbose?
+              puts render_element(asset_containers_record, verbose_container_procs)
+            else
+              puts render_element(asset_containers_record, simplified_container_procs)
             end
             asset_containers_record.childContainers.each do |child|
               puts
@@ -59,12 +48,7 @@ module FlightAsset
           end
 
           after(unless: :tty?) do
-            puts container_procs.map { |p| p[1].call(asset_containers_record) }.join("\t")
-            if asset_containers_record.parentContainer.nil?
-              puts
-            else
-              puts non_tty_parent_container_procs.map { |p| p[1].call(asset_containers_record) }.join("\t")
-            end
+            puts verbose_container_procs.map { |p| p[1].call(asset_containers_record) }.join("\t")
             asset_containers_record.childContainers.each do |child|
               puts non_tty_child_container_procs.map { |p| p[1].call(child) }.join("\t")
             end
@@ -74,31 +58,32 @@ module FlightAsset
           end
         end
 
-        def container_procs
+        ##
+        # The container procs which appear in all outputs
+        def base_container_procs
           [
             ['Name', ->(a) { a.name }],
-            ['X Capacity', ->(a) { a.xCapacity }],
-            ['Y Capacity', ->(a) { a.yCapacity }]
+            ['X Capacity', ->(a) { a.xCapacity } || tty_none_or_nil],
+            ['Y Capacity', ->(a) { a.yCapacity || tty_none_or_nil }],
+            ['Parent Container', ->(a) { ((p = a.parentContainer).nil? ? nil : p.name ) || tty_none_or_nil }]
           ]
         end
 
         ##
-        # These procs take the original container as their input as this is
-        # where the start/stop positions are stored
-        def tty_parent_container_procs
+        # The container procs for the simplified TTY output
+        def simplified_container_procs
           [
-            ['Location', ->(a) { a.parentContainer.name }],
-            *XY_COORDINATE_PROCS
+            *base_container_procs,
+            *xy_coordinate_procs
           ]
         end
 
         ##
-        # These procs take the original container as their input as this is
-        # where the start/stop positions are stored
-        def non_tty_parent_container_procs
+        # The container procs for non-tty outputs
+        def verbose_container_procs
           [
-            [nil, ->(a) { a.parentContainer.name }],
-            *VERBOSE_XY_COORDINATE_PROCS
+            *base_container_procs,
+            *verbose_xy_coordinate_procs
           ]
         end
 
@@ -107,7 +92,7 @@ module FlightAsset
         def tty_child_container_procs
           [
             ['Location', ->(a) { a.name }],
-            *XY_COORDINATE_PROCS
+            *xy_coordinate_procs
           ]
         end
 
@@ -116,7 +101,29 @@ module FlightAsset
         def non_tty_child_container_procs
           [
             [nil, ->(a) { a.name }],
-            *VERBOSE_XY_COORDINATE_PROCS
+            *verbose_xy_coordinate_procs
+          ]
+        end
+
+        def xy_coordinate_procs
+          [
+            ['X Position', ->(a) do
+              return tty_none_or_nil unless a.xStartPosition && a.xEndPosition
+              "#{a.xStartPosition} - #{a.xEndPosition}"
+            end],
+            ['Y Position', ->(a) do
+              return tty_none_or_nil unless a.yStartPosition && a.yEndPosition
+              "#{a.yStartPosition} - #{a.yEndPosition}"
+            end]
+          ]
+        end
+
+        def verbose_xy_coordinate_procs
+          [
+            ['X Start Position', ->(a) { a.xStartPosition || tty_none_or_nil }],
+            ['X End Position', ->(a) { a.xEndPosition || tty_none_or_nil }],
+            ['Y Start Position', ->(a) { a.yStartPosition || tty_none_or_nil }],
+            ['Y End Position', ->(a) { a.yEndPosition || tty_none_or_nil }]
           ]
         end
 
@@ -125,7 +132,7 @@ module FlightAsset
         def tty_asset_procs
           [
             ['Location', ->(a) { "asset - #{a.name}" }],
-            *XY_COORDINATE_PROCS
+            *xy_coordinate_procs
           ]
         end
 
@@ -135,7 +142,7 @@ module FlightAsset
           [
             [nil, ->(a) { a.name }],
             [nil, ->(_) { 'asset' }],
-            *VERBOSE_XY_COORDINATE_PROCS
+            *verbose_xy_coordinate_procs
           ]
         end
       end
