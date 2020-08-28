@@ -65,13 +65,6 @@ module FlightAsset
                   a.parentContainer.name
                 end
               end]
-              t << ['Container Type', ->(a) do
-                if a.parentContainer.nil?
-                  tty_none_or_nil
-                else
-                  a.parentContainer.containerType
-                end
-              end]
               t << ['X Start Position', ->(a) do
                 a.xStartPosition || tty_none_or_nil
               end]

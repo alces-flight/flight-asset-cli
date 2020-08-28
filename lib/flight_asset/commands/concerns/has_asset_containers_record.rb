@@ -77,7 +77,6 @@ module FlightAsset
         def container_procs
           [
             ['Name', ->(a) { a.name }],
-            ['Type', ->(a) { a.containerType }],
             ['X Capacity', ->(a) { a.xCapacity }],
             ['Y Capacity', ->(a) { a.yCapacity }]
           ]
@@ -88,7 +87,7 @@ module FlightAsset
         # where the start/stop positions are stored
         def tty_parent_container_procs
           [
-            ['Location', ->(a) { "#{a.parentContainer.containerType} - #{a.parentContainer.name}" }],
+            ['Location', ->(a) { a.parentContainer.name }],
             *XY_COORDINATE_PROCS
           ]
         end
@@ -99,7 +98,6 @@ module FlightAsset
         def non_tty_parent_container_procs
           [
             [nil, ->(a) { a.parentContainer.name }],
-            [nil, ->(a) { a.parentContainer.containerType }],
             *VERBOSE_XY_COORDINATE_PROCS
           ]
         end
@@ -108,7 +106,7 @@ module FlightAsset
         # These procs take the child container record directly
         def tty_child_container_procs
           [
-            ['Location', ->(a) { "#{a.containerType} - #{a.name}" }],
+            ['Location', ->(a) { a.name }],
             *XY_COORDINATE_PROCS
           ]
         end
@@ -118,7 +116,6 @@ module FlightAsset
         def non_tty_child_container_procs
           [
             [nil, ->(a) { a.name }],
-            [nil, ->(a) { a.containerType }],
             *VERBOSE_XY_COORDINATE_PROCS
           ]
         end
