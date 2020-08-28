@@ -46,7 +46,7 @@ module FlightAsset
 
       def valid_method_signature?
         case args.length
-        when 1, 6
+        when 6
           true
         when 2
           args[1] == ''
@@ -56,7 +56,7 @@ module FlightAsset
       end
 
       def parent_name
-        (args.length > 2 && args[1] != '') ? args[1] : nil
+        args[1] == '' ? nil : args[1]
       end
 
       def request_parent_input
