@@ -35,6 +35,9 @@ module FlightAsset
             procs = (verbose? ? verbose_container_procs : simplified_container_procs)
             puts render_element(asset_containers_record, procs)
 
+            puts
+            puts 'Contains the following:'
+
             child_procs = (verbose? ? verbose_child_procs : simplified_child_procs)
             children.each do |child|
               puts
