@@ -35,25 +35,30 @@ module FlightAsset
             procs = (verbose? ? verbose_container_procs : simplified_container_procs)
             puts render_element(asset_containers_record, procs)
 
-            puts
-            puts 'Contains the following:'
-
-            child_procs = (verbose? ? verbose_child_procs : simplified_child_procs)
-            children.each do |child|
+            if (children = load_children).any?
               puts
-              puts render_element(child, child_procs)
+              puts Paint['Contains the following:', '#2794d8']
+
+              child_procs = (verbose? ? verbose_child_procs : simplified_child_procs)
+              children.each do |child|
+                puts
+                puts render_element(child, child_procs)
+              end
+            else
+              puts
+              puts Paint['The container is empty!', :red]
             end
           end
 
           after(unless: :tty?) do
             puts verbose_container_procs.map { |p| p[1].call(asset_containers_record) }.join("\t")
-            children.each do |child|
+            load_children.each do |child|
               puts verbose_child_procs.map { |p| p[1].call(child) }.join("\t")
             end
           end
         end
 
-        def children
+        def load_children
           [
             *asset_containers_record.childContainers.to_a,
             *asset_containers_record.assets.to_a
