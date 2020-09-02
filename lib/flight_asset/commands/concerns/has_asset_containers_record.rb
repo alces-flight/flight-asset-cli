@@ -97,7 +97,7 @@ module FlightAsset
         # These procs render the verbose child outputs
         def verbose_child_procs
           [
-            ['Location', ->(a) { a.name }],
+            ['Name', ->(a) { a.name }],
             ['(placeholder)', ->(_) { '' }],
             ['(placeholder)', ->(_) { '' }],
             ['Type', ->(a) { a.is_a?(AssetsRecord) ? 'asset' : 'container' }],
@@ -109,7 +109,7 @@ module FlightAsset
         # These proocs render the simplified child output
         def simplified_child_procs
           [
-            ['Location', ->(a) { a.name }],
+            ['Name', ->(a) { a.name }],
             ['Type', ->(a) { a.is_a?(AssetsRecord) ? 'asset' : 'container' }],
             *xy_coordinate_procs
           ]
