@@ -46,7 +46,7 @@ module FlightAsset
               end
             else
               puts
-              puts Paint['The container is empty!', :red]
+              puts Paint['The container is empty.', '#2794d8']
             end
           end
 
