@@ -107,6 +107,10 @@ module FlightAsset
       c.summary = 'Reposition an asset within a container'
     end
 
+    create_command 'orphan-asset', 'ASSET' do |c|
+      c.summary = 'Remove an asset from its container'
+    end
+
     create_command 'decommission-asset', 'ASSET' do |c|
       c.summary = 'Flag that an asset has been decommissioned'
     end
@@ -193,6 +197,10 @@ module FlightAsset
 
     create_command 'move-container', 'CONTAINER PARENT X_START X_END Y_START Y_END' do |c|
       c.summary = 'Reposition a container within another container'
+    end
+
+    create_command 'orphan-container', 'CONTAINER' do |c|
+      c.summary = 'Remove a container from its parent container'
     end
 
     create_command 'remove-container', 'CONTAINER' do |c|

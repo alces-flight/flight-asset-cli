@@ -27,35 +27,27 @@
 
 module FlightAsset
   module Commands
-    class MoveAsset < FlightAsset::Command
+    class OrphanAsset < FlightAsset::Command
       include Concerns::HasAssetsRecord
       include Concerns::BeforeConfiguredCheck
 
       define_args :name
       attr_reader :assets_record
 
-      def parent_name
-        args[1]
-      end
-
-      def parent_container
-        @parent_container ||= request_asset_containers_record_by_name(args[1])
-      end
-
       def run
         @assets_record ||= begin
           g = request_assets_record_by_name(name)
           updates = {
-            x_start_position: args[2],
-            xStartPosition: args[2],
-            x_end_position: args[3],
-            xEndPosition: args[3],
-            y_start_position: args[4],
-            yStartPosition: args[4],
-            y_end_position: args[5],
-            yEndPosition: args[5],
-            parent_container: parent_container,
-            parentContainer: parent_container
+            x_start_position: nil,
+            xStartPosition: nil,
+            x_end_position: nil,
+            xEndPosition: nil,
+            y_start_position: nil,
+            yStartPosition: nil,
+            y_end_position: nil,
+            yEndPosition: nil,
+            parent_container: NilRecord,
+            parentContainer: NilRecord
           }
           g.update(**updates)
         end

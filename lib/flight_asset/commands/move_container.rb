@@ -53,13 +53,6 @@ module FlightAsset
             parent_container: parent_container,
             parentContainer: parent_container
           }
-          # else
-          #   updates[:x_start_position] = updates[:xStartPosition] = nil
-          #   updates[:y_start_position] = updates[:yStartPosition] = nil
-          #   updates[:x_end_position] = updates[:xEndPosition] = nil
-          #   updates[:y_end_position] = updates[:yEndPosition] = nil
-          #   updates[:parent_container] = updates[:parentContainer] = NilRecord
-          # end
           g.update(**updates)
         end
       end
