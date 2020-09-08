@@ -203,12 +203,6 @@ module FlightAsset
       c.summary = 'Remove a container from its parent container'
     end
 
-    create_command 'remove-container', 'CONTAINER' do |c|
-      c.summary = 'Permanently destroy a container'
-      c.hidden
-      c.action { raise InternalError, 'Currently not supoorted!' }
-    end
-
     alias_regex = /-assets?\Z/
     commands.keys
             .select { |c| c.match?(alias_regex) }
