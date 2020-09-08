@@ -195,6 +195,10 @@ module FlightAsset
       c.slop.integer '--y-capacity', 'Define the hieght', meta: 'HEIGHT'
     end
 
+    create_command 'delete-container', 'CONTAINER' do |c|
+      c.summary = 'Permanently destroy an empty container'
+    end
+
     create_command 'move-container', 'CONTAINER PARENT X_START X_END Y_START Y_END' do |c|
       c.summary = 'Reposition a container within another container'
     end
