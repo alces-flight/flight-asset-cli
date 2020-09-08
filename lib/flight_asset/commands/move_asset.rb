@@ -34,52 +34,36 @@ module FlightAsset
       define_args :name
       attr_reader :assets_record
 
-      # Error if their are missing coordinates
-      before(unless: :valid_method_signature?) do
-        metas = ['X_START',  'X_END', 'Y_START', 'Y_END']
-        (args.length - 2).times { metas.shift }
-        raise InputError, <<~ERROR
-          Insufficient inputs to move the container! Please try again with all the cooridinates set:
-          #{Paint["#{Config::CACHE.app_name} #{args.join(' ')} #{metas.join(' ')}", :yellow]}
-        ERROR
-      end
-
-      def valid_method_signature?
-        case args.length
-        when 6
-          true
-        when 2
-          args[1] == ''
-        else
-          false
-        end
-      end
-
       def parent_name
-        args[1] == '' ? nil : args[1]
+        args[1]
       end
 
-      def request_parent_input
-        request_asset_containers_record_by_name(parent_name)
+      def parent_container
+        @parent_container ||= request_asset_containers_record_by_name(args[1])
       end
 
       def run
         @assets_record ||= begin
           g = request_assets_record_by_name(name)
-          updates = {}
-          if parent_name
-            updates[:x_start_position] = updates[:xStartPosition] = args[2]
-            updates[:x_end_position] = updates[:xEndPosition] = args[3]
-            updates[:y_start_position] = updates[:yStartPosition] = args[4]
-            updates[:y_end_position] = updates[:yEndPosition] = args[5]
-            updates[:parent_container] = updates[:parentContainer] = request_parent_input
-          else
-            updates[:x_start_position] = updates[:xStartPosition] = nil
-            updates[:y_start_position] = updates[:yStartPosition] = nil
-            updates[:x_end_position] = updates[:xEndPosition] = nil
-            updates[:y_end_position] = updates[:yEndPosition] = nil
-            updates[:parent_container] = updates[:parentContainer] = NilRecord
-          end
+          updates = {
+            x_start_position: args[2],
+            xStartPosition: args[2],
+            x_end_position: args[3],
+            xEndPosition: args[3],
+            y_start_position: args[4],
+            yStartPosition: args[4],
+            y_end_position: args[5],
+            yEndPosition: args[5],
+            parent_container: parent_container,
+            parentContainer: parent_container
+          }
+          # else
+          #   updates[:x_start_position] = updates[:xStartPosition] = nil
+          #   updates[:y_start_position] = updates[:yStartPosition] = nil
+          #   updates[:x_end_position] = updates[:xEndPosition] = nil
+          #   updates[:y_end_position] = updates[:yEndPosition] = nil
+          #   updates[:parent_container] = updates[:parentContainer] = NilRecord
+          # end
           g.update(**updates)
         end
       end

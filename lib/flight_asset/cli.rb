@@ -103,8 +103,8 @@ module FlightAsset
       INFO_FLAG.call(c)
     end
 
-    create_command 'move-asset', 'ASSET PARENT_CONTAINER [X_START] [X_END] [Y_START] [Y_END]' do |c|
-      c.summary = 'Reposition (or orphan) an asset within a container'
+    create_command 'move-asset', 'ASSET PARENT_CONTAINER X_START X_END Y_START Y_END' do |c|
+      c.summary = 'Reposition an asset within a container'
     end
 
     create_command 'decommission-asset', 'ASSET' do |c|
@@ -191,8 +191,8 @@ module FlightAsset
       c.slop.integer '--y-capacity', 'Define the hieght', meta: 'HEIGHT'
     end
 
-    create_command 'move-container', 'CONTAINER PARENT [X_START] [X_END] [Y_START] [Y_END]' do |c|
-      c.summary = 'Reposition (or orphan) a container within another'
+    create_command 'move-container', 'CONTAINER PARENT X_START X_END Y_START Y_END' do |c|
+      c.summary = 'Reposition a container within another container'
     end
 
     create_command 'remove-container', 'CONTAINER' do |c|
