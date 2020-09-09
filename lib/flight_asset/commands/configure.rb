@@ -30,6 +30,17 @@ module FlightAsset
   module Commands
     class Configure < Command
       def run
+        if tty? && opts.select { |_, v| v }.empty?
+          # Run interactively if connected to a TTY without options
+          run_interactive
+        else
+          # Run non interactively
+          run_non_interactive
+        end
+      end
+
+
+      def run_interactive
         old = Config::CACHE.load_credentials
         data = CredentialsConfig.new
         data.component_id = prompt.ask  'Component Identifier:',
@@ -46,6 +57,15 @@ module FlightAsset
                     YAML.dump(data.to_h)
       end
 
+      def run_non_interactive
+        if opts.jwt
+          data = Config::CACHE.load_credentials
+          data.jwt = opts.jwt
+          FileUtils.mkdir_p File.dirname(Config::CACHE.credentials_path)
+          File.write  Config::CACHE.credentials_path,
+                      YAML.dump(data.to_h)
+        end
+      end
 
       def masked_jwt(jwt)
         return nil if jwt.nil?

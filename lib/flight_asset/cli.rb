@@ -56,6 +56,7 @@ module FlightAsset
 
     create_command 'configure' do |c|
       c.summary = 'Configure the application'
+      c.slop.string '--jwt', 'Update the API access token. Unset with empty string: '''
     end
 
     global_slop.bool '--verbose', <<~DESC.chomp
