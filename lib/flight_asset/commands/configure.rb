@@ -58,13 +58,12 @@ module FlightAsset
       end
 
       def run_non_interactive
-        if opts.jwt
-          data = Config::CACHE.load_credentials
-          data.jwt = opts.jwt
-          FileUtils.mkdir_p File.dirname(Config::CACHE.credentials_path)
-          File.write  Config::CACHE.credentials_path,
-                      YAML.dump(data.to_h)
-        end
+        data = Config::CACHE.load_credentials
+        data.jwt = opts.jwt if opts.jwt
+        data.component_id = opts.component_id if opts.component_id
+        FileUtils.mkdir_p File.dirname(Config::CACHE.credentials_path)
+        File.write  Config::CACHE.credentials_path,
+                    YAML.dump(data.to_h)
       end
 
       def masked_jwt(jwt)
