@@ -122,6 +122,29 @@ module FlightAsset
     end
 
     ##
+    # Renders an element against a set of transform functions and
+    # generates the formatted output
+    def render_element(element, transforms)
+      # Converts procs to prettified data
+      data = transforms.map do |key, proc|
+        header = Paint[key + ':', '#2794d8']
+        value = Paint[proc.call(element), :green]
+        [header, value]
+      end
+
+      # Determines the maximum width header for padding
+      max = data.max { |(h1, _v1), (h2, _v2)| h1.length <=> h2.length }[0].length
+
+      # Renders the data into a padded string
+      combined = data.reduce('') do |memo, (header, value)|
+        memo << "#{' ' * (max - header.length)}#{header} #{value}\n"
+      end
+
+      # Removes the trailing endline charcter
+      combined[0..-2]
+    end
+
+    ##
     # Caches the credentials object
     def credentials
       @credentials ||= Config::CACHE.load_credentials
@@ -229,27 +252,34 @@ module FlightAsset
       end
     end
 
-    ##
-    # DEPRECATED: This method will be removed in version 2
-    def request_assets_record_move_asset_group(assets_record, asset_groups_record = nil)
-      rel_url = assets_record.asset_group_relationship_url
-      data = asset_groups_record&.to_relationship
-      connection.patch(rel_url, { data: data })
-      AssetsRecord.fetch(
-        connection: connection, url_opts: { id: assets_record.id }
-      )
+    def request_asset_containers_records
+      AssetContainersRecord.index_enum(connection: connection)
     end
 
-    ##
-    # DEPRECATED: This method will be removed in version 2
-    def request_asset_groups_record_move_category(asset_groups_record, category_record = nil)
-      rel_url = asset_groups_record.category_relationship_url
-      data = category_record&.to_relationship
-      connection.patch(rel_url, { data: data })
-      AssetGroupsRecord.fetch(
-        connection: connection, url_opts: { id: asset_groups_record.id }
-      )
+    def request_asset_containers_record_by_name(name, error: true, verbose: false)
+      containers = request_asset_containers_records.select { |a| a.name == name }
+      if error && containers.empty?
+        raise ContainerMissing, <<~ERROR.chomp
+          Could not locate container: #{name}
+        ERROR
+      elsif containers.length > 1
+        # NOTE: This error is unrecoverable and can not be skipped
+        raise DuplicateError, <<~ERROR.chomp
+          Found multiple copies of container: #{name}
+          Contact your system administrator for further assistance
+        ERROR
+      elsif containers.length == 1
+        id = containers.first.id
+        if verbose
+          AssetContainersRecord.fetch(connection: connection,
+                                      url_opts: { id: id },
+                                      includes: ['assets', 'parent', 'child_containers'])
+        else
+          AssetContainersRecord.fetch(connection: connection, url_opts: { id: id })
+        end
+      else
+        nil
+      end
     end
   end
 end
-

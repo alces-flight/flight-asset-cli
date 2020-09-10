@@ -27,24 +27,20 @@
 
 module FlightAsset
   module Commands
-    class MoveAsset < FlightAsset::Command
-      include Concerns::HasAssetsRecord
+    class MoveContainer < FlightAsset::Command
+      include Concerns::HasAssetContainersRecord
       include Concerns::BeforeConfiguredCheck
 
       define_args :name
-      attr_reader :assets_record
-
-      def parent_name
-        args[1]
-      end
+      attr_reader :asset_containers_record
 
       def parent_container
         @parent_container ||= request_asset_containers_record_by_name(args[1])
       end
 
       def run
-        @assets_record ||= begin
-          g = request_assets_record_by_name(name)
+        @asset_containers_record ||= begin
+          g = request_asset_containers_record_by_name(name)
           updates = {
             x_start_position: args[2],
             xStartPosition: args[2],

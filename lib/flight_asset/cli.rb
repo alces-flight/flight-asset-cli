@@ -1,4 +1,4 @@
-#==============================================================================
+#==============================================================================]
 # Copyright (C) 2019-present Alces Flight Ltd.
 #
 # This file is part of Flight Asset.
@@ -28,6 +28,7 @@
 require 'commander'
 
 require_relative 'version'
+require_relative 'errors'
 
 module FlightAsset
   class CLI
@@ -55,6 +56,8 @@ module FlightAsset
 
     create_command 'configure' do |c|
       c.summary = 'Configure the application'
+      c.slop.string '--jwt', "Update the API access token. Unset with empty string: ''"
+      c.slop.string '--component-id', "Update the component by its ID. Unset with empty string ''"
     end
 
     global_slop.bool '--verbose', <<~DESC.chomp
@@ -102,6 +105,14 @@ module FlightAsset
       INFO_FLAG.call(c)
     end
 
+    create_command 'move-asset', 'ASSET PARENT_CONTAINER X_START X_END Y_START Y_END' do |c|
+      c.summary = 'Reposition an asset within a container'
+    end
+
+    create_command 'orphan-asset', 'ASSET' do |c|
+      c.summary = 'Remove an asset from its container'
+    end
+
     create_command 'decommission-asset', 'ASSET' do |c|
       c.summary = 'Flag that an asset has been decommissioned'
     end
@@ -124,17 +135,6 @@ module FlightAsset
       INFO_FLAG.call(c)
     end
 
-    create_command 'move-asset', 'ASSET [GROUP]' do |c|
-      c.summary = "Legacy command to modify an asset's group"
-      c.description = <<~DESC.chomp
-        This command has been deprecated and will be repurposed in the next major release.
-
-        Please use the following:
-        #{Config::CACHE.app_name} update-asset ASSET --group GROUP
-      DESC
-      c.hidden
-    end
-
     create_command 'list-groups' do |c|
       c.summary = 'Return all the groups'
       NAMED_FILTER.call(c, single: 'CATEGORY', plurals: 'groups')
@@ -151,7 +151,7 @@ module FlightAsset
     end
 
     create_command 'update-group', 'GROUP' do |c|
-      c.summary = 'Modify the genders name for a group'
+      c.summary = 'Modify an existing group'
       c.slop.string '--genders-name', 'Update the genders name', meta: 'NAME'
       c.slop.string '--category', <<~DESC.chomp
         Assign the group to a different category. Empty string will unassign the category
@@ -166,19 +166,47 @@ module FlightAsset
       c.summary = 'Unsets the decommissioned flag on a group'
     end
 
-    create_command 'move-group', 'GROUP [CATEGORY]' do |c|
-      c.summary = "Legacy command to modify a group's category"
-      c.description = <<~DESC.chomp
-        This command has been deprecated and will be repurposed in the next major release.
-
-        Please use the following:
-        #{Config::CACHE.app_name} update-group GROUP --category CATEGORY
-      DESC
-      c.hidden
-    end
-
     create_command 'list-categories' do |c|
       c.summary = 'Return all the categories'
+    end
+
+    create_command 'list-containers' do |c|
+      c.summary = 'Return all the containers'
+    end
+
+    create_command 'show-container', 'CONTAINER' do |c|
+      c.summary = 'Return the detailed description of a container'
+    end
+
+    create_command 'create-container', 'CONTAINER' do |c|
+      c.summary = 'Define a new container'
+      c.slop.string '--type', 'Specify the container type',
+                    meta: Config::CACHE.container_types.join('|'),
+                    default: Config::CACHE.container_types.first
+      # Commander has a bug (feature?) where it strips non-integers from c.slop.integer flags
+      # This is likely a integration issue between Commander and Slop
+      # Regardless it leads to funky error handling
+      c.slop.string '--x-capacity', 'Specify a new width', meta: 'WIDTH'
+      c.slop.string '--y-capacity', 'Specify a new hieght', meta: 'HEIGHT'
+    end
+
+    create_command 'update-container', 'CONTAINER' do |c|
+      c.summary = 'Modify an existing container'
+      c.slop.string '--type', 'Select the type of the container'
+      c.slop.integer '--x-capacity', 'Define the width', meta: 'WIDTH'
+      c.slop.integer '--y-capacity', 'Define the hieght', meta: 'HEIGHT'
+    end
+
+    create_command 'delete-container', 'CONTAINER' do |c|
+      c.summary = 'Permanently destroy an empty container'
+    end
+
+    create_command 'move-container', 'CONTAINER PARENT X_START X_END Y_START Y_END' do |c|
+      c.summary = 'Reposition a container within another container'
+    end
+
+    create_command 'orphan-container', 'CONTAINER' do |c|
+      c.summary = 'Remove a container from its parent container'
     end
 
     alias_regex = /-assets?\Z/

@@ -1,4 +1,3 @@
-#!/usr/bin/env ruby
 #==============================================================================
 # Copyright (C) 2019-present Alces Flight Ltd.
 #
@@ -26,31 +25,34 @@
 # https://github.com/alces-flight/alces-flight/flight-asset-cli
 #==============================================================================
 
-# Sets up bundler
-ENV['BUNDLE_GEMFILE'] ||= File.join(__dir__, '../Gemfile')
-require 'rubygems'
-require 'bundler'
-Bundler.setup(:default)
+module FlightAsset
+  module Commands
+    class UpdateContainer < FlightAsset::Command
+      include Concerns::HasAssetContainersRecord
+      include Concerns::BeforeConfiguredCheck
 
-# Uses the first argument as the config path
-args = ARGV.dup
-module FlightAsset; end
-FlightAsset.const_set('CONFIG_PATH', args.shift)
-require_relative '../lib/flight_asset/config'
+      define_args :name
+      attr_reader :asset_containers_record
 
-# Enables the development mode
-if FlightAsset::Config::CACHE.development?
-  begin
-      Bundler.setup(:default, :development)
-      require 'pry'
-      require 'pry-byebug'
-  rescue StandardError, LoadError
-    Bundler.setup(:default)
-    $stderr.puts "An error occurred when enabling development mode!"
+      def run
+        @asset_containers_record ||= begin
+          g = request_asset_containers_record_by_name(name)
+          updates = {}
+          if opts.type
+            updates[:containerType] = opts.type
+            updates[:container_type] = opts.type
+          end
+          if opts.x_capacity
+            updates[:xCapacity] = opts.x_capacity
+            updates[:x_capacity] = opts.x_capacity
+          end
+          if opts.y_capacity
+            updates[:yCapacity] = opts.y_capacity
+            updates[:y_capacity] = opts.y_capacity
+          end
+          g.update(**updates)
+        end
+      end
+    end
   end
 end
-
-# Builds and runs the CLI
-require_relative '../lib/flight_asset/cli'
-FlightAsset::CLI.run!(*args)
-

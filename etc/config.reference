@@ -50,6 +50,16 @@ config :base_url, default: 'https://center.alces-flight.com/api'
 config :api_prefix, default: 'v1'
 
 # ==============================================================================
+# Container Types
+# The valid container types displayed in the CLI and error messages. Note they
+# are not validated pre-request. This allows the server to add additional types
+# without updating this list.
+#
+# The first type is doubles as the default to the create command.
+# ==============================================================================
+config :container_types, default: ['generic', 'rack', 'room', 'chassis']
+
+# ==============================================================================
 # Create Support Type
 # The support type all new assets are created as. This type can be overridden on
 # the command line. The valid options are: inherit, managed, and advice

@@ -38,6 +38,9 @@ require 'tty-editor'
 require 'tty-table'
 require 'tty-prompt'
 
+# Requires the patch(es)
+require_relative 'patches/simple_jsonapi_client'
+
 require 'active_support/callbacks'
 require 'active_support/concern'
 

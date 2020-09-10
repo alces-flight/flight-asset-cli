@@ -1,5 +1,5 @@
 #==============================================================================
-# Copyright (C) 2019-present Alces Flight Ltd.
+# Copyright (C) 2020-present Alces Flight Ltd.
 #
 # This file is part of Flight Asset.
 #
@@ -202,9 +202,14 @@ module FlightAsset
 
     fallback_meta :support_type_inherited
 
+    attributes :x_start_position, :xStartPosition, :x_end_position, :xEndPosition,
+               :y_start_position, :yStartPosition, :y_end_position, :yEndPosition
+
     has_one :component, class_name: 'FlightAsset::ComponentsRecord'
     has_one :asset_group, class_name: 'FlightAsset::AssetGroupsRecord'
     has_one :assetGroup, class_name: 'FlightAsset::AssetGroupsRecord'
+    has_one :parentContainer, class: 'FlightAsset::AssetContainersRecord'
+    has_one :parent_container, class: 'FlightAsset::AssetContainersRecord'
 
     def asset_group_or_missing
       key = ['asset_group', 'assetGroup'].find do |key|
@@ -284,5 +289,16 @@ module FlightAsset
       urls.first
     end
   end
-end
 
+  class AssetContainersRecord < AutoRecord
+    has_one :parentContainer, class: self.to_s
+    has_one :parent_container, class: self.to_s
+
+    has_many :childContainers, class:  self.to_s
+    has_many :assets, class: 'FlightAsset::AssetsRecord'
+
+    attributes :name, :xCapacity, :yCapacity, :containerType, :container_type, :x_capacity, :y_capacity,
+      :x_start_position, :xStartPosition, :x_end_position, :xEndPosition,
+      :y_start_position, :yStartPosition, :y_end_position, :yEndPosition
+  end
+end

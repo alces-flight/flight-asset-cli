@@ -56,7 +56,50 @@ module FlightAsset
           ].tap do |t|
             append_decommissioned(t)
 
-            t << ['ID', ->(a) { a.id }] if verbose?
+            if verbose?
+              t << ['ID', ->(a) { a.id }]
+              t << ['Parent Container', ->(a) do
+                if a.parentContainer.nil?
+                  tty_none_or_nil
+                else
+                  a.parentContainer.name
+                end
+              end]
+              t << ['X Start Position', ->(a) do
+                a.xStartPosition || tty_none_or_nil
+              end]
+              t << ['X End Position', ->(a) do
+                a.xEndPosition || tty_none_or_nil
+              end]
+              t << ['Y Start Position', ->(a) do
+                a.yStartPosition || tty_none_or_nil
+              end]
+              t << ['Y End Position', ->(a) do
+                a.yEndPosition || tty_none_or_nil
+              end]
+            else
+              t << ['Parent Container', ->(a) do
+                if a.parentContainer.nil?
+                  tty_none_or_nil
+                else
+                  a.parentContainer.name
+                end
+              end]
+              t << ['X Position', ->(a) do
+                if a.xStartPosition || a.xEndPosition
+                  "#{a.xStartPosition} - #{a.xEndPosition}"
+                else
+                  tty_none_or_nil
+                end
+              end]
+              t << ['Y Position', ->(a) do
+                if a.yStartPosition || a.yEndPosition
+                  "#{a.yStartPosition} - #{a.yEndPosition}"
+                else
+                  tty_none_or_nil
+                end
+              end]
+            end
 
             t << ['Additional Information', ->(a) do
               if tty? && a.info.to_s.length > 0

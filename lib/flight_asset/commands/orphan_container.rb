@@ -1,5 +1,5 @@
 #==============================================================================
-# Copyright (C) 2019-present Alces Flight Ltd.
+# Copyright (C) 2020-present Alces Flight Ltd.
 #
 # This file is part of Flight Asset.
 #
@@ -27,30 +27,30 @@
 
 module FlightAsset
   module Commands
-    class MoveGroup < FlightAsset::Command
-      include Concerns::HasAssetGroupsRecord
-      include Concerns::HasCategoryInput
+    class OrphanContainer < FlightAsset::Command
+      include Concerns::HasAssetContainersRecord
       include Concerns::BeforeConfiguredCheck
 
       define_args :name
-      attr_accessor :asset_groups_record
-
-      before do
-        category_name = args.length < 2 ? '' : args[1]
-        msg = <<~WARN.chomp
-          This command has been deprecated and will cease to function as expected in the
-          next major release. Please use the following:
-          #{Paint["#{Config::CACHE.app_name} update-group '#{name}' --category '#{category_name}'", :yellow]}
-        WARN
-        Config::CACHE.logger.warn msg
-        $stderr.puts msg
-      end
+      attr_reader :asset_containers_record
 
       def run
-        initial = request_asset_groups_record_by_name(name)
-        self.asset_groups_record = request_asset_groups_record_move_category(
-          initial, request_input_categories_record_or_nil
-        )
+        @asset_containers_record ||= begin
+          g = request_asset_containers_record_by_name(name)
+          updates = {
+            x_start_position: nil,
+            xStartPosition: nil,
+            x_end_position: nil,
+            xEndPosition: nil,
+            y_start_position: nil,
+            yStartPosition: nil,
+            y_end_position: nil,
+            yEndPosition: nil,
+            parent_container: NilRecord,
+            parentContainer: NilRecord
+          }
+          g.update(**updates)
+        end
       end
     end
   end

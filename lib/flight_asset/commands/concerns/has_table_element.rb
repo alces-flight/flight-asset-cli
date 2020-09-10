@@ -34,22 +34,7 @@ module FlightAsset
         included do
           after(if: :tty?) do
             # Local caches the element so it can be reused
-            element = table_element
-
-            # Converts procs to prettified data
-            data = table_procs.map do |key, proc|
-              header = Paint[key + ':', '#2794d8']
-              value = Paint[proc.call(element), :green]
-              [header, value]
-            end
-
-            # Determines the maximum width header for padding
-            max = data.max { |h, v| h.length }[0].length
-
-            # Prints the data with required padding
-            data.each do |header, value|
-              puts "#{' ' * (max - header.length)}#{header} #{value}"
-            end
+            puts render_element(table_element, table_procs)
           end
 
           after(unless: :tty?) do

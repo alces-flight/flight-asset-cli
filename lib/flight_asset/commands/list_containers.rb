@@ -1,5 +1,5 @@
 #==============================================================================
-# Copyright (C) 2020-present Alces Flight Ltd.
+# Copyright (C) 2019-present Alces Flight Ltd.
 #
 # This file is part of Flight Asset.
 #
@@ -27,38 +27,21 @@
 
 module FlightAsset
   module Commands
-    class MoveAsset < FlightAsset::Command
-      include Concerns::HasAssetsRecord
+    class ListContainers < FlightAsset::Command
+      include Concerns::HasTableElements
       include Concerns::BeforeConfiguredCheck
 
-      define_args :name
-      attr_reader :assets_record
-
-      def parent_name
-        args[1]
+      def table_elements
+        @table_elements ||= request_asset_containers_records.sort_by(&:name)
       end
 
-      def parent_container
-        @parent_container ||= request_asset_containers_record_by_name(args[1])
-      end
-
-      def run
-        @assets_record ||= begin
-          g = request_assets_record_by_name(name)
-          updates = {
-            x_start_position: args[2],
-            xStartPosition: args[2],
-            x_end_position: args[3],
-            xEndPosition: args[3],
-            y_start_position: args[4],
-            yStartPosition: args[4],
-            y_end_position: args[5],
-            yEndPosition: args[5],
-            parent_container: parent_container,
-            parentContainer: parent_container
-          }
-          g.update(**updates)
-        end
+      def table_procs
+        [
+          *(verbose? ? [['ID', ->(a) { a.id }]] : []),
+          ['Name', ->(a) { a.name }],
+          ['X Capacity', ->(a) { a.xCapacity }],
+          ['Y Capacity', ->(a) { a.yCapacity }]
+        ]
       end
     end
   end

@@ -28,18 +28,6 @@ bundle install --with default --without development --path vendor
 
 WIP
 
-### Advanced: Change the Config Path
-
-The application ships with the following two `bin` files:
-
-```
-bin/asset ...                     # Run with the default config
-bin/asset-with-config CONFIG ...  # Run with a custom config
-```
-The first argument to `bin/asset-with-config` MUST be a config path. The application will use the its inbuilt defaults if the config is missing.
-
-This feature is primarily intended for integration purposes and is not intended for general users.
-
 ## Operation
 
 See the help text for the main commands list:
