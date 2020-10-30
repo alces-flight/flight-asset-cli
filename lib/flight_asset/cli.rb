@@ -135,6 +135,10 @@ module FlightAsset
       INFO_FLAG.call(c)
     end
 
+    create_command 'rename-asset', 'ASSET NEW_NAME' do |c|
+      c.summary = 'Change the name of an existing asset'
+    end
+
     create_command 'list-groups' do |c|
       c.summary = 'Return all the groups'
       NAMED_FILTER.call(c, single: 'CATEGORY', plurals: 'groups')
