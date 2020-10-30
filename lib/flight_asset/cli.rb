@@ -162,6 +162,10 @@ module FlightAsset
       DESC
     end
 
+    create_command 'rename-group', 'GROUP NEW_NAME' do |c|
+      c.summary = 'Change the name of an existing group'
+    end
+
     create_command 'decommission-group', 'GROUP' do |c|
       c.summary = 'Flag that a group has been decommissioned'
     end
