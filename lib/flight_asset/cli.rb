@@ -213,6 +213,10 @@ module FlightAsset
       c.summary = 'Remove a container from its parent container'
     end
 
+    create_command 'rename-container', 'CONTAINER NEW_NAME' do |c|
+      c.summary = 'Change the name of an existing container'
+    end
+
     alias_regex = /-assets?\Z/
     commands.keys
             .select { |c| c.match?(alias_regex) }
