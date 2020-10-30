@@ -43,7 +43,7 @@ module FlightAsset
           Failed to rename the container as "#{new_name}" already exists!
         ERROR
 
-        @asset_containers_record ||= request_old_asset_containers_record.update(name: new_name)
+        @asset_containers_record = request_old_asset_containers_record.update(name: new_name)
       end
 
       def request_old_asset_containers_record

@@ -43,7 +43,7 @@ module FlightAsset
           Failed to rename the asset as "#{new_name}" already exists!
         ERROR
 
-        @assets_record ||= request_old_assets_record.update(name: new_name)
+        @assets_record = request_old_assets_record.update(name: new_name)
       end
 
       def request_old_assets_record

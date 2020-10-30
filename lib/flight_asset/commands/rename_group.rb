@@ -43,7 +43,7 @@ module FlightAsset
           Failed to rename the group as "#{new_name}" already exists!
         ERROR
 
-        @asset_groups_record ||= request_old_asset_groups_record.update(name: new_name)
+        @asset_groups_record = request_old_asset_groups_record.update(name: new_name)
       end
 
       def request_old_asset_groups_record
