@@ -135,6 +135,10 @@ module FlightAsset
       INFO_FLAG.call(c)
     end
 
+    create_command 'rename-asset', 'ASSET NEW_NAME' do |c|
+      c.summary = 'Change the name of an existing asset'
+    end
+
     create_command 'list-groups' do |c|
       c.summary = 'Return all the groups'
       NAMED_FILTER.call(c, single: 'CATEGORY', plurals: 'groups')
@@ -156,6 +160,10 @@ module FlightAsset
       c.slop.string '--category', <<~DESC.chomp
         Assign the group to a different category. Empty string will unassign the category
       DESC
+    end
+
+    create_command 'rename-group', 'GROUP NEW_NAME' do |c|
+      c.summary = 'Change the name of an existing group'
     end
 
     create_command 'decommission-group', 'GROUP' do |c|
@@ -207,6 +215,10 @@ module FlightAsset
 
     create_command 'orphan-container', 'CONTAINER' do |c|
       c.summary = 'Remove a container from its parent container'
+    end
+
+    create_command 'rename-container', 'CONTAINER NEW_NAME' do |c|
+      c.summary = 'Change the name of an existing container'
     end
 
     alias_regex = /-assets?\Z/

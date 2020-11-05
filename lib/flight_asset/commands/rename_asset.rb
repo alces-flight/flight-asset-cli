@@ -1,5 +1,5 @@
 #==============================================================================
-# Copyright (C) 2019-present Alces Flight Ltd.
+# Copyright (C) 2020-present Alces Flight Ltd.
 #
 # This file is part of Flight Asset.
 #
@@ -26,5 +26,33 @@
 #==============================================================================
 
 module FlightAsset
-  VERSION = '2.1.0'
+  module Commands
+    class RenameAsset < FlightAsset::Command
+      include Concerns::HasAssetsRecord
+      include Concerns::BeforeConfiguredCheck
+
+      define_args :old_name, :new_name
+      attr_reader :assets_record
+
+      def run
+        # Checks the new name isn't already taken
+        # NOTE: This isn't a hard guarantee that a duplicate entry will be
+        #       created as it creates a race condition. A hard guarantee can
+        #       only be enforced server side
+        raise InputError, <<~ERROR.chomp if request_new_assets_record
+          Failed to rename the asset as "#{new_name}" already exists!
+        ERROR
+
+        @assets_record = request_old_assets_record.update(name: new_name)
+      end
+
+      def request_old_assets_record
+        request_assets_record_by_name(old_name, error: true)
+      end
+
+      def request_new_assets_record
+        request_assets_record_by_name(new_name, error: false)
+      end
+    end
+  end
 end

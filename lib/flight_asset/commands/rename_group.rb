@@ -1,5 +1,5 @@
 #==============================================================================
-# Copyright (C) 2019-present Alces Flight Ltd.
+# Copyright (C) 2020-present Alces Flight Ltd.
 #
 # This file is part of Flight Asset.
 #
@@ -26,5 +26,34 @@
 #==============================================================================
 
 module FlightAsset
-  VERSION = '2.1.0'
+  module Commands
+    class RenameGroup < FlightAsset::Command
+      include Concerns::HasAssetGroupsRecord
+      include Concerns::BeforeConfiguredCheck
+
+      define_args :old_name, :new_name
+      attr_reader :asset_groups_record
+
+      def run
+        # Checks the new name isn't already taken
+        # NOTE: This isn't a hard guarantee that a duplicate entry will be
+        #       created as it creates a race condition. A hard guarantee can
+        #       only be enforced server side
+        raise InputError, <<~ERROR.chomp if request_new_asset_groups_record
+          Failed to rename the group as "#{new_name}" already exists!
+        ERROR
+
+        @asset_groups_record = request_old_asset_groups_record.update(name: new_name)
+      end
+
+      def request_old_asset_groups_record
+        request_asset_groups_record_by_name(old_name, error: true)
+      end
+
+      def request_new_asset_groups_record
+        request_asset_groups_record_by_name(new_name, error: false)
+      end
+    end
+  end
 end
+
